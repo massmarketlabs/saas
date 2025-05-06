@@ -41,7 +41,7 @@ const isEmailVerifyModalOpen = ref(false)
 const resendLoading = ref(false)
 let unverifiedEmail = ''
 
-async function onSocialLogin(action: 'google' | 'github') {
+async function onSocialLogin(action: 'google') {
   loading.value = true
   loadingAction.value = action
   auth.signIn.social({ provider: action, callbackURL: redirectTo.value })
@@ -115,7 +115,7 @@ async function handleResendEmail() {
         </div>
       </template>
       <div class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 gap-2">
           <UButton
             color="neutral"
             variant="outline"
@@ -127,7 +127,7 @@ async function handleResendEmail() {
           >
             Google
           </UButton>
-          <UButton
+          <!-- <UButton
             color="neutral"
             variant="outline"
             icon="i-simple-icons-github"
@@ -137,7 +137,7 @@ async function handleResendEmail() {
             @click="onSocialLogin('github')"
           >
             Github
-          </UButton>
+          </UButton> -->
         </div>
 
         <USeparator :label="t('signIn.or')" />

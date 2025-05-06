@@ -5,7 +5,7 @@ import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-04-01',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   modules: [
@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     'nuxt-charts',
     ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
+    'reka-ui/nuxt',
     ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
   ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
