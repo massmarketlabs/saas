@@ -45,7 +45,7 @@ const state = reactive<Partial<Schema>>({
 const loading = ref(false)
 const loadingAction = ref('')
 
-async function onSocialLogin(action: 'google' | 'github') {
+async function onSocialLogin(action: 'google') {
   loading.value = true
   loadingAction.value = action
   auth.signIn.social({ provider: action, callbackURL: redirectTo.value })
@@ -93,7 +93,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       </template>
 
       <div class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 gap-2">
           <UButton
             color="neutral"
             variant="outline"
@@ -105,7 +105,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           >
             Google
           </UButton>
-          <UButton
+          <!-- <UButton
             color="neutral"
             variant="outline"
             icon="i-simple-icons-github"
@@ -115,7 +115,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             @click="onSocialLogin('github')"
           >
             Github
-          </UButton>
+          </UButton> -->
         </div>
 
         <USeparator :label="t('signUp.or')" />

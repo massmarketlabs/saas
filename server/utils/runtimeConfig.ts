@@ -14,8 +14,8 @@ export const generateRuntimeConfig = () => ({
   // Resend
   resendApiKey: process.env.NUXT_RESEND_API_KEY,
   // Github
-  githubClientId: process.env.NUXT_GH_CLIENT_ID,
-  githubClientSecret: process.env.NUXT_GH_CLIENT_SECRET,
+  // githubClientId: process.env.NUXT_GH_CLIENT_ID,
+  // githubClientSecret: process.env.NUXT_GH_CLIENT_SECRET,
   // Google
   googleClientId: process.env.NUXT_GOOGLE_CLIENT_ID,
   googleClientSecret: process.env.NUXT_GOOGLE_CLIENT_SECRET,
