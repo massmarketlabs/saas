@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-const { t } = useI18n()
+import * as locales from '@nuxt/ui/locale'
+
+const { t, locale } = useI18n()
+
+const lang = computed(() => locales[locale.value].code)
+const dir = computed(() => locales[locale.value].dir)
 
 // Zod locale configuration
 const { locale } = useI18n()
@@ -19,6 +24,10 @@ watchEffect(() => {
 })
 
 useHead({
+  htmlAttrs: {
+    lang,
+    dir
+  },
   titleTemplate: (title) => {
     if (title) {
       if (title.includes(t('global.appName'))) {
@@ -37,7 +46,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="locales[locale]">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

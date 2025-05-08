@@ -1,7 +1,7 @@
 {
   "en": {
     "global": {
-      "appName": "Mass Market Labs",
+      "appName": "Tomorrow's Youth Organization",
       "nav": {
         "admin": "Admin",
         "features": "Features",
@@ -26,84 +26,30 @@
       }
     }
   },
-  "zh-CN": {
+  "ar": {
     "global": {
-      "appName": "Mass Market Labs",
+      "appName": "منظمة شباب الغد",
       "nav": {
-        "admin": "管理后台",
-        "features": "功能特性",
-        "pricing": "定价方案",
-        "docs": "文档"
+        "admin": "الإدارة",
+        "features": "الميزات",
+        "pricing": "التسعير",
+        "docs": "التوثيق"
       },
       "auth": {
-        "signIn": "登录",
-        "signOut": "退出",
-        "profile": "个人资料"
+        "signIn": "تسجيل الدخول",
+        "signOut": "تسجيل الخروج",
+        "profile": "الملف الشخصي"
       },
       "page": {
-        "actions": "操作",
-        "create": "创建",
-        "edit": "编辑",
-        "delete": "删除",
-        "cancel": "取消",
-        "name": "名称",
-        "status": "状态",
-        "createdAt": "创建时间",
-        "all": "全部"
-      }
-    }
-  },
-  "ja": {
-    "global": {
-      "appName": "Mass Market Labs",
-      "nav": {
-        "admin": "管理画面",
-        "features": "機能",
-        "pricing": "料金",
-        "docs": "ドキュメント"
-      },
-      "auth": {
-        "signIn": "ログイン",
-        "signOut": "ログアウト",
-        "profile": "プロフィール"
-      },
-      "page": {
-        "actions": "アクション",
-        "create": "作成",
-        "edit": "編集",
-        "delete": "削除",
-        "cancel": "キャンセル",
-        "name": "名前",
-        "status": "状態",
-        "createdAt": "作成日時",
-        "all": "すべて"
-      }
-    }
-  },
-  "fr": {
-    "global": {
-      "appName": "Mass Market Labs",
-      "nav": {
-        "admin": "Administration",
-        "features": "Fonctionnalités",
-        "pricing": "Tarification",
-        "docs": "Documentation"
-      },
-      "auth": {
-        "signIn": "Connexion",
-        "signOut": "Déconnexion",
-        "profile": "Profil"
-      },
-      "page": {
-        "actions": "Actions",
-        "create": "Créer",
-        "edit": "Modifier",
-        "delete": "Supprimer",
-        "cancel": "Annuler",
-        "name": "Nom",
-        "status": "Statut",
-        "createdAt": "Créé le",
-        "all": "Tout"
+        "actions": "الإجراءات",
+        "create": "إنشاء",
+        "edit": "تعديل",
+        "delete": "حذف",
+        "cancel": "إلغاء",
+        "name": "الاسم",
+        "status": "الحالة",
+        "createdAt": "تاريخ الإنشاء",
+        "all": "الكل"
       }
     }
   }

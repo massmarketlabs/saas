@@ -1,0 +1,115 @@
+{
+  "zodI18n": {
+    "errors": {
+      "custom": "إدخال غير صالح",
+      "invalid_arguments": "وسائط الدالة غير صالحة",
+      "invalid_date": "تاريخ غير صالح",
+      "invalid_enum_value": "قيمة التعداد غير صالحة. المتوقع {options}، المستلم '{received}'",
+      "invalid_intersection_types": "لا يمكن دمج نتائج التقاطع",
+      "invalid_literal": "قيمة حرفية غير صالحة، المتوقع {expected}",
+      "invalid_return_type": "نوع إرجاع الدالة غير صالح",
+      "invalid_string": {
+        "cuid": "{validation} غير صالح",
+        "datetime": "{validation} غير صالح",
+        "email": "{validation} غير صالح",
+        "endsWith": "إدخال غير صالح: يجب أن ينتهي بـ \"{endsWith}\"",
+        "regex": "غير صالح",
+        "startsWith": "إدخال غير صالح: يجب أن يبدأ بـ \"{startsWith}\"",
+        "url": "{validation} غير صالح",
+        "uuid": "{validation} غير صالح"
+      },
+      "invalid_type": "المتوقع {expected}، المستلم {received}",
+      "invalid_type_received_undefined": "مطلوب",
+      "invalid_union": "إدخال غير صالح",
+      "invalid_union_discriminator": "قيمة مميزة غير صالحة. المتوقع {options}",
+      "not_finite": "يجب أن يكون الرقم منتهيًا",
+      "not_multiple_of": "يجب أن يكون الرقم مضاعفًا لـ {multipleOf}",
+      "required": "مطلوب",
+      "too_big": {
+        "array": {
+          "exact": "يجب أن يحتوي المصفوفة على {maximum} عنصر(عناصر) بالضبط",
+          "inclusive": "يجب أن تحتوي المصفوفة على {maximum} عنصر(عناصر) كحد أقصى",
+          "not_inclusive": "يجب أن تحتوي المصفوفة على أقل من {maximum} عنصر(عناصر)"
+        },
+        "date": {
+          "exact": "يجب أن يكون التاريخ {maximum} بالضبط",
+          "inclusive": "يجب أن يكون التاريخ أصغر من أو يساوي {maximum}",
+          "not_inclusive": "يجب أن يكون التاريخ أصغر من {maximum}"
+        },
+        "number": {
+          "exact": "يجب أن يكون الرقم {maximum} بالضبط",
+          "inclusive": "يجب أن يكون الرقم أقل من أو يساوي {maximum}",
+          "not_inclusive": "يجب أن يكون الرقم أقل من {maximum}"
+        },
+        "set": {
+          "exact": "إدخال غير صالح",
+          "inclusive": "إدخال غير صالح",
+          "not_inclusive": "إدخال غير صالح"
+        },
+        "string": {
+          "exact": "يجب أن تحتوي السلسلة على {maximum} حرف(أحرف) بالضبط",
+          "inclusive": "يجب أن تحتوي السلسلة على {maximum} حرف(أحرف) كحد أقصى",
+          "not_inclusive": "يجب أن تحتوي السلسلة على أقل من {maximum} حرف(أحرف)"
+        }
+      },
+      "too_small": {
+        "array": {
+          "exact": "يجب أن يحتوي المصفوفة على {minimum} عنصر(عناصر) بالضبط",
+          "inclusive": "يجب أن تحتوي المصفوفة على {minimum} عنصر(عناصر) كحد أدنى",
+          "not_inclusive": "يجب أن تحتوي المصفوفة على أكثر من {minimum} عنصر(عناصر)"
+        },
+        "date": {
+          "exact": "يجب أن يكون التاريخ {minimum} بالضبط",
+          "inclusive": "يجب أن يكون التاريخ أكبر من أو يساوي {minimum}",
+          "not_inclusive": "يجب أن يكون التاريخ أكبر من {minimum}"
+        },
+        "number": {
+          "exact": "يجب أن يكون الرقم {minimum} بالضبط",
+          "inclusive": "يجب أن يكون الرقم أكبر من أو يساوي {minimum}",
+          "not_inclusive": "يجب أن يكون الرقم أكبر من {minimum}"
+        },
+        "set": {
+          "exact": "إدخال غير صالح",
+          "inclusive": "إدخال غير صالح",
+          "not_inclusive": "إدخال غير صالح"
+        },
+        "string": {
+          "exact": "يجب أن تحتوي السلسلة على {minimum} حرف(أحرف) بالضبط",
+          "inclusive": "يجب أن تحتوي السلسلة على {minimum} حرف(أحرف) كحد أدنى",
+          "not_inclusive": "يجب أن تحتوي السلسلة على أكثر من {minimum} حرف(أحرف)"
+        }
+      },
+      "unrecognized_keys": "مفتاح(مفاتيح) غير معروف(ة) في الكائن: {keys}"
+    },
+    "types": {
+      "array": "مصفوفة",
+      "bigint": "عدد صحيح كبير",
+      "boolean": "قيمة منطقية",
+      "date": "تاريخ",
+      "float": "رقم عشري",
+      "function": "دالة",
+      "integer": "عدد صحيح",
+      "map": "خريطة",
+      "nan": "ليس رقمًا",
+      "never": "أبدًا",
+      "null": "فارغ",
+      "number": "رقم",
+      "object": "كائن",
+      "promise": "وعد",
+      "set": "مجموعة",
+      "string": "سلسلة نصية",
+      "symbol": "رمز",
+      "undefined": "غير معرّف",
+      "unknown": "مجهول",
+      "void": "فراغ"
+    },
+    "validations": {
+      "cuid": "معرف فريد",
+      "datetime": "تاريخ ووقت",
+      "email": "بريد إلكتروني",
+      "regex": "تعبير نمطي",
+      "url": "رابط",
+      "uuid": "معرف فريد عالمي"
+    }
+  }
+}

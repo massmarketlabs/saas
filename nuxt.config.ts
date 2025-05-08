@@ -1,14 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import type { NuxtPage } from 'nuxt/schema'
+import * as nuxtLocales from '@nuxt/ui/locale'
 import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 
 console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
 
 const locales = [
-  { code: 'en', iso: 'en-US', name: 'English' },
-  { code: 'zh-CN', iso: 'zh-CN', name: '简体中文' },
-  { code: 'ja', iso: 'ja-JP', name: '日本語' },
-  { code: 'fr', iso: 'fr-FR', name: 'Français' }
+  nuxtLocales.en,
+  nuxtLocales.ar
 ]
 const adminExcludes = locales
   .filter(locale => locale.code !== 'en')
