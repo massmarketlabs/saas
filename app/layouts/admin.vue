@@ -58,7 +58,7 @@ const clickSignOut = () => {
         >
           <Logo class="h-6 w-6" />
           <span
-            class="self-center ml-2 text-xl font-semibold whitespace-nowrap dark:text-white"
+            class="self-center ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
           >
             {{ t('global.appName') }}
           </span>
