@@ -1,7 +1,7 @@
 {
   "en": {
     "home": {
-      "slogan": "Nuxt.js Full-Stack SaaS Starter Kit - Free & Open Source",
+      "slogan": "Streamlining Impact — Cloud Solutions for Mission-Driven Organizations.",
       "getStarted": "Get Started",
       "viewOnGithub": "View on GitHub",
       "features": {
@@ -84,7 +84,7 @@
   },
   "ar": {
     "home": {
-      "slogan": "Nuxt.js Full-Stack SaaS Starter Kit - مجاني ومفتوح المصدر",
+      "slogan": "وداعاً إكسل، أهلاً بالأثر!",
       "getStarted": "ابدأ الآن",
       "viewOnGithub": "عرض على GitHub",
       "features": {

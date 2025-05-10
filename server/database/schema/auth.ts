@@ -41,13 +41,13 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updated_at')
 })
 
-export const subscription = pgTable('subscription', {
-  id: uuid('id').primaryKey(),
-  plan: text('plan').notNull(),
-  referenceId: text('reference_id').notNull(),
-  status: text('status'),
-  periodStart: timestamp('period_start'),
-  periodEnd: timestamp('period_end'),
-  cancelAtPeriodEnd: boolean('cancel_at_period_end'),
-  seats: integer('seats')
-})
+// export const subscription = pgTable('subscription', {
+//   id: uuid('id').primaryKey(),
+//   plan: text('plan').notNull(),
+//   referenceId: text('reference_id').notNull(),
+//   status: text('status'),
+//   periodStart: timestamp('period_start'),
+//   periodEnd: timestamp('period_end'),
+//   cancelAtPeriodEnd: boolean('cancel_at_period_end'),
+//   seats: integer('seats')
+// })
