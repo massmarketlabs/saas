@@ -56,7 +56,7 @@ const clickSignOut = () => {
           v-if="!isCollapsed"
           class="flex items-center ps-2.5"
         >
-          <Logo class="h-6 w-6" />
+          <!-- <Logo /> -->
           <span
             class="self-center ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
           >

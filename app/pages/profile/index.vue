@@ -1,15 +1,15 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
-const { user, session, client } = useAuth()
+const { user, session } = useAuth()
 const toast = useToast()
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { data: accounts } = await useAsyncData('/accounts', () => client.listAccounts())
+// const { data: accounts } = await useAsyncData('/accounts', () => client.listAccounts())
 
-function hasProvider(provider: string) {
-  return accounts.value?.data?.some(account => account.provider === provider)
-}
+// function hasProvider(provider: string) {
+//   return accounts.value?.data?.some(account => account.provider === provider)
+// }
 
 const error = useRoute().query?.error
 onMounted(() => {
@@ -106,7 +106,7 @@ onMounted(() => {
       </div>
 
       <!-- Connected Accounts -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6">
+      <!-- <div class="bg-white dark:bg-gray-800 rounded-lg p-6">
         <h2 class="text-xl font-bold mb-4">
           {{ t('profile.connectedAccounts') }}
         </h2>
@@ -128,7 +128,7 @@ onMounted(() => {
             {{ t('profile.linkGithub') }}
           </UButton>
         </div>
-      </div>
+      </div> -->
     </div>
   </UContainer>
 </template>

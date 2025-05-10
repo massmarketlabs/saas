@@ -1,7 +1,7 @@
 {
   "en": {
     "global": {
-      "appName": "Tomorrow's Youth Organization",
+      "appName": "Trace Impact",
       "nav": {
         "admin": "Admin",
         "features": "Features",
@@ -28,7 +28,7 @@
   },
   "ar": {
     "global": {
-      "appName": "منظمة شباب الغد",
+      "appName": "أثر التتبع",
       "nav": {
         "admin": "الإدارة",
         "features": "الميزات",
