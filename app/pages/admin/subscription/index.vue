@@ -30,10 +30,10 @@ const columns: AdminTableColumn<Subscription>[] = [
     accessorKey: 'id',
     header: 'ID'
   },
-  {
-    accessorKey: 'stripeCustomerId',
-    header: t('subscription.stripeCustomerId')
-  },
+  // {
+  //   accessorKey: 'stripeCustomerId',
+  //   header: t('subscription.stripeCustomerId')
+  // },
   {
     accessorKey: 'plan',
     header: t('subscription.plan')

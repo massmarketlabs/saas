@@ -9,7 +9,7 @@ import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import { cacheClient, resendInstance } from './drivers'
 import { runtimeConfig } from './runtimeConfig'
-import { setupStripe } from './stripe'
+// import { setupStripe } from './stripe'
 
 console.log(`Base URL is ${runtimeConfig.public.baseURL}`)
 
@@ -155,8 +155,8 @@ const createBetterAuth = () => betterAuth({
   },
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
-    admin(),
-    setupStripe()
+    admin()
+    // setupStripe()
   ]
 })
 

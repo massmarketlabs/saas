@@ -3,7 +3,6 @@
     "subscription": {
       "title": "Subscription Management",
       "plan": "Plan",
-      "stripeCustomerId": "Customer ID",
       "status": {
         "incomplete": "Incomplete",
         "incomplete_expired": "Incomplete Expired",
@@ -22,7 +21,6 @@
     "subscription": {
       "title": "إدارة الاشتراكات",
       "plan": "الخطة",
-      "stripeCustomerId": "معرف العميل",
       "status": {
         "incomplete": "غير مكتمل",
         "incomplete_expired": "غير مكتمل منتهي الصلاحية",
