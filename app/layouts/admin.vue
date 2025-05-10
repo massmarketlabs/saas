@@ -48,7 +48,7 @@ const clickSignOut = () => {
 <template>
   <div>
     <aside
-      class="fixed top-0 left-0 transition-all duration-300 hidden sm:block"
+      class="fixed top-0 ltr:left-0 rtl:right-0 transition-all duration-300 hidden sm:block"
       :class="[isCollapsed ? 'w-15' : 'w-64']"
     >
       <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800">
@@ -129,7 +129,7 @@ const clickSignOut = () => {
     </aside>
     <div
       class="p-2 h-screen bg-white dark:bg-gray-900 transition-all duration-300 overflow-hidden flex flex-col"
-      :class="[isCollapsed ? 'sm:ml-15' : 'sm:ml-64']"
+      :class="[isCollapsed ? 'ltr:sm:ml-15 rtl:sm:mr-15' : 'ltr:sm:ml-64 rtl:sm:mr-64']"
     >
       <FlexThreeColumn class="mb-2 flex-none">
         <template #left>
