@@ -1,6 +1,6 @@
 import type { LocalePathFunction } from '#i18n'
 
-export const getMenus = (t: TranFunction, localePath: LocalePathFunction, appRepo: string): NavigationMenuItem[][] => {
+export const getMenus = (t: TranFunction, localePath: LocalePathFunction): NavigationMenuItem[][] => {
   return [
     [
       {
@@ -13,11 +13,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, appRep
         icon: 'i-lucide-users',
         to: localePath('/admin/user')
       },
-      {
-        label: t('menu.subscriptions'),
-        icon: 'i-lucide-credit-card',
-        to: localePath('/admin/subscription')
-      },
+      // {
+      //   label: t('menu.subscriptions'),
+      //   icon: 'i-lucide-credit-card',
+      //   to: localePath('/admin/subscription')
+      // },
       {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',

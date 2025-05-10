@@ -5,18 +5,13 @@ const localePath = useLocalePath()
 
 <template>
   <!-- Navigation -->
-  <nav class="fixed h-16 top-0 left-0 right-0 z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+  <nav
+    class="fixed h-16 top-0 left-0 right-0 z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-b border-gray-200 dark:border-gray-800"
+  >
     <UContainer class="flex h-full items-center justify-between">
-      <NuxtLink
-        :to="localePath('/')"
-        class="flex items-center gap-2"
-      >
-        <span class="font-bold text-xl flex items-center">
-          <Logo class="w-6 h-6 mr-1" />
-          {{ t('global.appName') }}
-        </span>
+      <NuxtLink :to="localePath('/')">
+        {{ t('global.appName') }}
       </NuxtLink>
-
       <slot name="center" />
       <slot name="right" />
     </UContainer>
