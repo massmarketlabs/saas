@@ -7,10 +7,10 @@ export const generateRuntimeConfig = () => ({
   preset: process.env.NUXT_NITRO_PRESET,
   betterAuthSecret: process.env.NUXT_BETTER_AUTH_SECRET,
   // Stripe
-  stripeSecretKey: process.env.NUXT_STRIPE_SECRET_KEY,
-  stripeWebhookSecret: process.env.NUXT_STRIPE_WEBHOOK_SECRET,
-  stripePriceIdProMonth: process.env.NUXT_STRIPE_PRICE_ID_PRO_MONTH,
-  stripePriceIdProYear: process.env.NUXT_STRIPE_PRICE_ID_PRO_YEAR,
+  // stripeSecretKey: process.env.NUXT_STRIPE_SECRET_KEY,
+  // stripeWebhookSecret: process.env.NUXT_STRIPE_WEBHOOK_SECRET,
+  // stripePriceIdProMonth: process.env.NUXT_STRIPE_PRICE_ID_PRO_MONTH,
+  // stripePriceIdProYear: process.env.NUXT_STRIPE_PRICE_ID_PRO_YEAR,
   // Resend
   resendApiKey: process.env.NUXT_RESEND_API_KEY,
   // Github

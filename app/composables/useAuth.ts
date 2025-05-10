@@ -4,7 +4,7 @@ import type {
   InferSessionFromClient
 } from 'better-auth/client'
 import type { RouteLocationRaw } from 'vue-router'
-import { stripeClient } from '@better-auth/stripe/client'
+// import { stripeClient } from '@better-auth/stripe/client'
 import { adminClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
 
@@ -18,10 +18,10 @@ export function useAuth() {
       headers
     },
     plugins: [
-      adminClient(),
-      stripeClient({
-        subscription: true
-      })
+      adminClient()
+      // stripeClient({
+      //   subscription: true
+      // })
     ]
   })
 
@@ -38,12 +38,12 @@ export function useAuth() {
     const { data } = await client.useSession(useFetch)
     session.value = data.value?.session || null
     user.value = data.value?.user ? { ...data.value.user, role: data.value.user.role ?? undefined } : null
-    if (user.value) {
-      const { data: subscriptionData } = await client.subscription.list()
-      subscriptions.value = subscriptionData || []
-    } else {
-      subscriptions.value = []
-    }
+    // if (user.value) {
+    //   const { data: subscriptionData } = await client.subscription.list()
+    //   subscriptions.value = subscriptionData || []
+    // } else {
+    //   subscriptions.value = []
+    // }
     sessionFetching.value = false
     return data
   }
@@ -59,7 +59,7 @@ export function useAuth() {
   return {
     session,
     user,
-    subscription: client.subscription,
+    // subscription: client.subscription,
     subscriptions,
     loggedIn: computed(() => !!session.value),
     activeSubscription: computed(() => {

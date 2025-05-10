@@ -30,10 +30,6 @@
             "title": "Email Integration",
             "description": "Built-in Resend integration for transactional emails"
           },
-          "paymentReady": {
-            "title": "Payment Ready",
-            "description": "Stripe integration for subscription management"
-          },
           "noVendorLockIn": {
             "title": "No Vendor Lock-in",
             "description": "Modular architecture with swappable components"
@@ -116,10 +112,6 @@
           "emailIntegration": {
             "title": "تكامل البريد الإلكتروني",
             "description": "تكامل مدمج مع Resend للرسائل الإلكترونية المعاملاتية"
-          },
-          "paymentReady": {
-            "title": "جاهز للدفع",
-            "description": "تكامل مع Stripe لإدارة الاشتراكات"
           },
           "noVendorLockIn": {
             "title": "لا يوجد تقييد بمزود معين",
