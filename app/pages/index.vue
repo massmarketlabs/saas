@@ -165,7 +165,7 @@ const activeScreenshot = ref('0')
       <div class="absolute inset-0 bg-gradient-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-800" />
       <div class="absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 blur-3xl opacity-50" />
-        <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-3xl -ml-32 -mt-32 opacity-30" />
+        <div class="absolute top-0 ltr:left-0 rtl:right-0 w-[500px] h-[500px] bg-teal-500/20 rounded-full blur-3xl -ml-32 -mt-32 opacity-30" />
       </div>
       <!-- Hero Section -->
       <section class="relative overflow-hidden">
