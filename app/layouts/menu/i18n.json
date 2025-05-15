@@ -9,7 +9,8 @@
       "maintenance": "Maintenance",
       "dbStats": "Database Status",
       "home": "Home",
-      "auditLog": "Audit Log"
+      "auditLog": "Audit Log",
+      "donors": "Donors"
     }
   },
   "ar": {
@@ -20,7 +21,9 @@
       "subscriptions": "الاشتراكات",
       "maintenance": "الصيانة",
       "dbStats": "حالة قاعدة البيانات",
-      "home": "الصفحة الرئيسية"
+      "home": "الصفحة الرئيسية",
+      "auditLog": "سجل التدقيق",
+      "donors": "المتبرعون"
     }
   }
 }

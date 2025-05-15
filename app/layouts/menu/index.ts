@@ -19,6 +19,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction): Navig
       //   to: localePath('/admin/subscription')
       // },
       {
+        label: t('menu.donors'),
+        icon: 'hugeicons:money-receive-circle',
+        to: localePath('/admin/donors')
+      },
+      {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
         children: [

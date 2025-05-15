@@ -1,0 +1,16 @@
+{
+  "en": {
+    "donors": {
+      "actions": {
+        "createDonor": "Create Donor"
+      }
+    }
+  },
+  "ar": {
+    "donors": {
+      "actions": {
+        "createDonor": "إنشاء متبرع"
+      }
+    }
+  }
+}
