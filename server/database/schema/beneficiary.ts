@@ -12,8 +12,8 @@ export const beneficiary = pgTable('beneficiary', {
   id: uuid('id').primaryKey().defaultRandom(),
 
   // Authentication fields
-  auth_provider_id: text('auth_provider_id').unique(), // ID from authentication provider
-  auth_provider: text('auth_provider'), // Which provider (google, github, etc.)
+  // auth_provider_id: text('auth_provider_id').unique(), // ID from authentication provider
+  // auth_provider: text('auth_provider'), // Which provider (google, github, etc.)
   email: text('email').unique(),
 
   // Name fields

@@ -14,6 +14,7 @@
     "auth:schema": "npx @better-auth/cli generate --config server/utils/auth.ts --output server/database/schema/auth.ts -y",
     "db:generate": "drizzle-kit generate --config ./server/database/drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config ./server/database/drizzle.config.ts",
+    "db:drop": "drizzle-kit drop --config ./server/database/drizzle.config.ts",
     "build": "nuxt build",
     "serve": "node .output/server/index.mjs",
     "deploy": "wrangler deploy",
