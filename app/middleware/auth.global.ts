@@ -32,7 +32,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (to.meta?.auth === false) {
     return
   }
-
   const { loggedIn, user, fetchSession } = useAuth()
   const redirectOptions = useRuntimeConfig().public.auth
   const { only, redirectUserTo, redirectGuestTo } = defu(to.meta?.auth, redirectOptions)
@@ -55,13 +54,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
-  // If not authenticated, allow /signup and /signin without redirect
+  // If not authenticated, redirect to home
   if (!loggedIn.value) {
-    const allowedGuestPaths = [localePath('/signin'), localePath('/signup'), localePath('/forgot-password')]
-    if (allowedGuestPaths.includes(to.path)) {
-      return // Allow access to /signin and /signup for guests
-    }
-
     // Avoid infinite redirect
     if (to.path === localePath(redirectGuestTo)) {
       return
@@ -72,10 +66,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Admin Pages
   const routeBaseName = useRouteBaseName()
   const routeName = routeBaseName(to)
-  if (routeName?.startsWith('admin') && user.value?.role !== 'admin') {
+  if (routeName?.startsWith('admin') && user.value?.role != 'admin') {
     return navigateTo(localePath('/403'))
   }
-  if (routeName === 'admin') {
+  if (routeName == 'admin') {
     return navigateTo(localePath('/admin/dashboard'))
   }
 })
