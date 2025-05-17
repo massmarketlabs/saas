@@ -1,0 +1,16 @@
+{
+  "en": {
+    "interventions": {
+      "actions": {
+        "createIntervention": "Create Intervention"
+      }
+    }
+  },
+  "ar": {
+    "interventions": {
+      "actions": {
+        "createIntervention": "إنشاء التدخل"
+      }
+    }
+  }
+}
