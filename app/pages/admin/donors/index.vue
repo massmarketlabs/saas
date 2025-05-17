@@ -1,16 +1,16 @@
 <i18n src="./i18n.json"></i18n>
 
 <script lang="ts" setup>
-import type { aggregate_donor_contributions } from '~~/server/database/schema'
+import type { donors } from '~~/server/database/schema'
 
-type Donor = typeof aggregate_donor_contributions.$inferSelect
+type Donor = typeof donors.$inferSelect
 
 const { t } = useI18n()
 
-const isUserModalOpen = ref(false)
+const isDonorModalOpen = ref(false)
 
 const fetchData: FetchDataFn<Donor> = async ({ page, limit, sort, filter }) => {
-  const result = await $fetch<PageData<Donor>>('/api/admin/list/aggregate_donor_contributions', {
+  const result = await $fetch<PageData<Donor>>('/api/admin/list/donors', {
     query: {
       page,
       limit,
@@ -25,11 +25,26 @@ const fetchData: FetchDataFn<Donor> = async ({ page, limit, sort, filter }) => {
   }
 }
 
-const columns: AdminTableColumn<typeof aggregate_donor_contributions.$inferSelect>[] = [
-  { accessorFn: row => row.donor_id, header: 'ID' },
-  { accessorFn: row => row.donor_name, header: 'Name' },
-  { accessorFn: row => row.donor_created_at, header: 'Created At' }
+const columns: AdminTableColumn<Donor>[] = [
+  { accessorKey: 'id', header: 'ID' },
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'created_at', header: 'Created At' }
 ]
+
+const filters: AdminTableFilter[] = reactive([
+  {
+    name: t('global.page.name'),
+    field: 'name',
+    type: 'input',
+    value: undefined
+  },
+  {
+    name: t('global.page.createdAt'),
+    field: 'created_at',
+    type: 'daterange',
+    value: { start: undefined, end: undefined }
+  }
+])
 </script>
 
 <template>
@@ -39,17 +54,16 @@ const columns: AdminTableColumn<typeof aggregate_donor_contributions.$inferSelec
         color="neutral"
         icon="i-lucide-plus"
         variant="outline"
-        @click="isUserModalOpen = true"
+        @click="isDonorModalOpen = true"
       >
         {{ t('donors.actions.createDonor') }}
       </UButton>
     </template>
-    <div>
-      <AdminTable
-        ref="donors-table"
-        :columns="columns"
-        :fetch-data="fetchData"
-      />
-    </div>
+    <AdminTable
+      ref="table"
+      :columns="columns"
+      :filters="filters"
+      :fetch-data="fetchData"
+    />
   </NuxtLayout>
 </template>
