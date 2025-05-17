@@ -11,7 +11,8 @@
       "home": "Home",
       "auditLog": "Audit Log",
       "donors": "Donors",
-      "programs": "Programs"
+      "programs": "Programs",
+      "beneficiary": "Beneficiary"
     }
   },
   "ar": {
@@ -25,7 +26,8 @@
       "home": "الصفحة الرئيسية",
       "auditLog": "سجل التدقيق",
       "donors": "المتبرعون",
-      "programs": "البرامج"
+      "programs": "البرامج",
+      "beneficiary": "المستفيد"
     }
   }
 }
