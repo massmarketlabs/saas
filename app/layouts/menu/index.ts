@@ -29,6 +29,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction): Navig
         to: localePath('/admin/programs')
       },
       {
+        label: t('menu.beneficiary'),
+        icon: 'hugeicons:student',
+        to: localePath('/admin/beneficiary')
+      },
+      {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
         children: [

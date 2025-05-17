@@ -1,0 +1,16 @@
+{
+  "en": {
+    "beneficiary": {
+      "actions": {
+        "createBeneficiary": "Create Beneficiary"
+      }
+    }
+  },
+  "ar": {
+    "beneficiary": {
+      "actions": {
+        "createBeneficiary": "إنشاء المستفيد"
+      }
+    }
+  }
+}
