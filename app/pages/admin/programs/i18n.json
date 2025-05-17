@@ -1,0 +1,16 @@
+{
+  "en": {
+    "programs": {
+      "actions": {
+        "createProgram": "Create Program"
+      }
+    }
+  },
+  "ar": {
+    "programs": {
+      "actions": {
+        "createProgram": "إنشاء متبرع"
+      }
+    }
+  }
+}
