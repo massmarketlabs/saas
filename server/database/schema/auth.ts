@@ -1,6 +1,6 @@
 // generated using npm run auth:schema, and change text('id') to uuid('id')
 
-import { boolean, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: uuid('id').primaryKey(),
