@@ -34,6 +34,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction): Navig
         to: localePath('/admin/beneficiary')
       },
       {
+        label: t('menu.interventions'),
+        icon: 'mdi:google-classroom',
+        to: localePath('/admin/interventions')
+      },
+      {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
         children: [

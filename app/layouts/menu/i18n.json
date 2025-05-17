@@ -12,7 +12,8 @@
       "auditLog": "Audit Log",
       "donors": "Donors",
       "programs": "Programs",
-      "beneficiary": "Beneficiary"
+      "beneficiary": "Beneficiary",
+      "interventions": "Interventions"
     }
   },
   "ar": {
@@ -27,7 +28,8 @@
       "auditLog": "سجل التدقيق",
       "donors": "المتبرعون",
       "programs": "البرامج",
-      "beneficiary": "المستفيد"
+      "beneficiary": "المستفيد",
+      "interventions": "التدخلات"
     }
   }
 }
