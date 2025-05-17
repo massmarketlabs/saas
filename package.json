@@ -15,6 +15,7 @@
     "db:generate": "drizzle-kit generate --config ./server/database/drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config ./server/database/drizzle.config.ts",
     "db:drop": "drizzle-kit drop --config ./server/database/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config ./server/database/drizzle.config.ts",
     "build": "nuxt build",
     "serve": "node .output/server/index.mjs",
     "deploy": "wrangler deploy",
