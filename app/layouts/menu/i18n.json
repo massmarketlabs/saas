@@ -10,7 +10,8 @@
       "dbStats": "Database Status",
       "home": "Home",
       "auditLog": "Audit Log",
-      "donors": "Donors"
+      "donors": "Donors",
+      "programs": "Programs"
     }
   },
   "ar": {
@@ -23,7 +24,8 @@
       "dbStats": "حالة قاعدة البيانات",
       "home": "الصفحة الرئيسية",
       "auditLog": "سجل التدقيق",
-      "donors": "المتبرعون"
+      "donors": "المتبرعون",
+      "programs": "البرامج"
     }
   }
 }
