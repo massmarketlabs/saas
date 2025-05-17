@@ -1,6 +1,31 @@
+import type { Subscription } from '@better-auth/stripe'
 import { stripe } from '@better-auth/stripe'
+import { eq } from 'drizzle-orm'
 import Stripe from 'stripe'
+import { user as userTable } from '../database/schema'
+import { logAuditEvent } from './auditLogger'
+import { useDB } from './db'
 import { runtimeConfig } from './runtimeConfig'
+
+const getUserByStripeCustomerId = async (stripeCustomerId: string) => {
+  const db = await useDB()
+  const user = db.query.user.findFirst({
+    where: eq(userTable.stripeCustomerId, stripeCustomerId)
+  })
+  return user
+}
+
+const addPaymentLog = async (action: string, subscription: Subscription) => {
+  const user = await getUserByStripeCustomerId(subscription.stripeCustomerId!)
+  await logAuditEvent({
+    userId: user!.id,
+    category: 'payment',
+    action: `${action}:${subscription.plan}`,
+    targetType: 'stripeCustomerId',
+    targetId: subscription.stripeCustomerId,
+    status: 'success'
+  })
+}
 
 export const setupStripe = () => stripe({
   stripeClient: new Stripe(runtimeConfig.stripeSecretKey!),
@@ -16,15 +41,15 @@ export const setupStripe = () => stripe({
           days: 14,
           onTrialStart: async (subscription) => {
             // Called when a trial starts
-            console.log(`pro onTrialStart: ${subscription.referenceId}`)
+            await addPaymentLog('trial_start', subscription)
           },
           onTrialEnd: async ({ subscription }) => {
             // Called when a trial ends
-            console.log(`pro onTrialEnd: ${subscription.referenceId}`)
+            await addPaymentLog('trial_end', subscription)
           },
           onTrialExpired: async (subscription) => {
             // Called when a trial expires without conversion
-            console.log(`pro onTrialExpired: ${subscription.referenceId}`)
+            await addPaymentLog('trial_expired', subscription)
           }
         }
       },
@@ -35,34 +60,34 @@ export const setupStripe = () => stripe({
           days: 14,
           onTrialStart: async (subscription) => {
             // Called when a trial starts
-            console.log(`pro onTrialStart: ${subscription.referenceId}`)
+            await addPaymentLog('trial_start', subscription)
           },
           onTrialEnd: async ({ subscription }) => {
             // Called when a trial ends
-            console.log(`pro onTrialEnd: ${subscription.referenceId}`)
+            await addPaymentLog('trial_end', subscription)
           },
           onTrialExpired: async (subscription) => {
             // Called when a trial expires without conversion
-            console.log(`pro onTrialExpired: ${subscription.referenceId}`)
+            await addPaymentLog('trial_expired', subscription)
           }
         }
       }
-    ]
-  },
-  onSubscriptionComplete: async (data: any) => {
-    // Called when a subscription is successfully created
-    console.log(`onSubscriptionComplete: ${data}`)
-  },
-  onSubscriptionUpdate: async (data: any) => {
-    // Called when a subscription is updated
-    console.log(`onSubscriptionUpdate: ${data}`)
-  },
-  onSubscriptionCancel: async (data: any) => {
-    // Called when a subscription is canceled
-    console.log(`onSubscriptionCancel: ${data}`)
-  },
-  onSubscriptionDeleted: async (data: any) => {
-    // Called when a subscription is deleted
-    console.log(`onSubscriptionDeleted: ${data}`)
+    ],
+    onSubscriptionComplete: async ({ subscription }) => {
+      // Called when a subscription is successfully created
+      await addPaymentLog('subscription_created', subscription)
+    },
+    onSubscriptionUpdate: async ({ subscription }) => {
+      // Called when a subscription is updated
+      await addPaymentLog('subscription_updated', subscription)
+    },
+    onSubscriptionCancel: async ({ subscription }) => {
+      // Called when a subscription is canceled
+      await addPaymentLog('subscription_canceled', subscription)
+    },
+    onSubscriptionDeleted: async ({ subscription }) => {
+      // Called when a subscription is deleted
+      await addPaymentLog('subscription_deleted', subscription)
+    }
   }
 })

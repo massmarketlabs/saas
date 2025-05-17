@@ -159,14 +159,21 @@ const createBetterAuth = () => betterAuth({
   ]
 })
 
-let auth: ReturnType<typeof betterAuth>
+let _auth: ReturnType<typeof betterAuth>
+
+if (typeof useRuntimeConfig === 'undefined') {
+  _auth = createBetterAuth()
+}
+
+// Used by npm run auth:schema only.
+export const auth = _auth!
 
 export const useServerAuth = () => {
   if (runtimeConfig.preset == 'node-server') {
-    if (!auth) {
-      auth = createBetterAuth()
+    if (!_auth) {
+      _auth = createBetterAuth()
     }
-    return auth
+    return _auth
   } else {
     return createBetterAuth()
   }
