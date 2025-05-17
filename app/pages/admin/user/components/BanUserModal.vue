@@ -56,7 +56,7 @@ const onCancel = () => {
 
 <template>
   <UModal
-    v-model:open="open"
+    :open="open"
     :close="true"
     :title="t('user.modals.ban.title')"
   >
