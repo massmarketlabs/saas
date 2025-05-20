@@ -13,7 +13,8 @@
       "donors": "Donors",
       "programs": "Programs",
       "beneficiary": "Beneficiary",
-      "interventions": "Interventions"
+      "interventions": "Interventions",
+      "evaluation": "Evaluation"
     }
   },
   "ar": {
@@ -30,7 +31,8 @@
       "donors": "المتبرعون",
       "programs": "البرامج",
       "beneficiary": "المستفيد",
-      "interventions": "التدخلات"
+      "interventions": "التدخلات",
+      "evaluation": "تقييم"
     }
   }
 }
