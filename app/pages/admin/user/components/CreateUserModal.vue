@@ -98,6 +98,9 @@ const onCancel = () => {
             class="w-full"
             :items="[
               { label: t('user.roles.user'), value: 'user' },
+              { label: t('user.roles.teacher'), value: 'teacher' },
+              { label: t('user.roles.socialWorker'), value: 'social_worker' },
+              { label: t('user.roles.caseManager'), value: 'case_manager' },
               { label: t('user.roles.admin'), value: 'admin' }
             ]"
           />

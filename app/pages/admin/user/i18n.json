@@ -29,7 +29,10 @@
       },
       "roles": {
         "user": "User",
-        "admin": "Administrator"
+        "admin": "Administrator",
+        "teacher": "Teacher",
+        "socialWorker": "Social Worker",
+        "caseManager": "Case Manager"
       },
       "modals": {
         "createUser": "Create New User",
@@ -79,7 +82,10 @@
       },
       "roles": {
         "user": "مستخدم",
-        "admin": "مدير"
+        "admin": "مدير",
+        "teacher": "مدرس",
+        "socialWorker": "عامل اجتماعي",
+        "caseManager": "مدير الحالة"
       },
       "modals": {
         "createUser": "إنشاء مستخدم جديد",

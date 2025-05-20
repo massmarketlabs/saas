@@ -39,6 +39,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction): Navig
         to: localePath('/admin/interventions')
       },
       {
+        label: t('menu.evaluation'),
+        icon: 'hugeicons:chart-evaluation',
+        to: localePath('/admin/evaluation')
+      },
+      {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
         children: [

@@ -23,7 +23,10 @@ const filters: AdminTableFilter[] = reactive([
     type: 'checkbox',
     items: [
       { label: t('user.roles.user'), id: 'user', count: 0 },
-      { label: t('user.roles.admin'), id: 'admin', count: 0 }
+      { label: t('user.roles.admin'), id: 'admin', count: 0 },
+      { label: t('user.roles.teacher'), id: 'teacher', count: 0 },
+      { label: t('user.roles.socialWorker'), id: 'social_worker', count: 0 },
+      { label: t('user.roles.caseManager'), id: 'case_manager', count: 0 }
     ],
     value: []
   },

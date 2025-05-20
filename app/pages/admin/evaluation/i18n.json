@@ -1,0 +1,17 @@
+{
+  "en": {
+    "evaluation": {
+
+      "actions": {
+        "createEvaluation": "Create Evaluation"
+      }
+    }
+  },
+  "ar": {
+    "evaluation": {
+      "actions": {
+        "createEvaluation": "إنشاء التقييم"
+      }
+    }
+  }
+}
