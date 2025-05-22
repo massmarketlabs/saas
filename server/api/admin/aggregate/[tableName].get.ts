@@ -8,7 +8,7 @@ import { isValidTable } from '~~/server/utils/db'
 /**
  * Enum for relationship types
  */
-export enum RelationshipType {
+enum RelationshipType {
   ManyToOne = 'manyToOne',
   OneToMany = 'oneToMany',
   OneToOne = 'oneToOne',
@@ -18,7 +18,7 @@ export enum RelationshipType {
 /**
  * Interface for join metadata
  */
-export interface JoinInfo {
+interface JoinInfo {
   sourceTable: string
   targetTable: string
   sourceColumn: string
@@ -29,7 +29,7 @@ export interface JoinInfo {
 /**
  * Type for join result structure
  */
-export type JoinResult = Record<string, JoinInfo[]>
+type JoinResult = Record<string, JoinInfo[]>
 
 /**
  * Interface for foreign key constraint row from database
@@ -43,20 +43,13 @@ interface FKConstraintRow {
 }
 
 /**
- * Response type for the API endpoint
- */
-export interface JoinsResponse {
-  table: string
-  joins: JoinResult
-}
-
-/**
  * Interface for the aggregate root data response
  */
-export interface AggregateRootResponse {
+interface AggregateRootResponse {
   rootTable: string
-  rootData: any[]
-  relatedData: Record<string, any[]>
+  data: Record<string, any>
+  // rootData: any[]
+  // relatedData: Record<string, any[]>
 }
 
 /**
@@ -313,14 +306,14 @@ async function fetchAggregateRoot(
   tableName: string,
   joins: JoinResult,
   rootId?: string,
-  depth: number = 1,
   limit: number = 50
 ): Promise<AggregateRootResponse> {
   // Result structure
   const result: AggregateRootResponse = {
     rootTable: tableName,
-    rootData: [],
-    relatedData: {}
+    data: {}
+    // rootData: [],
+    // relatedData: {}
   }
 
   // Initial conditions for root table query
@@ -330,19 +323,22 @@ async function fetchAggregateRoot(
   }
 
   // Fetch root table data
-  result.rootData = await fetchTableData(event, tableName, rootConditions, limit)
+  // result.rootData = await fetchTableData(event, tableName, rootConditions, limit)
+  const resp = await fetchTableData(event, tableName, rootConditions, limit)
 
-  if (result.rootData.length === 0 || depth <= 0) {
+  if (!resp) {
     return result
   }
 
+  if (resp[0])
+    result.data = { ...resp[0] }
   // Extract IDs from root data for use in related queries
-  const rootIds = result.rootData.map(item => item.id).filter(Boolean)
+  const rootIds = resp.map(item => item.id).filter(Boolean)
 
   // Process each related table
   for (const [relatedTable, joinInfos] of Object.entries(joins)) {
-    if (!result.relatedData[relatedTable]) {
-      result.relatedData[relatedTable] = []
+    if (!result.data[relatedTable]) {
+      result.data[relatedTable] = []
     }
 
     // Process each join configuration for this related table
@@ -354,7 +350,7 @@ async function fetchAggregateRoot(
       if (joinInfo.relationship === RelationshipType.ManyToOne) {
         // This table has foreign keys to the related table
         // Extract all foreign key values from root data
-        const foreignKeyValues = result.rootData
+        const foreignKeyValues = resp
           .map(item => item[joinInfo.sourceColumn])
           .filter(value => value !== null && value !== undefined)
 
@@ -373,7 +369,7 @@ async function fetchAggregateRoot(
 
           const queryResult = await db.execute(sqlQuery)
           const relatedItems = Array.isArray(queryResult) ? queryResult : 'rows' in queryResult ? queryResult.rows : []
-          result.relatedData[relatedTable] = [...result.relatedData[relatedTable], ...relatedItems]
+          result.data[relatedTable] = [...result.data[relatedTable], ...relatedItems]
         } catch (error) {
           console.error(`Error fetching related data for ${relatedTable}:`, error)
         }
@@ -384,14 +380,14 @@ async function fetchAggregateRoot(
         try {
           const db = await useDB(event)
           const sqlQuery = sql`
-            SELECT * FROM "${sql.raw(joinInfo.targetTable)}" 
+            SELECT * FROM "${sql.raw(joinInfo.targetTable)}"
             WHERE "${sql.raw(joinInfo.targetColumn)}" IN (${sql.join(rootIds)})
             LIMIT ${limit}
           `
 
           const queryResult = await db.execute(sqlQuery)
           const relatedItems = Array.isArray(queryResult) ? queryResult : 'rows' in queryResult ? queryResult.rows : []
-          result.relatedData[relatedTable] = [...result.relatedData[relatedTable], ...relatedItems]
+          result.data[relatedTable] = [...result.data[relatedTable], ...relatedItems]
         } catch (error) {
           console.error(`Error fetching related data for ${relatedTable}:`, error)
         }
@@ -399,63 +395,13 @@ async function fetchAggregateRoot(
     }
 
     // Remove empty related data arrays
-    if (result.relatedData[relatedTable].length === 0) {
-      delete result.relatedData[relatedTable]
-    }
+    // if (result.data[relatedTable].length === 0) {
+    //   delete result.data[relatedTable]
+    // }
   }
 
   return result
 }
-
-/**
- * Handler to get all possible joins for a table
- */
-export const getTableJoins = eventHandler(async (event: H3Event): Promise<JoinsResponse> => {
-  const tableName = getRouterParam(event, 'tableName')
-
-  // Validate table name
-  if (!tableName) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      data: 'EMPTY_TABLE_NAME',
-      message: 'Empty Table Name'
-    })
-  }
-
-  if (!isValidTable(tableName)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      data: 'INVALID_TABLE_NAME',
-      message: 'Invalid Table Name'
-    })
-  }
-
-  try {
-    // First attempt to get joins from database metadata
-    const databaseJoins = await findDatabaseJoins(event, tableName)
-
-    // If no database joins found, fall back to schema analysis
-    const possibleJoins = Object.keys(databaseJoins).length > 0
-      ? databaseJoins
-      : findPossibleJoins(tableName)
-
-    // Return all possible join information
-    return {
-      table: tableName,
-      joins: possibleJoins
-    }
-  } catch (error) {
-    console.error('Error finding table joins:', error)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      data: 'ERROR_FINDING_JOINS',
-      message: `Failed to find joins for table '${tableName}'`
-    })
-  }
-})
 
 /**
  * Handler to get aggregate root data for a table and its related entities
@@ -466,7 +412,6 @@ export default eventHandler(async (event: H3Event): Promise<AggregateRootRespons
 
   // Parse query parameters
   const id = query.id?.toString()
-  const depth = Number.parseInt(query.depth?.toString() || '1', 10)
   const limit = Number.parseInt(query.limit?.toString() || '50', 10)
 
   // Validate table name
@@ -503,7 +448,6 @@ export default eventHandler(async (event: H3Event): Promise<AggregateRootRespons
       tableName,
       joins,
       id,
-      depth,
       limit
     )
 
