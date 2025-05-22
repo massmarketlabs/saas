@@ -7,6 +7,11 @@ type Beneficiary = typeof beneficiary.$inferSelect
 
 const { t } = useI18n()
 
+const state = reactive({
+  banReason: '',
+  banExpiresIn: -1 as number | undefined
+})
+
 const isDonorModalOpen = ref(false)
 
 const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }) => {
@@ -47,19 +52,77 @@ const filters: AdminTableFilter[] = reactive([
     value: { start: undefined, end: undefined }
   }
 ])
+
+const schema = z.object({
+  banReason: z.string().optional(),
+  banExpiresIn: z.number().optional()
+})
+
+type Schema = zodOutput<typeof schema>
+
+async function onSubmit({ data }: FormSubmitEvent<Schema>) {
+  console.log({ data })
+}
 </script>
 
 <template>
   <NuxtLayout name="admin">
     <template #navRight>
-      <UButton
-        color="neutral"
-        icon="i-lucide-plus"
-        variant="outline"
-        @click="isDonorModalOpen = true"
+      <UModal
+        :open="isDonorModalOpen"
+        :close="{ onClick: () => { isDonorModalOpen = false } }"
+        :title="t('user.modals.ban.title')"
       >
-        {{ t('beneficiary.actions.createBeneficiary') }}
-      </UButton>
+        <UButton
+          color="neutral"
+          icon="i-lucide-plus"
+          variant="outline"
+          @click="isDonorModalOpen = true"
+        >
+          {{ t('beneficiary.actions.createBeneficiary') }}
+        </UButton>
+        <template #body>
+          <UForm
+            class="space-y-4"
+            :schema="schema"
+            :state="state"
+            @submit="onSubmit"
+          >
+            <UFormField
+              :label="t('user.modals.ban.period')"
+              name="banExpiresIn"
+            >
+              <USelect
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              :label="t('user.modals.ban.reason')"
+              name="banReason"
+            >
+              <UTextarea
+                class="w-full"
+              />
+            </UFormField>
+
+            <div class="flex justify-end gap-2">
+              <UButton
+                color="neutral"
+                variant="outline"
+                @click="isDonorModalOpen = false"
+              >
+                {{ t('global.page.cancel') }}
+              </UButton>
+              <UButton
+                type="submit"
+                color="error"
+              >
+                {{ t('user.modals.ban.submit') }}
+              </UButton>
+            </div>
+          </UForm>
+        </template>
+      </UModal>
     </template>
     <AdminTable
       ref="table"
