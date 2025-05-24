@@ -1,15 +1,19 @@
 {
   "en": {
     "beneficiary": {
+      "title": "Beneficiary",
       "actions": {
-        "createBeneficiary": "Create Beneficiary"
+        "createBeneficiary": "Create Beneficiary",
+        "viewProfile": "View Profile"
       }
     }
   },
   "ar": {
     "beneficiary": {
+      "title": "المستفيد",
       "actions": {
-        "createBeneficiary": "إنشاء المستفيد"
+        "createBeneficiary": "إنشاء المستفيد",
+        "viewProfile": "عرض الملف الشخصي"
       }
     }
   }
