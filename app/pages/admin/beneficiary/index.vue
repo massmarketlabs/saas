@@ -2,10 +2,13 @@
 
 <script lang="ts" setup>
 import type { beneficiary } from '~~/server/database/schema'
+// import { NuxtLink } from '#components'
 
 type Beneficiary = typeof beneficiary.$inferSelect
 
 const { t } = useI18n()
+
+const router = useRouter()
 
 const state = reactive({
   banReason: '',
@@ -29,13 +32,60 @@ const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }
     total: result.total
   }
 }
-
+const getRowItems = (row: globalThis.Row<Beneficiary>) => {
+  const beneficiary = row.original
+  return [
+    {
+      type: 'label',
+      label: t('global.page.actions')
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: t('beneficiary.actions.viewProfile'),
+      icon: 'i-lucide-user',
+      async onSelect() {
+        router.push(`/admin/beneficiary/${beneficiary.id}`)
+      }
+    },
+    {
+      label: t('global.page.delete'),
+      icon: 'i-lucide-trash',
+      color: 'error',
+      async onSelect() {
+      }
+    }
+  ]
+}
 const columns: AdminTableColumn<Beneficiary>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'first_name_en', header: 'First Name' },
   { accessorKey: 'middle_name_en', header: 'Middle Name' },
   { accessorKey: 'last_name_en', header: 'Last Name' },
-  { accessorKey: 'created_at', header: 'Created At' }
+  { accessorKey: 'created_at', header: 'Created At' },
+  {
+    id: 'actions',
+    cell: ({ row }) => h(
+      'div',
+      { class: 'text-right' },
+      h(
+        UDropdownMenu as any,
+        {
+          content: {
+            align: 'end'
+          },
+          items: getRowItems(row)
+        },
+        () => h(UButton, {
+          icon: 'i-lucide-ellipsis-vertical',
+          color: 'neutral',
+          variant: 'ghost',
+          class: 'ml-auto'
+        })
+      )
+    )
+  }
 ]
 
 const filters: AdminTableFilter[] = reactive([
@@ -92,17 +142,13 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
               :label="t('user.modals.ban.period')"
               name="banExpiresIn"
             >
-              <USelect
-                class="w-full"
-              />
+              <USelect class="w-full" />
             </UFormField>
             <UFormField
               :label="t('user.modals.ban.reason')"
               name="banReason"
             >
-              <UTextarea
-                class="w-full"
-              />
+              <UTextarea class="w-full" />
             </UFormField>
 
             <div class="flex justify-end gap-2">
