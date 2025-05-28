@@ -3,17 +3,8 @@ import type { TableColumn } from '@nuxt/ui'
 import type { CellContext, RowData } from '@tanstack/vue-table'
 
 export type { FormSubmitEvent, NavigationMenuItem, TableData } from '@nuxt/ui'
-export { default as UAvatar } from '@nuxt/ui/runtime/components/Avatar.vue'
-export { default as UBadge } from '@nuxt/ui/runtime/components/Badge.vue'
-export { default as UButton } from '@nuxt/ui/runtime/components/Button.vue'
-export { default as UDropdownMenu } from '@nuxt/ui/runtime/components/DropdownMenu.vue'
-export { default as UTable } from '@nuxt/ui/runtime/components/Table.vue'
-export { default as UTooltip } from '@nuxt/ui/runtime/components/Tooltip.vue'
-
 export type { Row } from '@tanstack/vue-table'
-
 export type { UserWithRole } from 'better-auth/plugins'
-
 export { z } from 'zod'
 export type { output as zodOutput } from 'zod'
 
