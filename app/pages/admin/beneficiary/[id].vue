@@ -3,6 +3,8 @@
 <script setup lang="ts">
 import type { approval_request, beneficiary, beneficiary_relationships, emergency_contacts, intervention_enrollment, program_enrollment } from '~~/server/database/schema'
 
+import ProgramEnrollment from './components/ProgramEnrollment.vue'
+
 interface BeneficiaryAggregate {
   rootTable: string
   data: typeof beneficiary.$inferSelect &
@@ -48,7 +50,7 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
       </template>
     </FlexThreeColumn>
     <!-- Cards go here -->
-    <!-- Profile Type -->
+    <!-- Profile Information Card -->
     <UCard class="mb-4">
       <template #header>
         <span class="text-2xl font-bold">
@@ -242,13 +244,16 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
         </div>
       </template>
     </UCard>
-    <!-- Program Enrollment -->
+    <!-- Program Enrollment Card -->
     <UCard class="mb-4">
+      <!-- Card Header -->
       <template #header>
         <div class="flex items-center justify-between">
-          <span>
+          <!-- Title Label -->
+          <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.programEnrollment.sectionLabel') }}
           </span>
+          <!-- Add Action -->
           <UButton
             icon="i-lucide-plus"
             size="md"
@@ -257,13 +262,19 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
           </UButton>
         </div>
       </template>
-      {{ data?.data.program_enrollment.length === 0 ? t('global.data.empty') : null }}
+      <span v-if="data?.data && data.data.program_enrollment.length === 0">
+        {{ t('global.data.empty') }}
+      </span>
+      <ProgramEnrollment
+        v-else
+        :program-enrollment="data!.data.program_enrollment"
+      />
     </UCard>
-    <!-- Intervention Enrollment -->
+    <!-- Intervention Enrollment Card -->
     <UCard class="mb-4">
       <template #header>
         <div class="flex items-center justify-between">
-          <span>
+          <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.interventionEnrollment.sectionLabel') }}
           </span>
           <UButton
@@ -280,7 +291,7 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
     <UCard class="mb-4">
       <template #header>
         <div class="flex items-center justify-between">
-          <span>
+          <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.relationships.sectionLabel') }}
           </span>
           <UButton
@@ -297,7 +308,7 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
     <UCard class="mb-4">
       <template #header>
         <div class="flex items-center justify-between">
-          <span>
+          <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.emergency.sectionLabel') }}
           </span>
           <UButton

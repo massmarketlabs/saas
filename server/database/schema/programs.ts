@@ -17,7 +17,7 @@ export const programs = pgTable('programs', {
 // ========================
 export const program_enrollment = pgTable('program_enrollment', {
   id: uuid('id').defaultRandom().primaryKey(),
-  contact_id: uuid('contact_id').references(() => beneficiary.id).notNull(),
+  beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
   // Audit fields
   ...audit_fields
@@ -54,6 +54,6 @@ export const intervention = pgTable('interventions', {
 export const intervention_enrollment = pgTable('intervention_enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
   intervention_id: uuid('intervention_id').references(() => intervention.id).notNull(),
-  contact_id: uuid('contact_id').references(() => beneficiary.id).notNull(),
+  beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
   ...audit_fields
 })
