@@ -1,7 +1,6 @@
 {
   "en": {
     "profile": {
-      "back": "Back",
       "anonymousUser": "Anonymous User",
       "role": "Role",
       "emailVerified": "Email Verified",
@@ -20,7 +19,6 @@
   },
   "ar": {
     "profile": {
-      "back": "رجوع",
       "anonymousUser": "مستخدم مجهول",
       "role": "الدور",
       "emailVerified": "البريد الإلكتروني موثق",

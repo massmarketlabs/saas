@@ -9,6 +9,7 @@ type Beneficiary = typeof beneficiary.$inferSelect
 const { t } = useI18n()
 
 const router = useRouter()
+const localePath = useLocalePath()
 
 const state = reactive({
   banReason: '',
@@ -46,7 +47,7 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
       label: t('beneficiary.actions.viewProfile'),
       icon: 'i-lucide-user',
       async onSelect() {
-        router.push(`/admin/beneficiary/${beneficiary.id}`)
+        router.push(localePath(`/admin/beneficiary/${beneficiary.id}`))
       }
     },
     {

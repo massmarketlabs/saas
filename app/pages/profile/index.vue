@@ -50,7 +50,7 @@ onMounted(() => {
             color="neutral"
             icon="i-lucide-arrow-left"
           >
-            {{ t('profile.back') }}
+            {{ t('global.page.back') }}
           </UButton>
         </div>
 

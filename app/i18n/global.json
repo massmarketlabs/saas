@@ -22,7 +22,11 @@
         "name": "Name",
         "status": "Status",
         "createdAt": "Created At",
-        "all": "All"
+        "all": "All",
+        "back": "Back"
+      },
+      "data": {
+        "empty": "No Data Available"
       }
     }
   },
@@ -49,7 +53,11 @@
         "name": "الاسم",
         "status": "الحالة",
         "createdAt": "تاريخ الإنشاء",
-        "all": "الكل"
+        "all": "الكل",
+        "back": "رجوع"
+      },
+      "data": {
+        "empty": "لا توجد بيانات متاحة"
       }
     }
   }
