@@ -4,7 +4,44 @@
       "title": "Beneficiary",
       "actions": {
         "createBeneficiary": "Create Beneficiary",
-        "viewProfile": "View Profile"
+        "viewProfile": "View Profile",
+        "add": "Add"
+      },
+      "profile": {
+        "profileInformation": "Profile Information",
+        "basicInformation": "Basic Information",
+        "emailAddress": "Email Address",
+        "displayName": "Display Name",
+        "joinedAt": "Joined At",
+        "nameEn": {
+          "sectionLabel": "Name (English)",
+          "firstName": "First Name",
+          "middleName": "Middle Name",
+          "lastName": "Last Name"
+        },
+        "nameAr": {
+          "sectionLabel": "Name (Arabic)",
+          "firstName": "First Name (AR)",
+          "middleName": "Middle Name (AR)",
+          "lastName": "Last Name (AR)"
+        },
+        "personalDetails": "Personal Details",
+        "dob": "Date of Birth",
+        "address": "Address",
+        "gid": "Government Issued Identification Number",
+        "phone": "Phone",
+        "programEnrollment": {
+          "sectionLabel": "Program Enrollment"
+        },
+        "interventionEnrollment": {
+          "sectionLabel": "Intervention Enrollment"
+        },
+        "relationships": {
+          "sectionLabel": "Relationships"
+        },
+        "emergency": {
+          "sectionLabel": "Emergency Contacts"
+        }
       }
     }
   },
@@ -13,7 +50,44 @@
       "title": "المستفيد",
       "actions": {
         "createBeneficiary": "إنشاء المستفيد",
-        "viewProfile": "عرض الملف الشخصي"
+        "viewProfile": "عرض الملف الشخصي",
+        "add": "أضاف"
+      },
+      "profile": {
+        "profileInformation": "معلومات الملف الشخصي",
+        "basicInformation": "معلومات اساسية",
+        "emailAddress": "عنوان البريد الإلكتروني",
+        "displayName": "اسم العرض",
+        "joinedAt": "انضم في",
+        "nameEn": {
+          "sectionLabel": "الاسم (باللغة الإنجليزية)",
+          "firstName": "الاسم الأول",
+          "middleName": "الاسم الأوسط",
+          "lastName": "اسم العائلة"
+        },
+        "nameAr": {
+          "sectionLabel": "الاسم (باللغة العربية)",
+          "firstName": "الاسم الأول (عربي)",
+          "middleName": "الاسم الأوسط (عربي)",
+          "lastName": "الاسم الأخير (عربي)"
+        },
+        "personalDetails": "البيانات الشخصية",
+        "dob": "تاريخ الميلاد",
+        "address": "عنوان",
+        "gid": "رقم الهوية الصادر عن الحكومة",
+        "phone": "هاتف",
+        "programEnrollment": {
+          "sectionLabel": "التسجيل في البرنامج"
+        },
+        "interventionEnrollment": {
+          "sectionLabel": "التسجيل للتدخل"
+        },
+        "relationships": {
+          "sectionLabel": "العلاقات"
+        },
+        "emergency": {
+          "sectionLabel": "جهات الاتصال في حالات الطوارئ"
+        }
       }
     }
   }

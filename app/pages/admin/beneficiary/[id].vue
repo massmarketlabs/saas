@@ -1,8 +1,8 @@
+<i18n src="./i18n.json"></i18n>
+
 <script setup lang="ts">
 import type { approval_request, beneficiary, beneficiary_relationships, emergency_contacts, intervention_enrollment, program_enrollment } from '~~/server/database/schema'
 
-const route = useRoute()
-const id = route.params.id
 interface BeneficiaryAggregate {
   rootTable: string
   data: typeof beneficiary.$inferSelect &
@@ -13,10 +13,17 @@ interface BeneficiaryAggregate {
     { program_enrollment: typeof program_enrollment.$inferSelect[] }
 }
 
+const { t, locale } = useI18n()
+const dir = getDirection(locale.value)
+
+const route = useRoute()
+
+const id = route.params.id
+
 const { data, pending } = await useFetch<BeneficiaryAggregate>('/api/admin/aggregate/beneficiary', { query: { id } })
 useHead({ title: pending.value ? 'Loading...' : `Beneficiary: ${data.value?.data.first_name_en} ${data.value?.data.last_name_en}` })
 const localePath = useLocalePath()
-const avatar_fallback = `${data.value?.data.first_name_en} ${data.value?.data?.last_name_en}`
+const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${data.value?.data?.last_name_en}` : `${data.value?.data.first_name_ar} ${data.value?.data?.last_name_ar}`
 </script>
 
 <template>
@@ -28,7 +35,7 @@ const avatar_fallback = `${data.value?.data.first_name_en} ${data.value?.data?.l
         color="neutral"
         icon="i-lucide-arrow-left"
       >
-        Back
+        {{ t('global.page.back') }}
       </UButton>
     </template>
     <!-- Beneficiary Image or Fallback -->
@@ -45,14 +52,16 @@ const avatar_fallback = `${data.value?.data.first_name_en} ${data.value?.data?.l
     <UCard class="mb-4">
       <template #header>
         <span class="text-2xl font-bold">
-          Profile Information
+          {{ t('beneficiary.profile.profileInformation') }}
         </span>
       </template>
 
       <!-- Basic Information -->
       <div class="space-y-4 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Basic Information
+        <h3
+          class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+        >
+          {{ t('beneficiary.profile.basicInformation') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <UInput
@@ -66,235 +75,240 @@ const avatar_fallback = `${data.value?.data.first_name_en} ${data.value?.data?.l
           </UInput>
           <UInput
             :model-value="data?.data?.email"
-            placeholder="Email Address"
+            :placeholder="t('beneficiary.profile.emailAddress')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Email Address" />
+            <Label :model-value="t('beneficiary.profile.emailAddress')" />
           </UInput>
           <UInput
             :model-value="data?.data?.display_name"
-            placeholder="Display Name"
+            :placeholder="t('beneficiary.profile.displayName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Display Name" />
+            <Label :model-value="t('beneficiary.profile.displayName')" />
           </UInput>
           <UInput
             :model-value="data?.data?.joined_at"
-            placeholder="Joined At"
+            :placeholder="t('beneficiary.profile.joinedAt')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
             type="date"
           >
-            <Label model-value="Joined At" />
+            <Label :model-value="t('beneficiary.profile.joinedAt')" />
           </UInput>
         </div>
       </div>
 
       <!-- English Name -->
       <div class="space-y-4 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Name (English)
+        <h3
+          class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+        >
+          {{ t('beneficiary.profile.nameEn.sectionLabel') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <UInput
             :model-value="data?.data?.first_name_en"
-            placeholder="First Name (EN)"
+            :placeholder="t('beneficiary.profile.nameEn.firstName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="First Name" />
+            <Label :model-value="t('beneficiary.profile.nameEn.firstName')" />
           </UInput>
           <UInput
             :model-value="data?.data?.middle_name_en"
-            placeholder="Middle Name (EN)"
+            :placeholder="t('beneficiary.profile.nameEn.middleName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Middle Name" />
+            <Label :model-value="t('beneficiary.profile.nameEn.middleName')" />
           </UInput>
           <UInput
             :model-value="data?.data?.last_name_en"
-            placeholder="Last Name (EN)"
+            :placeholder="t('beneficiary.profile.nameEn.lastName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Last Name" />
+            <Label :model-value="t('beneficiary.profile.nameEn.lastName')" />
           </UInput>
         </div>
       </div>
 
       <!-- Arabic Name -->
       <div class="space-y-4 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Name (Arabic)
+        <h3
+          class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+        >
+          {{ t('beneficiary.profile.nameAr.sectionLabel') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <UInput
             :model-value="data?.data?.first_name_ar"
-            placeholder="First Name (AR)"
+            :placeholder="t('beneficiary.profile.nameAr.firstName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="First Name" />
+            <Label :model-value="t('beneficiary.profile.nameAr.firstName')" />
           </UInput>
           <UInput
             :model-value="data?.data?.middle_name_ar"
-            placeholder="Middle Name (AR)"
+            :placeholder="t('beneficiary.profile.nameAr.middleName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Middle Name" />
+            <Label :model-value="t('beneficiary.profile.nameAr.middleName')" />
           </UInput>
           <UInput
             :model-value="data?.data?.last_name_ar"
-            placeholder="Last Name (AR)"
+            :placeholder="t('beneficiary.profile.nameAr.lastName')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Last Name" />
+            <Label :model-value="t('beneficiary.profile.nameAr.lastName')" />
           </UInput>
         </div>
       </div>
 
       <!-- Personal Details -->
       <div class="space-y-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2">
-          Personal Details
+        <h3
+          class="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-2"
+        >
+          {{ t('beneficiary.profile.personalDetails') }}
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <UInput
             :model-value="data?.data?.dob"
             type="date"
-            placeholder="Date of Birth"
+            :placeholder="t('beneficiary.profile.dob')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
           >
-            <Label model-value="Date of Birth" />
+            <Label :model-value="t('beneficiary.profile.dob')" />
           </UInput>
           <UInput
             :model-value="data?.data?.phone"
-            placeholder="Phone Number"
+            :placeholder="t('beneficiary.profile.phone')"
             :ui="{ base: 'peer' }"
             size="md"
             disabled
             type="tel"
           >
-            <Label model-value="Phone Number" />
+            <Label :model-value="t('beneficiary.profile.phone')" />
           </UInput>
           <div class="md:col-span-2">
             <UInput
               :model-value="data?.data?.address"
-              placeholder="Address"
+              :placeholder="t('beneficiary.profile.address')"
               :ui="{ base: 'peer' }"
               size="md"
               disabled
               class="w-full"
             >
-              <Label model-value="Address" />
+              <Label :model-value="t('beneficiary.profile.address')" />
             </UInput>
           </div>
           <div class="md:col-span-2">
             <UInput
               :model-value="data?.data?.gid"
-              placeholder="Government Issued Identification"
+              :placeholder="t('beneficiary.profile.gid')"
               :ui="{ base: 'peer' }"
               size="md"
               disabled
               class="w-full"
             >
-              <Label model-value="Government Issued Identification" />
+              <Label :model-value="t('beneficiary.profile.gid')" />
             </UInput>
           </div>
         </div>
       </div>
+      <template #footer>
+        <div class="flex justify-end">
+          <UButton variant="soft">
+            {{ t('global.page.edit') }}
+          </UButton>
+        </div>
+      </template>
     </UCard>
     <!-- Program Enrollment -->
     <UCard class="mb-4">
       <template #header>
         <div class="flex items-center justify-between">
           <span>
-            Program Enrollment
+            {{ t('beneficiary.profile.programEnrollment.sectionLabel') }}
           </span>
           <UButton
             icon="i-lucide-plus"
             size="md"
           >
-            Add
+            {{ t('beneficiary.actions.add') }}
           </UButton>
         </div>
       </template>
-      {{ data?.data.program_enrollment.length === 0 ? 'No Data Available' : null }}
+      {{ data?.data.program_enrollment.length === 0 ? t('global.data.empty') : null }}
     </UCard>
     <!-- Intervention Enrollment -->
     <UCard class="mb-4">
-      <template
-        #header
-      >
-        <div
-          class="flex items-center justify-between"
-        >
+      <template #header>
+        <div class="flex items-center justify-between">
           <span>
-            Intervention Enrollment
+            {{ t('beneficiary.profile.interventionEnrollment.sectionLabel') }}
           </span>
           <UButton
             icon="i-lucide-plus"
             size="md"
           >
-            Add
+            {{ t('beneficiary.actions.add') }}
           </UButton>
         </div>
       </template>
-      {{ data?.data.intervention_enrollment.length === 0 ? 'No Data Available' : null }}
+      {{ data?.data.intervention_enrollment.length === 0 ? t('global.data.empty') : null }}
     </UCard>
     <!-- Beneficiary Relationships -->
     <UCard class="mb-4">
       <template #header>
-        <div
-          class="flex items-center justify-between"
-        >
+        <div class="flex items-center justify-between">
           <span>
-            Relationships
+            {{ t('beneficiary.profile.relationships.sectionLabel') }}
           </span>
           <UButton
             size="md"
             icon="i-lucide-plus"
           >
-            Add
+            {{ t('beneficiary.actions.add') }}
           </UButton>
         </div>
       </template>
-      {{ data?.data.beneficiary_relationships.length === 0 ? 'No Data Available' : null }}
+      {{ data?.data.beneficiary_relationships.length === 0 ? t('global.data.empty') : null }}
     </UCard>
     <!-- Emergency Contacts -->
     <UCard class="mb-4">
       <template #header>
-        <div
-          class="flex items-center justify-between"
-        >
+        <div class="flex items-center justify-between">
           <span>
-            Emergency Contacts
+            {{ t('beneficiary.profile.emergency.sectionLabel') }}
           </span>
           <UButton
             size="md"
             icon="i-lucide-plus"
           >
-            Add
+            {{ t('beneficiary.actions.add') }}
           </UButton>
         </div>
       </template>
-      {{ data?.data.emergency_contacts.length === 0 ? 'No Data Available' : null }}
+      {{ data?.data.emergency_contacts.length === 0 ? t('global.data.empty') : null }}
     </UCard>
     <!-- Data Dump -->
     <UCard class="mb-4">

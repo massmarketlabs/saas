@@ -1,17 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import type { NuxtPage } from 'nuxt/schema'
-import * as nuxtLocales from '@nuxt/ui/locale'
+import { adminExcludes, locales } from './app/utils/locales'
 import { generateRuntimeConfig } from './server/utils/runtimeConfig'
-
-console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
-
-const locales = [
-  nuxtLocales.en,
-  nuxtLocales.ar
-]
-const adminExcludes = locales
-  .filter(locale => locale.code !== 'en')
-  .map(locale => `/${locale.code}/admin/**`)
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-04-01',
