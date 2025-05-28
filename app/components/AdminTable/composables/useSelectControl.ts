@@ -1,7 +1,8 @@
+import type { RowData } from '@tanstack/vue-table'
 import type { ShallowRef } from 'vue'
 import type { UTableInstance } from '../types'
 
-export default function useSelectControl<T>(tableRef: ShallowRef<UTableInstance | null>, rowId?: string) {
+export default function useSelectControl<T extends RowData>(tableRef: ShallowRef<UTableInstance | null>, rowId?: string) {
   const selectColumnId = 'admin-table-select'
   const getRowId = (originalRow: T, index: number, parent?: Row<T>) => {
     if (rowId) {
