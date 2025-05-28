@@ -4,9 +4,9 @@ import type { UTableInstance } from '../types'
 
 export default function useSelectControl<T extends RowData>(tableRef: ShallowRef<UTableInstance | null>, rowId?: string) {
   const selectColumnId = 'admin-table-select'
-  const getRowId = (originalRow: T, index: number, parent?: Row<T>) => {
+  const getRowId = (originalRow: T, index: number) => {
     if (rowId) {
-      return (originalRow as Record<string, any>)[rowId] || (parent ? parent.id : index)
+      return `${(originalRow as Record<string, any>)[rowId] || index}`
     } else {
       return `${index}`
     }
