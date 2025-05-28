@@ -2,6 +2,8 @@
 import type { NuxtPage } from 'nuxt/schema'
 import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 
+console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
+
 const locales = [
   { code: 'en', iso: 'en-US', name: 'English' },
   { code: 'zh-CN', iso: 'zh-CN', name: '简体中文' },
@@ -23,7 +25,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     'nuxt-charts',
-    '@nuxt/test-utils/module',
+    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
     ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
   ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
