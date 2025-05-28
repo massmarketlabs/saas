@@ -3,7 +3,7 @@ import { config } from 'dotenv'
 
 let runtimeConfigInstance: NitroRuntimeConfig
 
-export const generateRunimeTimeConfig = () => ({
+export const generateRuntimeConfig = () => ({
   preset: process.env.NUXT_NITRO_PRESET,
   betterAuthSecret: process.env.NUXT_BETTER_AUTH_SECRET,
   // Stripe
@@ -41,7 +41,7 @@ if (typeof useRuntimeConfig !== 'undefined') {
 } else {
   // for cli: npm run auth:schema
   config()
-  runtimeConfigInstance = generateRunimeTimeConfig() as NitroRuntimeConfig
+  runtimeConfigInstance = generateRuntimeConfig() as NitroRuntimeConfig
 }
 
 export const runtimeConfig = runtimeConfigInstance

@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import type { NuxtPage } from 'nuxt/schema'
-import { generateRunimeTimeConfig } from './server/utils/runtimeConfig'
+import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 
 const locales = [
   { code: 'en', iso: 'en-US', name: 'English' },
@@ -100,7 +100,7 @@ export default defineNuxtConfig({
       // console.log(`\n`)
     }
   },
-  runtimeConfig: generateRunimeTimeConfig(),
+  runtimeConfig: generateRuntimeConfig(),
   app: {
     head: {
       charset: 'utf-8',
