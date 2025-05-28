@@ -66,7 +66,7 @@ export type AdminTableFilter =
 
 export interface SortOption {
   field: string
-  order: string
+  order: 'asc' | 'desc'
 }
 
 export type FilterCondition = {
