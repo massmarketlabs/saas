@@ -1,9 +1,7 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
-import type { approval_request, beneficiary, beneficiary_relationships, emergency_contacts, intervention_enrollment, program_enrollment } from '~~/server/database/schema'
-
-import ProgramEnrollment from './components/ProgramEnrollment.vue'
+import type { approval_request, beneficiary, beneficiary_relationships, emergency_contacts, intervention_enrollment, program_enrollment, programs } from '~~/server/database/schema'
 
 interface BeneficiaryAggregate {
   rootTable: string
@@ -23,9 +21,15 @@ const route = useRoute()
 const id = route.params.id
 
 const { data, pending } = await useFetch<BeneficiaryAggregate>('/api/admin/aggregate/beneficiary', { query: { id } })
+const { data: programList, pending: pendingProgramList } = await useFetch<{ data: typeof programs.$inferSelect[] }>('/api/admin/list/programs')
+
 useHead({ title: pending.value ? 'Loading...' : `Beneficiary: ${data.value?.data.first_name_en} ${data.value?.data.last_name_en}` })
 const localePath = useLocalePath()
 const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${data.value?.data?.last_name_en}` : `${data.value?.data.first_name_ar} ${data.value?.data?.last_name_ar}`
+
+function findProgram(id: string) {
+  return programList.value?.data.find(x => x.id === id)
+}
 </script>
 
 <template>
@@ -265,10 +269,29 @@ const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${dat
       <span v-if="data?.data && data.data.program_enrollment.length === 0">
         {{ t('global.data.empty') }}
       </span>
-      <ProgramEnrollment
-        v-else
-        :program-enrollment="data!.data.program_enrollment"
-      />
+      <div v-else>
+        <p v-if="pendingProgramList">
+          Loading...
+        </p>
+        <ul v-else>
+          <li
+            v-for="(enrollment) in data!.data.program_enrollment"
+            :key="enrollment.id"
+          >
+            <div class="flex gap-4">
+              <span>
+                {{ t('beneficiary.profile.nameEn.sectionLabel') }}: {{ findProgram(enrollment.program_id)?.name }}
+              </span>
+              <span>
+                {{ t('global.page.createdAt') }}: {{ enrollment.created_at }}
+              </span>
+              <span>
+                {{ t('global.page.updatedAt') }}: {{ enrollment.updated_at }}
+              </span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </UCard>
     <!-- Intervention Enrollment Card -->
     <UCard class="mb-4">
