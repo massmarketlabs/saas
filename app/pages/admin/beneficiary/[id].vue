@@ -20,6 +20,7 @@ const route = useRoute()
 
 const id = route.params.id
 
+// Data Fetching
 const { data, pending } = await useFetch<BeneficiaryAggregate>('/api/admin/aggregate/beneficiary', { query: { id } })
 const { data: programList, pending: pendingProgramList } = await useFetch<{ data: typeof programs.$inferSelect[] }>('/api/admin/list/programs')
 
@@ -308,7 +309,16 @@ function findProgram(id: string) {
           </UButton>
         </div>
       </template>
-      {{ data?.data.intervention_enrollment.length === 0 ? t('global.data.empty') : null }}
+      <span v-if="data?.data && data.data.intervention_enrollment.length === 0">
+        {{ t('global.data.empty') }}
+      </span>
+      <div
+        v-for="(enrollment) in data!.data.intervention_enrollment"
+        v-else
+        :key="enrollment.id"
+      >
+        <span> {{ enrollment.intervention_id }}</span>
+      </div>
     </UCard>
     <!-- Beneficiary Relationships -->
     <UCard class="mb-4">
@@ -325,7 +335,16 @@ function findProgram(id: string) {
           </UButton>
         </div>
       </template>
-      {{ data?.data.beneficiary_relationships.length === 0 ? t('global.data.empty') : null }}
+      <span v-if="data?.data && data?.data.beneficiary_relationships.length === 0">
+        {{ t('global.data.empty') }}
+      </span>
+      <div
+        v-for="(relationship) in data!.data.beneficiary_relationships"
+        v-else
+        :key="relationship.id"
+      >
+        {{ relationship.relationship_type }}
+      </div>
     </UCard>
     <!-- Emergency Contacts -->
     <UCard class="mb-4">
@@ -342,15 +361,24 @@ function findProgram(id: string) {
           </UButton>
         </div>
       </template>
-      {{ data?.data.emergency_contacts.length === 0 ? t('global.data.empty') : null }}
+      <span v-if="data?.data && data?.data.emergency_contacts.length === 0">
+        {{ t('global.data.empty') }}
+      </span>
+      <div
+        v-for="(contact) in data!.data.emergency_contacts"
+        v-else
+        :key="contact.id"
+      >
+        {{ contact.relationship }}
+      </div>
     </UCard>
     <!-- Data Dump -->
-    <UCard class="mb-4">
+    <!-- <UCard class="mb-4">
       <template #header>
         Raw Data
       </template>
       <pre>{{ JSON.stringify(data, null, '\t') }}</pre>
-    </UCard>
+    </UCard> -->
     <!-- End of Cards -->
   </NuxtLayout>
 </template>
