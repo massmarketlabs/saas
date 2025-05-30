@@ -6,6 +6,7 @@ export default withNuxt(
   antfu({
     // ...@antfu/eslint-config options
     // Vue ESLint Rule: https://eslint.vuejs.org/rules/
+    markdown: false,
     rules: {
       'style/comma-dangle': ['warn', 'never'],
       'vue/comma-dangle': 'off',
