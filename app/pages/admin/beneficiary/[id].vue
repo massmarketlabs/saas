@@ -279,16 +279,31 @@ function findProgram(id: string) {
             v-for="(enrollment) in data!.data.program_enrollment"
             :key="enrollment.id"
           >
-            <div class="flex gap-4">
-              <span>
-                {{ t('beneficiary.profile.nameEn.sectionLabel') }}: {{ findProgram(enrollment.program_id)?.name }}
-              </span>
-              <span>
-                {{ t('global.page.createdAt') }}: {{ enrollment.created_at }}
-              </span>
-              <span>
-                {{ t('global.page.updatedAt') }}: {{ enrollment.updated_at }}
-              </span>
+            <div class="flex justify-between">
+              <div>
+                <span class="font-bold">
+                  {{ t('beneficiary.profile.nameEn.sectionLabel') }}:
+                </span>
+                <span>
+                  {{ findProgram(enrollment.program_id)?.name }}
+                </span>
+              </div>
+              <div>
+                <span class="font-bold">
+                  {{ t('global.page.createdAt') }}:
+                </span>
+                <span>
+                  {{ enrollment.created_at }}
+                </span>
+              </div>
+              <div>
+                <span class="font-bold">
+                  {{ t('global.page.updatedAt') }}:
+                </span>
+                <span>
+                  {{ enrollment.updated_at }}
+                </span>
+              </div>
             </div>
           </li>
         </ul>
@@ -368,8 +383,31 @@ function findProgram(id: string) {
         v-for="(contact) in data!.data.emergency_contacts"
         v-else
         :key="contact.id"
+        class="flex justify-between"
       >
-        {{ contact.relationship }}
+        <div>
+          <span class="font-bold">{{ t('global.page.name') }}: </span>
+          <span>
+            {{ contact.name }}
+          </span>
+        </div>
+
+        <div>
+          <span class="font-bold">{{ t('beneficiary.profile.phone') }}: </span>
+          <span dir="ltr">
+            {{ contact.phone }}
+          </span>
+        </div>
+        <div>
+          <span class="font-bold">{{ t('beneficiary.profile.emergency.relationship') }}: </span>
+          <span>{{ contact.relationship }}</span>
+        </div>
+        <span
+          v-if="contact.is_primary"
+          class="font-semibold text-success"
+        >
+          {{ t('beneficiary.profile.emergency.primary') }}
+        </span>
       </div>
     </UCard>
     <!-- Data Dump -->
