@@ -40,7 +40,9 @@
           "sectionLabel": "Relationships"
         },
         "emergency": {
-          "sectionLabel": "Emergency Contacts"
+          "sectionLabel": "Emergency Contacts",
+          "primary": "Primary Contact",
+          "relationship": "Relationship"
         }
       }
     }
@@ -86,7 +88,9 @@
           "sectionLabel": "العلاقات"
         },
         "emergency": {
-          "sectionLabel": "جهات الاتصال في حالات الطوارئ"
+          "sectionLabel": "جهات الاتصال في حالات الطوارئ",
+          "primary": "جهة الاتصال الأساسية",
+          "relationship": "علاقة"
         }
       }
     }
