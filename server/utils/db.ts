@@ -6,8 +6,9 @@ import * as schema from '../database/schema'
 import { getPgPool } from './drivers'
 import { runtimeConfig } from './runtimeConfig'
 
-// use db without schema
-const createDB = () => drizzle({ client: getPgPool() })
+const createDB = (dbSchema?: typeof schema) => {
+  return drizzle({ client: getPgPool(), schema: dbSchema })
+}
 
 let db: ReturnType<typeof createDB>
 
@@ -29,7 +30,7 @@ export const useDB = async (event?: H3Event<EventHandlerRequest>): Promise<NodeP
     return event.context.db
   }
   // Otherwise, create a new connection to the database
-  const dbInstance = drizzle({ client: getPgPool(), schema })
+  const dbInstance = createDB(schema)
   if (event) {
     event.context.db = dbInstance
   }
