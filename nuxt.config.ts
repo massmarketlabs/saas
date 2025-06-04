@@ -21,7 +21,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@nuxt/eslint',
-    'nuxt-zod-i18n', // before @nuxtjs/i18n module
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     'nuxt-charts',
