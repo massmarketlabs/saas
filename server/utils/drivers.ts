@@ -36,14 +36,23 @@ export const getPgPool = () => {
 
 // Cache Client
 let redisClient: Redis | undefined
-if (runtimeConfig.preset == 'node-server') {
-  redisClient = new Redis(runtimeConfig.redisUrl)
+
+const getRedisClient = () => {
+  if (redisClient) {
+    return redisClient
+  } else {
+    if (runtimeConfig.preset == 'node-server') {
+      redisClient = new Redis(runtimeConfig.redisUrl)
+      return redisClient
+    }
+  }
 }
 
 export const cacheClient = {
   get: async (key: string) => {
-    if (redisClient) {
-      const value = await redisClient.get(key)
+    const client = getRedisClient()
+    if (client) {
+      const value = await client.get(key)
       return value
     } else {
       const value = await hubKV().get(key)
@@ -54,12 +63,13 @@ export const cacheClient = {
     }
   },
   set: async (key: string, value: string, ttl: number | undefined) => {
+    const client = getRedisClient()
     const stringValue = typeof value === 'string' ? value : JSON.stringify(value)
-    if (redisClient) {
+    if (client) {
       if (ttl) {
-        await redisClient.set(key, stringValue, 'EX', ttl)
+        await client.set(key, stringValue, 'EX', ttl)
       } else {
-        await redisClient.set(key, stringValue)
+        await client.set(key, stringValue)
       }
     } else {
       if (ttl) {
@@ -70,8 +80,9 @@ export const cacheClient = {
     }
   },
   delete: async (key: string) => {
-    if (redisClient) {
-      await redisClient.del(key)
+    const client = getRedisClient()
+    if (client) {
+      await client.del(key)
     } else {
       await hubKV().del(key)
     }
