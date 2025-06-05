@@ -12,6 +12,7 @@ const { t } = useI18n()
 useHead({
   title: t('signIn.signIn')
 })
+
 const auth = useAuth()
 const toast = useToast()
 const route = useRoute()

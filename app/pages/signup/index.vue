@@ -28,7 +28,7 @@ const schema = z.object({
   email: z.string().email(t('signUp.form.email.error')),
   password: z.string().min(8, t('signUp.form.password.error', { min: 8 })),
   confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
+}).refine((data: { password: any, confirmPassword: any }) => data.password === data.confirmPassword, {
   message: t('signUp.form.confirmPassword.error'),
   path: ['confirmPassword']
 })
