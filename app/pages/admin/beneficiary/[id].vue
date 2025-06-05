@@ -12,8 +12,10 @@ interface BeneficiaryAggregate {
     { intervention_enrollment: typeof intervention_enrollment.$inferSelect[] } &
     { program_enrollment: typeof program_enrollment.$inferSelect[] }
 }
+const copied = ref(false)
 
 const { t, locale } = useI18n()
+
 const dir = getDirection(locale.value)
 
 const route = useRoute()
@@ -22,14 +24,26 @@ const id = route.params.id
 
 // Data Fetching
 const { data, pending } = await useFetch<BeneficiaryAggregate>('/api/admin/aggregate/beneficiary', { query: { id } })
+
 const { data: programList, pending: pendingProgramList } = await useFetch<{ data: typeof programs.$inferSelect[] }>('/api/admin/list/programs')
 
 useHead({ title: pending.value ? 'Loading...' : `Beneficiary: ${data.value?.data.first_name_en} ${data.value?.data.last_name_en}` })
+
 const localePath = useLocalePath()
+
 const avatar_fallback = dir === 'ltr' ? `${data.value?.data.first_name_en} ${data.value?.data?.last_name_en}` : `${data.value?.data.first_name_ar} ${data.value?.data?.last_name_ar}`
 
 function findProgram(id: string) {
   return programList.value?.data.find(x => x.id === id)
+}
+
+function copy() {
+  navigator.clipboard.writeText(data.value?.data.id || '')
+  copied.value = true
+
+  setTimeout(() => {
+    copied.value = false
+  }, 2000)
 }
 </script>
 
@@ -79,6 +93,24 @@ function findProgram(id: string) {
             disabled
           >
             <Label model-value="ID" />
+            <template
+              v-if="data?.data?.id"
+              #trailing
+            >
+              <UTooltip
+                text="Copy to clipboard"
+                :content="{ side: 'right' }"
+              >
+                <UButton
+                  :color="copied ? 'success' : 'neutral'"
+                  variant="link"
+                  size="sm"
+                  :icon="copied ? 'i-lucide-copy-check' : 'i-lucide-copy'"
+                  aria-label="Copy to clipboard"
+                  @click="copy"
+                />
+              </UTooltip>
+            </template>
           </UInput>
           <UInput
             :model-value="data?.data?.email"
@@ -243,9 +275,17 @@ function findProgram(id: string) {
       </div>
       <template #footer>
         <div class="flex justify-end">
-          <UButton variant="soft">
-            {{ t('global.page.edit') }}
-          </UButton>
+          <UModal
+            title="Profile Information"
+            description="Pariatur voluptate duis exercitation nisi commodo minim."
+          >
+            <UButton variant="soft">
+              {{ t('global.page.edit') }}
+            </UButton>
+            <template #body>
+              <Placeholder />
+            </template>
+          </UModal>
         </div>
       </template>
     </UCard>
@@ -259,12 +299,21 @@ function findProgram(id: string) {
             {{ t('beneficiary.profile.programEnrollment.sectionLabel') }}
           </span>
           <!-- Add Action -->
-          <UButton
-            icon="i-lucide-plus"
-            size="md"
+          <UModal
+            :title="t('beneficiary.profile.programEnrollment.sectionLabel')"
+            description="Ut Lorem duis in est qui exercitation quis adipisicing sint non proident."
           >
-            {{ t('beneficiary.actions.add') }}
-          </UButton>
+            <UButton
+              icon="i-lucide-plus"
+              size="md"
+            >
+              {{ t('beneficiary.actions.add') }}
+            </UButton>
+
+            <template #body>
+              <Placeholder />
+            </template>
+          </UModal>
         </div>
       </template>
       <span v-if="data?.data && data.data.program_enrollment.length === 0">
@@ -293,7 +342,7 @@ function findProgram(id: string) {
                   {{ t('global.page.createdAt') }}:
                 </span>
                 <span>
-                  {{ enrollment.created_at }}
+                  {{ formatDate(new Date(enrollment.created_at)) }}
                 </span>
               </div>
               <div>
@@ -301,7 +350,7 @@ function findProgram(id: string) {
                   {{ t('global.page.updatedAt') }}:
                 </span>
                 <span>
-                  {{ enrollment.updated_at }}
+                  {{ formatDate(new Date(enrollment.updated_at)) }}
                 </span>
               </div>
             </div>
@@ -316,12 +365,20 @@ function findProgram(id: string) {
           <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.interventionEnrollment.sectionLabel') }}
           </span>
-          <UButton
-            icon="i-lucide-plus"
-            size="md"
+          <UModal
+            :title="t('beneficiary.profile.interventionEnrollment.sectionLabel')"
+            description="Lorem dolore in sit non."
           >
-            {{ t('beneficiary.actions.add') }}
-          </UButton>
+            <UButton
+              icon="i-lucide-plus"
+              size="md"
+            >
+              {{ t('beneficiary.actions.add') }}
+            </UButton>
+            <template #body>
+              <Placeholder />
+            </template>
+          </UModal>
         </div>
       </template>
       <span v-if="data?.data && data.data.intervention_enrollment.length === 0">
@@ -342,12 +399,20 @@ function findProgram(id: string) {
           <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.relationships.sectionLabel') }}
           </span>
-          <UButton
-            size="md"
-            icon="i-lucide-plus"
+          <UModal
+            :title="t('beneficiary.profile.relationships.sectionLabel')"
+            description="Anim consequat dolor ex in magna culpa nostrud minim."
           >
-            {{ t('beneficiary.actions.add') }}
-          </UButton>
+            <UButton
+              size="md"
+              icon="i-lucide-plus"
+            >
+              {{ t('beneficiary.actions.add') }}
+            </UButton>
+            <template #body>
+              <Placeholder />
+            </template>
+          </UModal>
         </div>
       </template>
       <span v-if="data?.data && data?.data.beneficiary_relationships.length === 0">
@@ -368,12 +433,20 @@ function findProgram(id: string) {
           <span class="text-2xl font-bold">
             {{ t('beneficiary.profile.emergency.sectionLabel') }}
           </span>
-          <UButton
-            size="md"
-            icon="i-lucide-plus"
+          <UModal
+            :title="t('beneficiary.profile.emergency.sectionLabel')"
+            description="Ipsum amet eu elit qui cillum aliqua."
           >
-            {{ t('beneficiary.actions.add') }}
-          </UButton>
+            <UButton
+              size="md"
+              icon="i-lucide-plus"
+            >
+              {{ t('beneficiary.actions.add') }}
+            </UButton>
+            <template #body>
+              <Placeholder />
+            </template>
+          </UModal>
         </div>
       </template>
       <span v-if="data?.data && data?.data.emergency_contacts.length === 0">

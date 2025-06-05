@@ -2,14 +2,16 @@
   "en": {
     "programs": {
       "actions": {
-        "createProgram": "Create Program"
+        "createProgram": "Create Program",
+        "viewProgram": "View Program"
       }
     }
   },
   "ar": {
     "programs": {
       "actions": {
-        "createProgram": "إنشاء متبرع"
+        "createProgram": "إنشاء متبرع",
+        "viewProgram": "عرض البرنامج"
       }
     }
   }

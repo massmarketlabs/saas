@@ -9,12 +9,13 @@ type Beneficiary = typeof beneficiary.$inferSelect
 const { t } = useI18n()
 
 const router = useRouter()
+
 const localePath = useLocalePath()
 
-const state = reactive({
-  banReason: '',
-  banExpiresIn: -1 as number | undefined
-})
+// const state = reactive({
+//   banReason: '',
+//   banExpiresIn: -1 as number | undefined
+// })
 
 const isDonorModalOpen = ref(false)
 
@@ -104,16 +105,16 @@ const filters: AdminTableFilter[] = reactive([
   }
 ])
 
-const schema = z.object({
-  banReason: z.string().optional(),
-  banExpiresIn: z.number().optional()
-})
+// const schema = z.object({
+//   banReason: z.string().optional(),
+//   banExpiresIn: z.number().optional()
+// })
 
-type Schema = zodOutput<typeof schema>
+// type Schema = zodOutput<typeof schema>
 
-async function onSubmit({ data }: FormSubmitEvent<Schema>) {
-  console.log({ data })
-}
+// async function onSubmit({ data }: FormSubmitEvent<Schema>) {
+//   console.log({ data })
+// }
 </script>
 
 <template>
@@ -128,12 +129,12 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
           color="neutral"
           icon="i-lucide-plus"
           variant="outline"
+          :label="t('beneficiary.actions.createBeneficiary')"
           @click="isDonorModalOpen = true"
-        >
-          {{ t('beneficiary.actions.createBeneficiary') }}
-        </UButton>
+        />
         <template #body>
-          <UForm
+          <Placeholder />
+          <!-- <UForm
             class="space-y-4"
             :schema="schema"
             :state="state"
@@ -167,7 +168,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
                 {{ t('user.modals.ban.submit') }}
               </UButton>
             </div>
-          </UForm>
+          </UForm> -->
         </template>
       </UModal>
     </template>

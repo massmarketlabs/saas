@@ -1,4 +1,4 @@
-import { date, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 import { beneficiary } from './beneficiary'
 import { audit_fields } from './shared'
 
@@ -39,7 +39,7 @@ export const terms = pgTable('terms', {
 // ========================
 // Interventions
 // ========================
-export const intervention = pgTable('interventions', {
+export const interventions = pgTable('interventions', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   term_id: uuid('term_id').references(() => terms.id).notNull(),
@@ -53,7 +53,19 @@ export const intervention = pgTable('interventions', {
 // ========================
 export const intervention_enrollment = pgTable('intervention_enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
-  intervention_id: uuid('intervention_id').references(() => intervention.id).notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
+  ...audit_fields
+})
+
+// ========================
+// Evaluation
+// ========================
+export const evaluation = pgTable('evaluation', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').unique(),
+  version: integer('version'),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
+  form: jsonb('form'),
   ...audit_fields
 })
