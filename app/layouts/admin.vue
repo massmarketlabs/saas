@@ -1,8 +1,11 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
+import type { programs } from '~~/server/database/schema'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
+
+type Programs = typeof programs.$inferSelect
 
 const { user, signOut } = useAuth()
 
@@ -11,7 +14,6 @@ const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const isCollapsed = ref(false)
-const runtimeConfig = useRuntimeConfig()
 
 defineShortcuts({
   'g-1': () => router.push(localePath('/admin/dashboard')),
@@ -20,7 +22,9 @@ defineShortcuts({
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
 const pathNameParentMap: StringDict<NavigationMenuItem | undefined> = {}
 
-const menus = getMenus(t, localePath, runtimeConfig.public.appRepo)
+const { data: programsList } = await useFetch<PageData<Programs>>('/api/admin/list/programs')
+
+const menus = getMenus(t, localePath, programsList.value)
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -162,8 +166,8 @@ const clickSignOut = () => {
             variant="ghost"
             @click="isCollapsed = !isCollapsed"
           />
-          <title>{{ pathNameItemMap[$route.path]?.label }}</title>
-          <h1>{{ pathNameItemMap[$route.path]?.label }} </h1>
+          <title>{{ pathNameItemMap[route.path]?.label }}</title>
+          <h1>{{ pathNameItemMap[route.path]?.label }} </h1>
           <slot name="navLeft" />
         </template>
         <template #middle>

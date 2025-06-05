@@ -75,7 +75,9 @@ npm run dev
 ```
 
 ## 🚀 Deployment
+
 #### Node.js Server
+
 ```bash
 # Deploy to self host server
 npm run build
@@ -83,6 +85,7 @@ npm run serve
 ```
 
 #### Cloudflare Worker
+
 ```bash
 # Deploy to Cloudflare Worker
 npm run build
@@ -93,13 +96,16 @@ npm run deploy
 ## 🌟 Support
 
 If you find this project helpful, please consider:
+
 - Giving it a star ⭐
 - [Becoming a sponsor on Patreon](https://patreon.com/NuxSaaS) 💖
 
 Your support helps maintain and improve NuxSaaS!
 
 ## 🙏 Credits
+
 This project is built upon these amazing open source projects:
+
 - [Nuxt](https://nuxt.com) - The Progressive Web Framework
 - [Nuxt UI](https://ui.nuxt.com) - Fully styled and customizable components
 - [Better Auth](https://github.com/better-auth/better-auth) -The most comprehensive authentication framework for TypeScript
@@ -109,4 +115,13 @@ This project is built upon these amazing open source projects:
 - [nuxthub-better-auth](https://github.com/atinux/nuxthub-better-auth): A demo of using Better Auth with Nuxt
 
 ## 📜 License
+
 This project is licensed under the [MIT License](LICENSE).
+
+## TODO
+
+- README
+
+- RBAC
+
+- Commands

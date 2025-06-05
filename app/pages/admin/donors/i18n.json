@@ -2,14 +2,16 @@
   "en": {
     "donors": {
       "actions": {
-        "createDonor": "Create Donor"
+        "createDonor": "Create Donor",
+        "viewDonor": "View Donor"
       }
     }
   },
   "ar": {
     "donors": {
       "actions": {
-        "createDonor": "إنشاء متبرع"
+        "createDonor": "إنشاء متبرع",
+        "viewDonor": "عرض المتبرع"
       }
     }
   }

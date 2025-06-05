@@ -1,6 +1,18 @@
 import type { LocalePathFunction } from '#i18n'
+import type { programs } from '~~/server/database/schema'
 
-export const getMenus = (t: TranFunction, localePath: LocalePathFunction): NavigationMenuItem[][] => {
+type Program = typeof programs.$inferSelect
+
+function programListToMenu(localePath: LocalePathFunction, programsList: PageData<Program> | undefined): NavigationMenuItem[] {
+  if (!programsList) {
+    return []
+  }
+
+  return programsList.data.map((x) => {
+    return { label: x.name, to: localePath(`/admin/programs/${x.id}`) }
+  })
+}
+export const getMenus = (t: TranFunction, localePath: LocalePathFunction, programsList: PageData<Program> | undefined): NavigationMenuItem[][] => {
   return [
     [
       {
@@ -26,23 +38,26 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction): Navig
       {
         label: t('menu.programs'),
         icon: 'material-symbols:deployed-code-outline-sharp',
-        to: localePath('/admin/programs')
+        // to: localePath('/admin/programs')
+        children: [
+          ...programListToMenu(localePath, programsList)
+        ]
       },
       {
         label: t('menu.beneficiary'),
         icon: 'hugeicons:student',
         to: localePath('/admin/beneficiary')
       },
-      {
-        label: t('menu.interventions'),
-        icon: 'mdi:google-classroom',
-        to: localePath('/admin/interventions')
-      },
-      {
-        label: t('menu.evaluation'),
-        icon: 'hugeicons:chart-evaluation',
-        to: localePath('/admin/evaluation')
-      },
+      // {
+      //   label: t('menu.interventions'),
+      //   icon: 'mdi:google-classroom',
+      //   to: localePath('/admin/interventions')
+      // },
+      // {
+      //   label: t('menu.evaluation'),
+      //   icon: 'hugeicons:chart-evaluation',
+      //   to: localePath('/admin/evaluation')
+      // },
       {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',

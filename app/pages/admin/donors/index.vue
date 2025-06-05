@@ -1,11 +1,16 @@
 <i18n src="./i18n.json"></i18n>
 
 <script lang="ts" setup>
+import type { DropdownMenuItem } from '@nuxt/ui'
 import type { donors } from '~~/server/database/schema'
 
 type Donor = typeof donors.$inferSelect
 
 const { t } = useI18n()
+
+const localePath = useLocalePath()
+
+const router = useRouter()
 
 const isDonorModalOpen = ref(false)
 
@@ -28,7 +33,39 @@ const fetchData: FetchDataFn<Donor> = async ({ page, limit, sort, filter }) => {
 const columns: AdminTableColumn<Donor>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'created_at', header: 'Created At' }
+  { accessorKey: 'created_at', header: 'Created At' },
+  { id: 'actions', cell: ({ row }) => h('div', { class: 'text-right' }, h(
+    UDropdownMenu as any,
+    { content: { align: 'end' }, items: [
+      {
+        type: 'label',
+        label: t('global.page.actions')
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: t('donors.actions.viewDonor'),
+        icon: 'i-lucide-user',
+        async onSelect() {
+          router.push(localePath(`/admin/donors/${row.original.id}`))
+        }
+      },
+      {
+        label: t('global.page.delete'),
+        icon: 'i-lucide-trash',
+        color: 'error',
+        async onSelect() {
+        }
+      }
+    ] as DropdownMenuItem[] },
+    () => h(UButton, {
+      icon: 'i-lucide-ellipsis-vertical',
+      color: 'neutral',
+      variant: 'ghost',
+      class: 'ml-auto'
+    })
+  )) }
 ]
 
 const filters: AdminTableFilter[] = reactive([
