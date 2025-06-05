@@ -8,6 +8,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
 useHead({
   title: t('resetPassword.title')
 })
@@ -25,7 +26,7 @@ const state = reactive({
 
 const schema = z.object({
   password: z.string().min(8, t('resetPassword.errors.minLength', { min: 8 })),
-  confirmPassword: z.string().min(8, t('resetPassword.errors.minLength', { min: 8 })).refine(val => val === state.password, {
+  confirmPassword: z.string().min(8, t('resetPassword.errors.minLength', { min: 8 })).refine((val: string | undefined) => val === state.password, {
     message: t('resetPassword.errors.passwordMismatch')
   })
 })

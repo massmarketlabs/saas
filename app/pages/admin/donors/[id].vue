@@ -16,7 +16,7 @@ const localePath = useLocalePath()
 
 const id = route.params.id
 
-const { data, pending } = useFetch<DonorAggregate>('/api/admin/aggregate/donors', { query: { id } })
+const { data, pending } = await useFetch<DonorAggregate>('/api/admin/aggregate/donors', { query: { id } })
 
 const columns: TableColumn<typeof contributions.$inferSelect>[] = [
   { accessorKey: 'amount', header: 'Amount' },

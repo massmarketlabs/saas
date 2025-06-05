@@ -8,6 +8,7 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+
 useHead({
   title: t('forgotPassword.title')
 })

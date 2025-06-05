@@ -1,20 +1,18 @@
 <script lang="ts" setup>
 import * as locales from '@nuxt/ui/locale'
 
+// Zod locale configuration
 const { t, locale } = useI18n()
 
 const lang = computed(() => locales[locale.value].code)
 const dir = computed(() => locales[locale.value].dir)
-
-// Zod locale configuration
-const { locale } = useI18n()
 
 const updateZodLocale = (newLocale: string) => {
   const localeKey = newLocale.replace('-', '') as keyof typeof zodLocales
   if (z.locales[localeKey]) {
     z.config(z.locales[localeKey]())
   } else {
-    console.warn(`Zod locale "${localeKey}" not found, falling back to English.`)
+    console.warn(`Zod locale "${String(localeKey)}" not found, falling back to English.`)
     z.config(z.locales.en())
   }
 }
