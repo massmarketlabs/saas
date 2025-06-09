@@ -2,10 +2,9 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import SearchPalette from './components/SearchPalette.vue'
 import CreateProgramModal from './components/CreateProgramModal.vue'
+import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
-
 
 const isCollapsed = ref(false)
 
@@ -20,7 +19,7 @@ const { t } = useI18n()
 defineShortcuts({
   'g-1': () => router.push(localePath('/admin/dashboard')),
   'g-2': () => router.push(localePath('/admin/user')),
-  'g-3': () => router.push(localePath('/admin/donors')),
+  'g-3': () => router.push(localePath('/admin/donors'))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}

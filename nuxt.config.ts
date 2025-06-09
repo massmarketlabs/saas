@@ -131,5 +131,5 @@ export default defineNuxtConfig({
         statusCode: 301 // Permanent redirect
       }
     }
-  },
+  }
 })

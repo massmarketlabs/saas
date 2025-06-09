@@ -1,12 +1,12 @@
+import type { programs } from '~~/server/database/schema'
 // app/stores/useProgramStore.ts
 import { defineStore } from 'pinia'
 import * as z from 'zod'
-import type { programs } from '~~/server/database/schema'
 
 type Programs = typeof programs.$inferSelect
 
 const schema = z.object({
-  name: z.string().min(2),
+  name: z.string().min(2)
 })
 
 type Schema = z.output<typeof schema>
@@ -20,16 +20,16 @@ export const useProgramStore = defineStore('programs', () => {
 
   const toast = useToast()
 
-  
   async function fetchPrograms() {
     loading.value = true
     error.value = null
     try {
       const { data, error: fetchError } = await useFetch<PageData<Programs>>('/api/admin/list/programs', {
         key: 'programs',
-        server: true,
+        server: true
       })
-      if (fetchError.value) throw fetchError.value
+      if (fetchError.value)
+        throw fetchError.value
       programs.value = data.value?.data || []
     } catch (err) {
       error.value = err as Error

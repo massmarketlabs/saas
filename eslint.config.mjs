@@ -1,6 +1,5 @@
-import withNuxt from './.nuxt/eslint.config.mjs'
 import antfu from '@antfu/eslint-config'
-import importPlugin from 'eslint-plugin-import'
+import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   antfu({
@@ -21,9 +20,6 @@ export default withNuxt(
     }
   }),
   {
-    plugins: {
-      import: importPlugin
-    },
     settings: {
       'import/resolver': {
         alias: {
@@ -40,4 +36,4 @@ export default withNuxt(
       }
     }
   }
-).flat()
+)

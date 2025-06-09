@@ -51,7 +51,7 @@
       "title": "المستفيد",
       "actions": {
         "createBeneficiary": "إنشاء المستفيد",
-        "viewProfile": "عرض الملف الشخصي"      
+        "viewProfile": "عرض الملف الشخصي"
       },
       "profile": {
         "profileInformation": "معلومات الملف الشخصي",
