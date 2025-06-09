@@ -4,8 +4,7 @@
       "title": "Beneficiary",
       "actions": {
         "createBeneficiary": "Create Beneficiary",
-        "viewProfile": "View Profile",
-        "add": "Add"
+        "viewProfile": "View Profile"
       },
       "profile": {
         "profileInformation": "Profile Information",
@@ -52,8 +51,7 @@
       "title": "المستفيد",
       "actions": {
         "createBeneficiary": "إنشاء المستفيد",
-        "viewProfile": "عرض الملف الشخصي",
-        "add": "أضاف"
+        "viewProfile": "عرض الملف الشخصي"      
       },
       "profile": {
         "profileInformation": "معلومات الملف الشخصي",

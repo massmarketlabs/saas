@@ -27,7 +27,7 @@ const { data, pending } = await useFetch<BeneficiaryAggregate>('/api/admin/aggre
 
 const { data: programList, pending: pendingProgramList } = await useFetch<{ data: typeof programs.$inferSelect[] }>('/api/admin/list/programs')
 
-useHead({ title: pending.value ? 'Loading...' : `Beneficiary: ${data.value?.data.first_name_en} ${data.value?.data.last_name_en}` })
+useHead({ title: pending.value ? 'Loading...' : `Beneficiary | ${data.value?.data.first_name_en} ${data.value?.data.last_name_en}` })
 
 const localePath = useLocalePath()
 
@@ -307,7 +307,7 @@ function copy() {
               icon="i-lucide-plus"
               size="md"
             >
-              {{ t('beneficiary.actions.add') }}
+              {{ t('global.page.create') }}
             </UButton>
 
             <template #body>
@@ -373,7 +373,7 @@ function copy() {
               icon="i-lucide-plus"
               size="md"
             >
-              {{ t('beneficiary.actions.add') }}
+              {{ t('global.page.create') }}
             </UButton>
             <template #body>
               <Placeholder />
@@ -407,7 +407,7 @@ function copy() {
               size="md"
               icon="i-lucide-plus"
             >
-              {{ t('beneficiary.actions.add') }}
+              {{ t('global.page.create') }}
             </UButton>
             <template #body>
               <Placeholder />
@@ -441,7 +441,7 @@ function copy() {
               size="md"
               icon="i-lucide-plus"
             >
-              {{ t('beneficiary.actions.add') }}
+              {{ t('global.page.create') }}
             </UButton>
             <template #body>
               <Placeholder />

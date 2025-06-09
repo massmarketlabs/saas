@@ -63,13 +63,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo(localePath(`${redirectGuestTo}?redirect=${to.fullPath}`))
   }
 
-  // Admin Pages
   const routeBaseName = useRouteBaseName()
   const routeName = routeBaseName(to)
+  console.log({ routeName })
+
+  // Admin Pages
   if (routeName?.startsWith('admin') && user.value?.role != 'admin') {
     return navigateTo(localePath('/403'))
   }
   if (routeName == 'admin') {
     return navigateTo(localePath('/admin/dashboard'))
+  }
+
+  // Intervention Manager
+  if (routeName == 'intervention-manager') {
+    return navigateTo(localePath('/intervention-manager/dashboard'))
   }
 })

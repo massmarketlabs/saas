@@ -1,30 +1,37 @@
+<!-- app/layouts/admin.vue -->
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import type { programs } from '~~/server/database/schema'
 import SearchPalette from './components/SearchPalette.vue'
+import CreateProgramModal from './components/CreateProgramModal.vue'
 import { getMenus } from './menu'
 
-type Programs = typeof programs.$inferSelect
+
+const isCollapsed = ref(false)
 
 const { user, signOut } = useAuth()
 
 const router = useRouter()
 const route = useRoute()
-const { t } = useI18n()
 const localePath = useLocalePath()
-const isCollapsed = ref(false)
+
+const { t } = useI18n()
 
 defineShortcuts({
   'g-1': () => router.push(localePath('/admin/dashboard')),
-  'g-2': () => router.push(localePath('/admin/user'))
+  'g-2': () => router.push(localePath('/admin/user')),
+  'g-3': () => router.push(localePath('/admin/donors')),
 })
+
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
 const pathNameParentMap: StringDict<NavigationMenuItem | undefined> = {}
 
-const { data: programsList } = await useFetch<PageData<Programs>>('/api/admin/list/programs')
+const programStore = useProgramStore()
+await programStore.fetchPrograms()
 
-const menus = getMenus(t, localePath, programsList.value)
+const { programs } = storeToRefs(programStore)
+
+const menus = computed(() => getMenus(t, localePath, programs.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -40,7 +47,7 @@ const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) 
     }
   }
 }
-menus.forEach((group) => {
+menus.value.forEach((group) => {
   menuIterator(group)
 })
 
@@ -85,7 +92,11 @@ const clickSignOut = () => {
           :collapsed="isCollapsed"
           orientation="vertical"
           class="data-[orientation=vertical]:w-full flex-1 overflow-y-auto"
-        />
+        >
+          <template #add>
+            <CreateProgramModal />
+          </template>
+        </UNavigationMenu>
         <div class="flex flex-col pl-1 pr-2">
           <USeparator />
           <UTooltip
@@ -155,7 +166,11 @@ const clickSignOut = () => {
                   orientation="vertical"
                   :items="menus"
                   class="data-[orientation=vertical]:w-full"
-                />
+                >
+                  <template #add>
+                    <CreateProgramModal />
+                  </template>
+                </UNavigationMenu>
               </div>
             </template>
           </UDrawer>

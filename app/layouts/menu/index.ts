@@ -3,16 +3,22 @@ import type { programs } from '~~/server/database/schema'
 
 type Program = typeof programs.$inferSelect
 
-function programListToMenu(localePath: LocalePathFunction, programsList: PageData<Program> | undefined): NavigationMenuItem[] {
+function programListToMenu(localePath: LocalePathFunction, programsList: Program[] | undefined): NavigationMenuItem[] {
   if (!programsList) {
     return []
   }
 
-  return programsList.data.map((x) => {
-    return { label: x.name, to: localePath(`/admin/programs/${x.id}`) }
+  const menu = programsList.map((x) => {
+    const navigationItem: NavigationMenuItem = { label: x.name, to: localePath(`/admin/programs/${x.id}`) }
+    return navigationItem
   })
+  const addSlot: NavigationMenuItem = { slot: 'add' as const }
+  menu.push(addSlot)
+
+  return menu
 }
-export const getMenus = (t: TranFunction, localePath: LocalePathFunction, programsList: PageData<Program> | undefined): NavigationMenuItem[][] => {
+
+export const getMenus = (t: TranFunction, localePath: LocalePathFunction, programsList: Program[] | undefined): NavigationMenuItem[][] => {
   return [
     [
       {
@@ -25,11 +31,6 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, progra
         icon: 'i-lucide-users',
         to: localePath('/admin/user')
       },
-      // {
-      //   label: t('menu.subscriptions'),
-      //   icon: 'i-lucide-credit-card',
-      //   to: localePath('/admin/subscription')
-      // },
       {
         label: t('menu.donors'),
         icon: 'hugeicons:money-receive-circle',
@@ -48,16 +49,6 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, progra
         icon: 'hugeicons:student',
         to: localePath('/admin/beneficiary')
       },
-      // {
-      //   label: t('menu.interventions'),
-      //   icon: 'mdi:google-classroom',
-      //   to: localePath('/admin/interventions')
-      // },
-      // {
-      //   label: t('menu.evaluation'),
-      //   icon: 'hugeicons:chart-evaluation',
-      //   to: localePath('/admin/evaluation')
-      // },
       {
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
@@ -80,13 +71,12 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, progra
         label: t('menu.home'),
         icon: 'i-lucide-home',
         to: localePath('/')
+      },
+      {
+        label: t('menu.interventionManager'),
+        icon: 'mdi:google-classroom',
+        to: localePath('/intervention-manager')
       }
-      // {
-      //   label: 'GitHub',
-      //   icon: 'i-lucide-github',
-      //   to: appRepo,
-      //   target: '_blank'
-      // }
     ]
   ]
 }

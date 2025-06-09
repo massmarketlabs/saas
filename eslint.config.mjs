@@ -1,11 +1,9 @@
-// @ts-check
-import antfu from '@antfu/eslint-config'
 import withNuxt from './.nuxt/eslint.config.mjs'
+import antfu from '@antfu/eslint-config'
+import importPlugin from 'eslint-plugin-import'
 
 export default withNuxt(
   antfu({
-    // ...@antfu/eslint-config options
-    // Vue ESLint Rule: https://eslint.vuejs.org/rules/
     markdown: false,
     rules: {
       'style/comma-dangle': ['warn', 'never'],
@@ -22,6 +20,25 @@ export default withNuxt(
       'no-debugger': 'off',
       'no-async-promise-executor': 'off'
     }
-  })
-  // Your custom configs here
-)
+  }),
+  {
+    plugins: {
+      import: importPlugin
+    },
+    settings: {
+      'import/resolver': {
+        alias: {
+          map: [
+            ['~', './'],
+            ['~~', './']
+          ],
+          extensions: ['.js', '.ts', '.vue']
+        },
+        node: {
+          extensions: ['.js', '.ts', '.vue']
+        },
+        typescript: {}
+      }
+    }
+  }
+).flat()
