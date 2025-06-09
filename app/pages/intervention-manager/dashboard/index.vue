@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <NuxtLayout name="intervention-manager">
-        <span>Hello, dashboard</span>
-    </NuxtLayout>
+  <NuxtLayout name="intervention-manager">
+    <span>Hello, dashboard</span>
+  </NuxtLayout>
 </template>

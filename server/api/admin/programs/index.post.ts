@@ -1,11 +1,12 @@
+import type { H3Event } from 'h3'
+// import { insertProgramSchema } from '~~/server/validators/programs'
+import { createError } from 'h3'
 // server/api/admin/programs/post.ts
 import { z } from 'zod'
 import { programs } from '~~/server/database/schema'
-// import { insertProgramSchema } from '~~/server/validators/programs'
-import { type H3Event, createError, send } from 'h3'
 
 export const insertProgramSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Name is required')
 })
 
 export type InsertProgramInput = z.infer<typeof insertProgramSchema>
@@ -14,11 +15,11 @@ export type InsertProgramInput = z.infer<typeof insertProgramSchema>
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const body = await readBody(event)
-    
+
     // Validate with Zod
     const data = insertProgramSchema.parse(body)
-    
-    // Get db connection 
+
+    // Get db connection
     const db = await useDB()
     // Insert into database
     const result = await db.insert(programs).values(data).returning()
