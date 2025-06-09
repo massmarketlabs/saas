@@ -49,7 +49,7 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
             <UButton
               size="md"
               icon="i-lucide-plus"
-              label="Add"
+              :label="t('global.page.create')"
             />
 
             <template #body>
@@ -88,7 +88,7 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
             <UButton
               size="md"
               icon="i-lucide-plus"
-              label="Add"
+              :label="t('global.page.create')"
             />
 
             <template #body>
@@ -124,7 +124,7 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
             <UButton
               size="md"
               icon="i-lucide-plus"
-              label="Add"
+              :label="t('global.page.create')"
             />
             <template #body>
               <Placeholder class="h-48" />

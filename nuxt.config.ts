@@ -13,8 +13,9 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/seo',
     'nuxt-charts',
-    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
+    '@pinia/nuxt',
     'reka-ui/nuxt',
+    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
     ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
   ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
@@ -30,6 +31,9 @@ export default defineNuxtConfig({
         }
       }
     : {}),
+  pinia: {
+    storesDirs: ['./app/stores/**']
+  },
   i18n: {
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
@@ -113,5 +117,19 @@ export default defineNuxtConfig({
     rollupConfig: {
       external: process.env.NUXT_NITRO_PRESET != 'node-server' ? ['pg-native'] : undefined
     }
-  }
+  },
+  routeRules: {
+    '/intervention-manager': {
+      redirect: {
+        to: '/intervention-manager/dashboard',
+        statusCode: 301 // Permanent redirect
+      }
+    },
+    '/ar/intervention-manager': {
+      redirect: {
+        to: '/ar/intervention-manager/dashboard',
+        statusCode: 301 // Permanent redirect
+      }
+    }
+  },
 })
