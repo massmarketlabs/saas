@@ -9,17 +9,18 @@ export default withNuxt(
     markdown: false,
     rules: {
       'style/comma-dangle': ['warn', 'never'],
-      'vue/comma-dangle': 'off',
-      'antfu/top-level-function': 'off',
       'style/brace-style': 'off',
-      'eqeqeq': 'off',
+      'style/operator-linebreak': 'off',
+      'vue/comma-dangle': 'off',
       'vue/eqeqeq': 'off',
-      'no-console': 'off',
       'vue/max-attributes-per-line': 'warn',
       'vue/no-unused-refs': 'off',
+      'antfu/top-level-function': 'off',
+      'node/prefer-global/process': 'off',
+      'eqeqeq': 'off',
+      'no-console': 'off',
       'no-debugger': 'off',
-      'no-async-promise-executor': 'off',
-      'node/prefer-global/process': 'off'
+      'no-async-promise-executor': 'off'
     }
   })
   // Your custom configs here
