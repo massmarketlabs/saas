@@ -5,10 +5,10 @@ import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
 
 const locales = [
-  { code: 'en', iso: 'en-US', name: 'English' },
-  { code: 'zh-CN', iso: 'zh-CN', name: '简体中文' },
-  { code: 'ja', iso: 'ja-JP', name: '日本語' },
-  { code: 'fr', iso: 'fr-FR', name: 'Français' }
+  { code: 'en', language: 'en-US', name: 'English' },
+  { code: 'zh-CN', language: 'zh-CN', name: '简体中文' },
+  { code: 'ja', language: 'ja-JP', name: '日本語' },
+  { code: 'fr', language: 'fr-FR', name: 'Français' }
 ]
 const adminExcludes = locales
   .filter(locale => locale.code !== 'en')

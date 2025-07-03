@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import AppFooter from './components/AppFooter.vue'
 import AppNavbar from './components/AppNavbar.vue'
+
+const i18nHead = useLocaleHead()
+useHead(() => ({
+  link: [...(i18nHead.value.link || [])]
+}))
 </script>
 
 <template>
