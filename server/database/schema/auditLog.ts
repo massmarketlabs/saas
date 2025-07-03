@@ -1,9 +1,9 @@
-import { pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 import { user } from './auth'
 
 export const auditLog = pgTable('audit_log', {
   id: serial('id').primaryKey(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
   category: text('category').notNull(), // e.g., 'auth', 'email', 'payment'
   action: text('action').notNull(), // e.g., 'login', 'register', 'verification'
   targetType: text('target_type'), // e.g., 'user', 'email'

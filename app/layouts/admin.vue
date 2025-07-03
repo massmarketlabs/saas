@@ -2,6 +2,7 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
+import { useOrganizationStore } from '~/stores/useOrganizationStore'
 import CreateProgramModal from './components/CreateProgramModal.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
@@ -12,14 +13,17 @@ const { user, signOut } = useAuth()
 
 const router = useRouter()
 const route = useRoute()
+const orgStore = useOrganizationStore()
+await orgStore.fetchOrganizations()
+
 const localePath = useLocalePath()
 
 const { t } = useI18n()
 
 defineShortcuts({
-  'g-1': () => router.push(localePath('/admin/dashboard')),
-  'g-2': () => router.push(localePath('/admin/user')),
-  'g-3': () => router.push(localePath('/admin/donors'))
+  'g-1': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/dashboard`)),
+  'g-2': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/user`)),
+  'g-3': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/donors`))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
@@ -29,8 +33,7 @@ const programStore = useProgramStore()
 await programStore.fetchPrograms()
 
 const { programs } = storeToRefs(programStore)
-
-const menus = computed(() => getMenus(t, localePath, programs.value))
+const menus = computed(() => getMenus(t, localePath, programs.value, orgStore.myOrganization?.slug))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -64,15 +67,21 @@ const clickSignOut = () => {
       <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800">
         <a
           v-if="!isCollapsed"
-          class="flex items-center ps-2.5"
+          class="ps-2.5"
         >
           <!-- <Logo /> -->
           <span
-            class="self-center ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
+            class="ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
           >
             {{ t('global.appName') }}
           </span>
         </a>
+        <span
+          v-if="!isCollapsed"
+          class="ps-2.5 ml-2 text-md font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
+        >
+          {{ orgStore.myOrganization?.name }}
+        </span>
         <Logo
           v-if="isCollapsed"
           class="h-6 w-6 ml-1"

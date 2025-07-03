@@ -2,9 +2,12 @@ import type { H3Event } from 'h3'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { admin, openAPI } from 'better-auth/plugins'
+import { admin, openAPI, organization } from 'better-auth/plugins'
+import { eq } from 'drizzle-orm'
 import { v7 as uuidv7 } from 'uuid'
+// import { user as userSchema } from '~~/server/database/schema'
 import * as schema from '../database/schema'
+import { user } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import { cacheClient, resendInstance } from './drivers'
@@ -155,7 +158,30 @@ const createBetterAuth = () => betterAuth({
   },
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
-    admin()
+    admin(),
+    organization({
+      organizationCreation: {
+        afterCreate: async ({ user: activeUser, organization }) => {
+          // Assign the creator the 'admin' role for the newly created organization
+          const db = getDB()
+
+          await db.update(user)
+            .set({ role: 'admin' })
+            .where(eq(user.id, activeUser.id))
+
+          // Optionally log this as an audit event
+          await logAuditEvent({
+            userId: activeUser.id,
+            category: 'organization',
+            action: 'assign_admin_role',
+            targetType: 'organization',
+            targetId: organization.id,
+            status: 'success',
+            details: `User ${activeUser.id} assigned as admin to organization ${organization.id}`
+          })
+        }
+      }
+    })
     // setupStripe()
   ]
 })

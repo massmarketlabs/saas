@@ -112,9 +112,9 @@ export const beneficiary_relationships = pgTable('beneficiary_relationships', {
 export const approval_request = pgTable('approval_request', {
   id: uuid('id').primaryKey().defaultRandom(),
   beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
-  submitted_by: uuid('submitted_by').references(() => user.id).notNull(),
+  submitted_by: text('submitted_by').references(() => user.id).notNull(),
   reason: text('reason').notNull(),
-  reviewed_by: uuid('reviewed_by'),
+  reviewed_by: text('reviewed_by').references(() => user.id),
   approved: timestamp('approved', { mode: 'string', withTimezone: true }),
 
   // Audit fields

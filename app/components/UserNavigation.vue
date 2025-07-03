@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { loggedIn, signOut, user, activeSubscription } = useAuth()
+const { loggedIn, signOut, user, organization } = useAuth()
+const orgs = await organization.list()
+const orgSlug = computed(() => `/${orgs?.data?.[0]?.slug}/admin/dashboard`)
 </script>
 
 <template>
@@ -33,19 +35,19 @@ const { loggedIn, signOut, user, activeSubscription } = useAuth()
         />
         <span>
           {{ user?.name }}
-          <UBadge
+          <!-- <UBadge
             v-if="activeSubscription"
             label="Pro"
-          />
+          /> -->
         </span>
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="user?.role == 'admin'"
+      v-if="orgs.data && orgs.data[0] && user?.role == 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"
-      :to="localePath('/admin')"
+      :to="localePath(orgSlug)"
     >
       {{ t('global.nav.admin') }}
     </UButton>

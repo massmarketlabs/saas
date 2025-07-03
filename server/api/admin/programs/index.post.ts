@@ -2,7 +2,7 @@ import type { H3Event } from 'h3'
 // import { insertProgramSchema } from '~~/server/validators/programs'
 import { createError } from 'h3'
 // server/api/admin/programs/post.ts
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { programs } from '~~/server/database/schema'
 
 export const insertProgramSchema = z.object({
