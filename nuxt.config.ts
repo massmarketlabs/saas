@@ -4,16 +4,6 @@ import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 
 console.log(`Current NODE_ENV: ${process.env.NODE_ENV}`)
 
-const locales = [
-  { code: 'en', language: 'en-US', name: 'English' },
-  { code: 'zh-CN', language: 'zh-CN', name: '简体中文' },
-  { code: 'ja', language: 'ja-JP', name: '日本語' },
-  { code: 'fr', language: 'fr-FR', name: 'Français' }
-]
-const adminExcludes = locales
-  .filter(locale => locale.code !== 'en')
-  .map(locale => `/${locale.code}/admin/**`)
-
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -43,7 +33,12 @@ export default defineNuxtConfig({
   i18n: {
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
-    locales,
+    locales: [
+      { code: 'en', language: 'en-US', name: 'English' },
+      { code: 'zh-CN', language: 'zh-CN', name: '简体中文' },
+      { code: 'ja', language: 'ja-JP', name: '日本語' },
+      { code: 'fr', language: 'fr-FR', name: 'Français' }
+    ],
     defaultLocale: 'en',
     bundle: {
       optimizeTranslationDirective: false
@@ -52,7 +47,8 @@ export default defineNuxtConfig({
   sitemap: {
     exclude: [
       '/admin/**',
-      ...adminExcludes
+      '/403',
+      '/profile'
     ]
   },
   seo: {
@@ -61,7 +57,7 @@ export default defineNuxtConfig({
   robots: {
     disallow: [
       '/admin',
-      ...adminExcludes.map(path => path.replace('/**', ''))
+      '/profile'
     ]
   },
   eslint: {
