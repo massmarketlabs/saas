@@ -1,11 +1,12 @@
-import type { Subscription } from '@better-auth/stripe'
+// app/composables/useAuth
+// import type { Subscription } from '@better-auth/stripe'
 import type {
   ClientOptions,
   InferSessionFromClient
 } from 'better-auth/client'
 import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
-import { adminClient } from 'better-auth/client/plugins'
+import { adminClient, organizationClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
 
 export function useAuth() {
@@ -18,7 +19,8 @@ export function useAuth() {
       headers
     },
     plugins: [
-      adminClient()
+      adminClient(),
+      organizationClient()
       // stripeClient({
       //   subscription: true
       // })
@@ -27,7 +29,7 @@ export function useAuth() {
 
   const session = useState<InferSessionFromClient<ClientOptions> | null>('auth:session', () => null)
   const user = useState<UserWithRole | null>('auth:user', () => null)
-  const subscriptions = useState<Subscription[]>('auth:subscriptions', () => [])
+  // const subscriptions = useState<Subscription[]>('auth:subscriptions', () => [])
   const sessionFetching = import.meta.server ? ref(false) : useState('auth:sessionFetching', () => false)
 
   const fetchSession = async () => {
@@ -60,18 +62,19 @@ export function useAuth() {
     session,
     user,
     // subscription: client.subscription,
-    subscriptions,
+    // subscriptions,
     loggedIn: computed(() => !!session.value),
-    activeSubscription: computed(() => {
-      return subscriptions.value.find(
-        sub => sub.status === 'active' || sub.status === 'trialing'
-      )
-    }),
+    // activeSubscription: computed(() => {
+    //   return subscriptions.value.find(
+    //     sub => sub.status === 'active' || sub.status === 'trialing'
+    //   )
+    // }),
     signIn: client.signIn,
     signUp: client.signUp,
     forgetPassword: client.forgetPassword,
     resetPassword: client.resetPassword,
     sendVerificationEmail: client.sendVerificationEmail,
+    organization: client.organization,
     errorCodes: client.$ERROR_CODES,
     async signOut({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) {
       const res = await client.signOut()

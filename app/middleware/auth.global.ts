@@ -65,7 +65,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const routeBaseName = useRouteBaseName()
   const routeName = routeBaseName(to)
-  console.log({ routeName })
+  // console.log({ routeName })
 
   // Admin Pages
   if (routeName?.startsWith('admin') && user.value?.role != 'admin') {
@@ -73,10 +73,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   if (routeName == 'admin') {
     return navigateTo(localePath('/admin/dashboard'))
-  }
-
-  // Intervention Manager
-  if (routeName == 'intervention-manager') {
-    return navigateTo(localePath('/intervention-manager/dashboard'))
   }
 })

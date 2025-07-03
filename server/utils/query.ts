@@ -1,7 +1,7 @@
 import type { SQL } from 'drizzle-orm'
 import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core'
 import { and, eq, gte, ilike, inArray, lte } from 'drizzle-orm'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 export const filterSchema = z.array(
   z.union([
