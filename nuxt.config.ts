@@ -55,6 +55,9 @@ export default defineNuxtConfig({
       ...adminExcludes
     ]
   },
+  seo: {
+    canonicalLowercase: false
+  },
   robots: {
     disallow: [
       '/admin',
