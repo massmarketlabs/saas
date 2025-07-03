@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const localePath = useLocalePath()
-  const { client, loggedIn, session } = useAuth()
+  const { client, loggedIn } = useAuth()
 
   // Wait for auth to be fully loaded
   if (!loggedIn.value) {

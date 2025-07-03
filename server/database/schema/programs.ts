@@ -1,4 +1,4 @@
-import { date, integer, jsonb, pgTable, text, uuid, varchar } from 'drizzle-orm/pg-core'
+import { date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 import { beneficiary } from './beneficiary'
 import { audit_fields } from './shared'
 
