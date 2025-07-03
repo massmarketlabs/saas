@@ -161,11 +161,11 @@ const createBetterAuth = () => betterAuth({
 
 let _auth: ReturnType<typeof betterAuth>
 
-if (typeof useRuntimeConfig === 'undefined') {
+// Used by npm run auth:schema only.
+const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/database/schema/auth.ts'))
+if (isAuthSchemaCommand) {
   _auth = createBetterAuth()
 }
-
-// Used by npm run auth:schema only.
 export const auth = _auth!
 
 export const useServerAuth = () => {
