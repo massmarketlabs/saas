@@ -2,6 +2,7 @@
 
 <script lang="ts" setup>
 import type { beneficiary } from '~~/server/database/schema'
+import CreateModal from './components/create-modal.vue'
 
 definePageMeta({
   layout: false
@@ -14,13 +15,6 @@ const { t } = useI18n()
 const router = useRouter()
 
 const localePath = useLocalePath()
-
-// const state = reactive({
-//   banReason: '',
-//   banExpiresIn: -1 as number | undefined
-// })
-
-const isDonorModalOpen = ref(false)
 
 const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }) => {
   const result = await $fetch<PageData<Beneficiary>>('/api/admin/list/beneficiary', {
@@ -107,73 +101,12 @@ const filters: AdminTableFilter[] = reactive([
     value: { start: undefined, end: undefined }
   }
 ])
-
-// const schema = z.object({
-//   banReason: z.string().optional(),
-//   banExpiresIn: z.number().optional()
-// })
-
-// type Schema = zodOutput<typeof schema>
-
-// async function onSubmit({ data }: FormSubmitEvent<Schema>) {
-//   console.log({ data })
-// }
 </script>
 
 <template>
   <NuxtLayout name="admin">
     <template #navRight>
-      <UModal
-        :open="isDonorModalOpen"
-        :close="{ onClick: () => { isDonorModalOpen = false } }"
-        :title="t('user.modals.ban.title')"
-      >
-        <UButton
-          color="neutral"
-          icon="i-lucide-plus"
-          variant="outline"
-          :label="t('beneficiary.actions.createBeneficiary')"
-          @click="isDonorModalOpen = true"
-        />
-        <template #body>
-          <Placeholder />
-          <!-- <UForm
-            class="space-y-4"
-            :schema="schema"
-            :state="state"
-            @submit="onSubmit"
-          >
-            <UFormField
-              :label="t('user.modals.ban.period')"
-              name="banExpiresIn"
-            >
-              <USelect class="w-full" />
-            </UFormField>
-            <UFormField
-              :label="t('user.modals.ban.reason')"
-              name="banReason"
-            >
-              <UTextarea class="w-full" />
-            </UFormField>
-
-            <div class="flex justify-end gap-2">
-              <UButton
-                color="neutral"
-                variant="outline"
-                @click="isDonorModalOpen = false"
-              >
-                {{ t('global.page.cancel') }}
-              </UButton>
-              <UButton
-                type="submit"
-                color="error"
-              >
-                {{ t('user.modals.ban.submit') }}
-              </UButton>
-            </div>
-          </UForm> -->
-        </template>
-      </UModal>
+      <CreateModal :t="t" />
     </template>
     <AdminTable
       ref="table"
