@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from '@nuxt/ui'
 import type { z } from 'zod/v4'
 import { createInsertSchema } from 'drizzle-zod'
 import { z as zod, ZodError } from 'zod/v4'
@@ -8,7 +9,7 @@ const { t } = defineProps<{
   t: TranFunction
 }>()
 
-const isDonorModalOpen = ref(false)
+const isModalOpen = ref(false)
 const isLoading = ref(false)
 
 // Create the validation schema with proper typing
@@ -19,7 +20,7 @@ const schema = createInsertSchema(beneficiary, {
   last_name_en: zod.string().min(1, 'Last name is required'),
   email: zod.email('Valid email is required'),
   phone: zod.string().optional(),
-  dob: zod.string().optional(),
+  dob: zod.date().optional(),
   gender: zod.enum(['male', 'female', 'other']).optional()
 })
 
@@ -41,7 +42,7 @@ const form = ref<BeneficiaryFormData>({
   display_name: '',
 
   // Profile fields
-  dob: '',
+  dob: new Date(),
   gender: undefined,
   phone: '',
   address: '',
@@ -62,7 +63,7 @@ const resetForm = () => {
     middle_name_ar: '',
     last_name_ar: '',
     display_name: '',
-    dob: '',
+    dob: new Date(),
     gender: undefined,
     phone: '',
     address: '',
@@ -114,7 +115,7 @@ const handleSubmit = async () => {
 
     // Reset form and close modal
     resetForm()
-    isDonorModalOpen.value = false
+    isModalOpen.value = false
 
     // Show success message
     // You might want to emit an event or show a toast notification
@@ -137,7 +138,7 @@ const handleSubmit = async () => {
 }
 
 // Reset form when modal closes
-watch(isDonorModalOpen, (isOpen) => {
+watch(isModalOpen, (isOpen) => {
   if (!isOpen) {
     formErrors.value = {}
   }
@@ -146,9 +147,10 @@ watch(isDonorModalOpen, (isOpen) => {
 // Computed property for form validation state
 const isFormValid = computed(() => {
   return form.value.first_name_en.trim() !== ''
+    && form.value.middle_name_en.trim() !== ''
     && form.value.last_name_en.trim() !== ''
-    && form.value.email.trim() !== ''
-    && /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(form.value.email)
+    // && form.value.email.trim() !== ''
+    // && /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(form.value.email)
 })
 
 // Type-safe field getters for easier access
@@ -163,17 +165,19 @@ const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
 
 <template>
   <UModal
-    v-model="isDonorModalOpen"
+    v-model="isModalOpen"
+    :open="isModalOpen"
     :title="t('beneficiary.actions.create.title')"
     :description="t('beneficiary.actions.create.description')"
     class="overflow-y-auto"
+    :close="true"
   >
     <UButton
       color="neutral"
       icon="i-lucide-plus"
       variant="outline"
       :label="t('beneficiary.actions.create.title')"
-      @click="isDonorModalOpen = true"
+      @click="isModalOpen = true"
     />
 
     <template #body>
@@ -333,7 +337,7 @@ const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
             :error="getFieldError('dob')"
           >
             <UInput
-              v-model="form.dob"
+              v-model="form.dob as unknown as AcceptableValue"
               type="date"
               :disabled="isLoading"
               class="w-full"
@@ -386,7 +390,7 @@ const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
             type="button"
             variant="ghost"
             :disabled="isLoading"
-            @click="isDonorModalOpen = false"
+            @click="isModalOpen = false"
           >
             {{ t('global.page.cancel') }}
           </UButton>
