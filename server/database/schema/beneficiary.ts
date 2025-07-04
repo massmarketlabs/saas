@@ -36,7 +36,7 @@ export const beneficiary = pgTable('beneficiary', {
 
   // Organization fields
   gid: text('gid').unique(), // Global identifier
-  role: text('role'),
+  // role: text('role'),
   joined_at: date('joined_at'),
   // TODO: Search needs to be not null, generatedAlwaysAs might suffice
   // search: tsvector('search')
