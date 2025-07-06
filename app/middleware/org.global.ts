@@ -14,6 +14,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   try {
     const orgs = await client.organization.list()
+    if (orgs.error) {
+      throw createError(orgs.error || 'Unable to fetch organizations')
+    }
 
     if (!orgs.data || orgs.data.length === 0) {
       return navigateTo(localePath('/organization/onboarding'))
