@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AcceptableValue } from '@nuxt/ui'
+import type { AcceptableValue, FormErrorEvent } from '@nuxt/ui'
 import type { z } from 'zod/v4'
 import { createInsertSchema } from 'drizzle-zod'
 import { z as zod, ZodError } from 'zod/v4'
@@ -18,7 +18,8 @@ const schema = createInsertSchema(beneficiary, {
   first_name_en: zod.string().min(1, 'First name is required'),
   middle_name_en: zod.string().min(1, 'Middle name is required'),
   last_name_en: zod.string().min(1, 'Last name is required'),
-  email: zod.email('Valid email is required'),
+  gid: zod.string().min(1, 'Government Issued Identification Number is required.'),
+  email: zod.email().or(zod.literal('')),
   phone: zod.string().optional(),
   dob: zod.date().optional(),
   gender: zod.enum(['male', 'female', 'other']).optional()
@@ -31,11 +32,11 @@ type BeneficiaryFormData = z.infer<typeof schema>
 const form = ref<BeneficiaryFormData>({
   // Required fields
   first_name_en: '',
+  middle_name_en: '',
   last_name_en: '',
-  email: '',
 
   // Optional name fields
-  middle_name_en: '',
+  email: '',
   first_name_ar: '',
   middle_name_ar: '',
   last_name_ar: '',
@@ -104,6 +105,7 @@ const handleSubmit = async () => {
 
     // Validate the form
     const validatedData = schema.parse(form.value)
+    console.log({ validatedData })
 
     // Here you would typically call your API endpoint
     // const result = await $fetch('/api/beneficiaries', {
@@ -121,12 +123,13 @@ const handleSubmit = async () => {
     // You might want to emit an event or show a toast notification
   } catch (error: any) {
     if (error instanceof ZodError) {
+      console.log({ error: error.issues })
       // Handle Zod validation errors with proper typing
       const errorMap: Partial<Record<keyof BeneficiaryFormData, string>> = {}
-      // error.errors.forEach((err) => {
-      //   const fieldName = err.path[0] as keyof BeneficiaryFormData
-      //   errorMap[fieldName] = err.message
-      // })
+      error.issues.forEach((err) => {
+        const fieldName = err.path[0] as keyof BeneficiaryFormData
+        errorMap[fieldName] = err.message
+      })
       formErrors.value = errorMap
     } else {
       console.error('Error creating beneficiary:', error)
@@ -145,13 +148,12 @@ watch(isModalOpen, (isOpen) => {
 })
 
 // Computed property for form validation state
-const isFormValid = computed(() => {
-  return form.value.first_name_en.trim() !== ''
-    && form.value.middle_name_en.trim() !== ''
-    && form.value.last_name_en.trim() !== ''
-    // && form.value.email.trim() !== ''
-    // && /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(form.value.email)
-})
+// const isFormValid = computed(() => {
+//   return form.value.first_name_en.trim() !== ''
+//     && form.value.middle_name_en.trim() !== ''
+//     && form.value.last_name_en.trim() !== ''
+//     && /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(form.value.email)
+// })
 
 // Type-safe field getters for easier access
 const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined => {
@@ -161,17 +163,18 @@ const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined
 const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
   return Boolean(formErrors.value[fieldName])
 }
+async function onError(event: FormErrorEvent) {
+  if (event?.errors?.[0]?.id) {
+    const element = document.getElementById(event.errors[0].id)
+    element?.focus()
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
 </script>
 
 <template>
-  <UModal
-    v-model="isModalOpen"
-    :open="isModalOpen"
-    :title="t('beneficiary.actions.create.title')"
-    :description="t('beneficiary.actions.create.description')"
-    class="overflow-y-auto"
-    :close="true"
-  >
+  <div>
+    <!-- Trigger Button -->
     <UButton
       color="neutral"
       icon="i-lucide-plus"
@@ -180,212 +183,231 @@ const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
       @click="isModalOpen = true"
     />
 
-    <template #body>
-      <form
-        class="space-y-2"
-        @submit.prevent="handleSubmit"
-      >
-        <!-- Required Information Section -->
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ t('beneficiary.sections.required') }}
-          </h3>
-          <FlexThreeColumn>
-            <template #left>
-              <UFormGroup
-                :label="t('beneficiary.fields.firstName')"
-                :error="getFieldError('first_name_en')"
-                required
-              >
-                <UInput
-                  v-model="form.first_name_en"
-                  :placeholder="t('beneficiary.placeholders.firstName')"
-                  :disabled="isLoading"
-                  :class="{ 'border-red-500': hasFieldError('first_name_en') }"
-                />
-              </UFormGroup>
-            </template>
-            <template #middle>
-              <UFormGroup
-                :label="t('beneficiary.fields.middleName')"
-                :error="getFieldError('middle_name_en')"
-              >
-                <UInput
-                  v-model="form.middle_name_en"
-                  :placeholder="t('beneficiary.placeholders.middleName')"
-                  :disabled="isLoading"
-                />
-              </UFormGroup>
-            </template>
-            <template #right>
-              <UFormGroup
-                :label="t('beneficiary.fields.lastName')"
-                :error="getFieldError('last_name_en')"
-                required
-              >
-                <UInput
-                  v-model="form.last_name_en"
-                  :placeholder="t('beneficiary.placeholders.lastName')"
-                  :disabled="isLoading"
-                  :class="{ 'border-red-500': hasFieldError('last_name_en') }"
-                />
-              </UFormGroup>
-            </template>
-          </FlexThreeColumn>
-          <UFormGroup
-            :label="t('beneficiary.fields.gid')"
-            :error="getFieldError('gid')"
-          >
-            <UInput
-              v-model="form.gid"
-              :placeholder="t('beneficiary.placeholders.gid')"
-              :disabled="isLoading"
-              class="w-full"
-            />
-            <template #hint>
-              <span class="text-sm text-gray-500">
-                {{ t('beneficiary.hints.gid') }}
-              </span>
-            </template>
-          </UFormGroup>
-        </div>
-
-        <!-- Optional Name Information Section -->
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ t('beneficiary.sections.additionalDetails') }}
-          </h3>
-          <!-- Arabic Names -->
-          <FlexThreeColumn>
-            <template
-              #left
-            >
-              <UFormGroup
-                :label="t('beneficiary.fields.firstNameAr')"
-                :error="getFieldError('first_name_ar')"
-              >
-                <UInput
-                  v-model="form.first_name_ar"
-                  :placeholder="t('beneficiary.placeholders.firstNameAr')"
-                  :disabled="isLoading"
-                  dir="rtl"
-                />
-              </UFormGroup>
-            </template>
-            <template #middle>
-              <UFormGroup
-                :label="t('beneficiary.fields.middleNameAr')"
-                :error="getFieldError('middle_name_ar')"
-              >
-                <UInput
-                  v-model="form.middle_name_ar"
-                  :placeholder="t('beneficiary.placeholders.middleNameAr')"
-                  :disabled="isLoading"
-                  dir="rtl"
-                />
-              </UFormGroup>
-            </template>
-            <template #right>
-              <UFormGroup
-                :label="t('beneficiary.fields.lastNameAr')"
-                :error="getFieldError('last_name_ar')"
-              >
-                <UInput
-                  v-model="form.last_name_ar"
-                  :placeholder="t('beneficiary.placeholders.lastNameAr')"
-                  :disabled="isLoading"
-                  dir="rtl"
-                />
-              </UFormGroup>
-            </template>
-          </FlexThreeColumn>
-          <!-- Display Name -->
-          <div class="grid grid-cols-1 gap-2">
-            <UFormGroup
-              :label="t('beneficiary.fields.displayName')"
-              :error="getFieldError('display_name')"
+    <!-- Modal -->
+    <UModal
+      v-model:open="isModalOpen"
+      :title="t('beneficiary.actions.create.title')"
+      :description="t('beneficiary.actions.create.description')"
+    >
+      <template #body>
+        <UForm
+          :state="form"
+          class="space-y-4"
+          @submit.prevent="handleSubmit"
+          @error="onError"
+        >
+          <!-- Required Information Section -->
+          <div class="space-y-3">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ t('beneficiary.sections.required') }}
+            </h3>
+            <!-- English Name -->
+            <FlexThreeColumn>
+              <template #left>
+                <UFormField
+                  :label="t('beneficiary.fields.firstName')"
+                  :error="getFieldError('first_name_en')"
+                  required
+                >
+                  <UInput
+                    v-model="form.first_name_en"
+                    :placeholder="t('beneficiary.placeholders.firstName')"
+                    :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('first_name_en') }"
+                  />
+                </UFormField>
+              </template>
+              <template #middle>
+                <UFormField
+                  :label="t('beneficiary.fields.middleName')"
+                  :error="getFieldError('middle_name_en')"
+                  required
+                >
+                  <UInput
+                    v-model="form.middle_name_en"
+                    :placeholder="t('beneficiary.placeholders.middleName')"
+                    :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('middle_name_en') }"
+                  />
+                </UFormField>
+              </template>
+              <template #right>
+                <UFormField
+                  :label="t('beneficiary.fields.lastName')"
+                  :error="getFieldError('last_name_en')"
+                  required
+                >
+                  <UInput
+                    v-model="form.last_name_en"
+                    :placeholder="t('beneficiary.placeholders.lastName')"
+                    :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('last_name_en') }"
+                  />
+                </UFormField>
+              </template>
+            </FlexThreeColumn>
+            <!-- GID -->
+            <UFormField
+              :label="t('beneficiary.fields.gid')"
+              :error="getFieldError('gid')"
             >
               <UInput
-                v-model="form.display_name"
-                :placeholder="t('beneficiary.placeholders.displayName')"
+                v-model="form.gid"
+                :placeholder="t('beneficiary.placeholders.gid')"
                 :disabled="isLoading"
                 class="w-full"
               />
-            </UFormGroup>
+              <template #hint>
+                <span class="text-sm text-gray-500">
+                  {{ t('beneficiary.hints.gid') }}
+                </span>
+              </template>
+            </UFormField>
           </div>
-          <!-- Email -->
-          <UFormGroup
-            :label="t('beneficiary.fields.email')"
-            :error="getFieldError('email')"
-            required
-          >
-            <UInput
-              v-model="form.email"
-              type="email"
-              :placeholder="t('beneficiary.placeholders.email')"
-              :disabled="isLoading"
-              class="w-full"
-              :class="{ 'border-red-500': hasFieldError('email') }"
-            />
-          </UFormGroup>
-        </div>
 
-        <!-- Profile Information Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <UFormGroup
-            :label="t('beneficiary.fields.dateOfBirth')"
-            :error="getFieldError('dob')"
-          >
-            <UInput
-              v-model="form.dob as unknown as AcceptableValue"
-              type="date"
-              :disabled="isLoading"
-              class="w-full"
-            />
-          </UFormGroup>
+          <!-- Optional Name Information Section -->
+          <div class="space-y-3">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ t('beneficiary.sections.additionalDetails') }}
+            </h3>
+            <!-- Arabic Names -->
+            <FlexThreeColumn>
+              <template #left>
+                <UFormField
+                  :label="t('beneficiary.fields.firstNameAr')"
+                  :error="getFieldError('first_name_ar')"
+                >
+                  <UInput
+                    v-model="form.first_name_ar"
+                    :placeholder="t('beneficiary.placeholders.firstNameAr')"
+                    :disabled="isLoading"
+                    dir="rtl"
+                  />
+                </UFormField>
+              </template>
+              <template #middle>
+                <UFormField
+                  :label="t('beneficiary.fields.middleNameAr')"
+                  :error="getFieldError('middle_name_ar')"
+                >
+                  <UInput
+                    v-model="form.middle_name_ar"
+                    :placeholder="t('beneficiary.placeholders.middleNameAr')"
+                    :disabled="isLoading"
+                    dir="rtl"
+                  />
+                </UFormField>
+              </template>
+              <template #right>
+                <UFormField
+                  :label="t('beneficiary.fields.lastNameAr')"
+                  :error="getFieldError('last_name_ar')"
+                >
+                  <UInput
+                    v-model="form.last_name_ar"
+                    :placeholder="t('beneficiary.placeholders.lastNameAr')"
+                    :disabled="isLoading"
+                    dir="rtl"
+                  />
+                </UFormField>
+              </template>
+            </FlexThreeColumn>
 
-          <UFormGroup
-            :label="t('beneficiary.fields.gender')"
-            :error="getFieldError('gender')"
-          >
-            <USelect
-              v-model="form.gender"
-              :items="genderOptions"
-              :placeholder="t('beneficiary.placeholders.gender')"
-              :disabled="isLoading"
-              class="w-full"
-            />
-          </UFormGroup>
-        </div>
-        <div class="grid grid-col-1 gap-2">
-          <UFormGroup
-            :label="t('beneficiary.fields.phone')"
-            :error="getFieldError('phone')"
-          >
-            <UInput
-              v-model="form.phone"
-              type="tel"
-              :placeholder="t('beneficiary.placeholders.phone')"
-              :disabled="isLoading"
-              class="w-full"
-            />
-          </UFormGroup>
+            <!-- Display Name -->
+            <div>
+              <UFormField
+                :label="t('beneficiary.fields.displayName')"
+                :error="getFieldError('display_name')"
+              >
+                <UInput
+                  v-model="form.display_name"
+                  :placeholder="t('beneficiary.placeholders.displayName')"
+                  :disabled="isLoading"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
 
-          <UFormGroup
-            :label="t('beneficiary.fields.address')"
-            :error="getFieldError('address')"
-          >
-            <UTextarea
-              v-model="form.address"
-              :placeholder="t('beneficiary.placeholders.address')"
-              :disabled="isLoading"
-              class="w-full"
-              :rows="3"
-            />
-          </UFormGroup>
-        </div>
-        <!-- Form Actions -->
-        <div class="flex justify-end space-x-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <!-- Email -->
+            <div>
+              <UFormField
+                :label="t('beneficiary.fields.email')"
+                :error="getFieldError('email')"
+              >
+                <UInput
+                  v-model="form.email"
+                  type="email"
+                  :placeholder="t('beneficiary.placeholders.email')"
+                  :disabled="isLoading"
+                  class="w-full"
+                  :class="{ 'border-red-500': hasFieldError('email') }"
+                />
+              </UFormField>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <!-- Date of Birth -->
+            <UFormField
+              :label="t('beneficiary.fields.dateOfBirth')"
+              :error="getFieldError('dob')"
+            >
+              <UInput
+                v-model="form.dob as unknown as AcceptableValue"
+                type="date"
+                :disabled="isLoading"
+                class="w-full"
+              />
+            </UFormField>
+            <!-- Gender -->
+            <UFormField
+              :label="t('beneficiary.fields.gender')"
+              :error="getFieldError('gender')"
+            >
+              <USelect
+                v-model="form.gender"
+                :items="genderOptions"
+                :placeholder="t('beneficiary.placeholders.gender')"
+                :disabled="isLoading"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+          <!-- Phone -->
+          <div>
+            <UFormField
+              :label="t('beneficiary.fields.phone')"
+              :error="getFieldError('phone')"
+            >
+              <UInput
+                v-model="form.phone"
+                type="tel"
+                :placeholder="t('beneficiary.placeholders.phone')"
+                :disabled="isLoading"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+          <!-- Address -->
+          <div>
+            <UFormField
+              :label="t('beneficiary.fields.address')"
+              :error="getFieldError('address')"
+            >
+              <UTextarea
+                v-model="form.address"
+                :placeholder="t('beneficiary.placeholders.address')"
+                :disabled="isLoading"
+                class="w-full"
+                :rows="3"
+              />
+            </UFormField>
+          </div>
+        </UForm>
+      </template>
+
+      <template #footer>
+        <div class="flex justify-end space-x-2">
           <UButton
             type="button"
             variant="ghost"
@@ -396,14 +418,15 @@ const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
           </UButton>
 
           <UButton
-            type="submit"
+            type="button"
             :loading="isLoading"
-            :disabled="isLoading || !isFormValid"
+            :disabled="isLoading "
+            @click="handleSubmit"
           >
             {{ t('beneficiary.actions.create.submit') }}
           </UButton>
         </div>
-      </form>
-    </template>
-  </UModal>
+      </template>
+    </UModal>
+  </div>
 </template>
