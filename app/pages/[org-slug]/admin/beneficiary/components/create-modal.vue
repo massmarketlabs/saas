@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { AcceptableValue, FormErrorEvent } from '@nuxt/ui'
-import type { z } from 'zod/v4'
-import { createInsertSchema } from 'drizzle-zod'
-import { z as zod, ZodError } from 'zod/v4'
-import { beneficiary } from '~~/server/database/schema'
+import type { FormErrorEvent } from '@nuxt/ui'
+import type { BeneficiaryFormData } from '~~/server/api/admin/beneficiary/index.post'
+import { ZodError } from 'zod/v4'
+import { createBeneficiarySchema } from '~~/server/api/admin/beneficiary/index.post'
 
 const { t } = defineProps<{
   t: TranFunction
@@ -11,29 +10,16 @@ const { t } = defineProps<{
 
 const isModalOpen = ref(false)
 const isLoading = ref(false)
-
-// Create the validation schema with proper typing
-const schema = createInsertSchema(beneficiary, {
-  // Make required fields explicit
-  first_name_en: zod.string().min(1, 'First name is required'),
-  middle_name_en: zod.string().min(1, 'Middle name is required'),
-  last_name_en: zod.string().min(1, 'Last name is required'),
-  gid: zod.string().min(1, 'Government Issued Identification Number is required.'),
-  email: zod.email().or(zod.literal('')),
-  phone: zod.string().optional(),
-  dob: zod.date().optional(),
-  gender: zod.enum(['male', 'female', 'other']).optional()
-})
-
-// Infer the type from the schema
-type BeneficiaryFormData = z.infer<typeof schema>
-
+const org = useOrganizationStore()
+const toast = useToast()
 // Form state with proper typing
 const form = ref<BeneficiaryFormData>({
   // Required fields
   first_name_en: '',
   middle_name_en: '',
   last_name_en: '',
+  dob: new Date().toISOString(),
+  gender: 'other',
 
   // Optional name fields
   email: '',
@@ -41,16 +27,11 @@ const form = ref<BeneficiaryFormData>({
   middle_name_ar: '',
   last_name_ar: '',
   display_name: '',
-
-  // Profile fields
-  dob: new Date(),
-  gender: undefined,
   phone: '',
   address: '',
-
-  // Organization fields
   gid: '',
-  joined_at: ''
+  joined_at: '',
+  organization_id: org.myOrganization!.slug // TODO: Clean up forcing slug
 })
 
 // Reset form function with proper typing
@@ -64,12 +45,13 @@ const resetForm = () => {
     middle_name_ar: '',
     last_name_ar: '',
     display_name: '',
-    dob: new Date(),
-    gender: undefined,
+    dob: new Date().toISOString(),
+    gender: 'other',
     phone: '',
     address: '',
     gid: '',
-    joined_at: new Date().toISOString().split('T')[0]
+    joined_at: new Date().toISOString().split('T')[0],
+    organization_id: org.myOrganization!.slug // TODO: Clean up forcing slug
   }
 
   form.value = { ...defaultForm }
@@ -104,15 +86,20 @@ const handleSubmit = async () => {
     formErrors.value = {}
 
     // Validate the form
-    const validatedData = schema.parse(form.value)
+    const validatedData = createBeneficiarySchema.parse(form.value)
     console.log({ validatedData })
 
     // Here you would typically call your API endpoint
-    // const result = await $fetch('/api/beneficiaries', {
-    //   method: 'POST',
-    //   body: validatedData
-    // })
+    const result = await $fetch('/api/admin/beneficiary', {
+      method: 'POST',
+      body: validatedData
+    })
 
+    if (!result?.data) {
+      console.log({ result })
+      toast.add({ color: 'error', title: 'Unable to submit', description: 'Details of error' })
+      return
+    }
     console.log('Form submitted:', validatedData)
 
     // Reset form and close modal
@@ -146,14 +133,6 @@ watch(isModalOpen, (isOpen) => {
     formErrors.value = {}
   }
 })
-
-// Computed property for form validation state
-// const isFormValid = computed(() => {
-//   return form.value.first_name_en.trim() !== ''
-//     && form.value.middle_name_en.trim() !== ''
-//     && form.value.last_name_en.trim() !== ''
-//     && /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/.test(form.value.email)
-// })
 
 // Type-safe field getters for easier access
 const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined => {
@@ -250,6 +229,7 @@ async function onError(event: FormErrorEvent) {
             <UFormField
               :label="t('beneficiary.fields.gid')"
               :error="getFieldError('gid')"
+              required
             >
               <UInput
                 v-model="form.gid"
@@ -263,6 +243,36 @@ async function onError(event: FormErrorEvent) {
                 </span>
               </template>
             </UFormField>
+            <!-- DOB and Gender -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <!-- Date of Birth -->
+              <UFormField
+                :label="t('beneficiary.fields.dateOfBirth')"
+                :error="getFieldError('dob')"
+                required
+              >
+                <UInput
+                  v-model="form.dob"
+                  type="date"
+                  :disabled="isLoading"
+                  class="w-full"
+                />
+              </UFormField>
+              <!-- Gender -->
+              <UFormField
+                :label="t('beneficiary.fields.gender')"
+                :error="getFieldError('gender')"
+                required
+              >
+                <USelect
+                  v-model="form.gender"
+                  :items="genderOptions"
+                  :placeholder="t('beneficiary.placeholders.gender')"
+                  :disabled="isLoading"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
           </div>
 
           <!-- Optional Name Information Section -->
@@ -314,95 +324,60 @@ async function onError(event: FormErrorEvent) {
             </FlexThreeColumn>
 
             <!-- Display Name -->
-            <div>
-              <UFormField
-                :label="t('beneficiary.fields.displayName')"
-                :error="getFieldError('display_name')"
-              >
-                <UInput
-                  v-model="form.display_name"
-                  :placeholder="t('beneficiary.placeholders.displayName')"
-                  :disabled="isLoading"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
+            <UFormField
+              :label="t('beneficiary.fields.displayName')"
+              :error="getFieldError('display_name')"
+            >
+              <UInput
+                v-model="form.display_name"
+                :placeholder="t('beneficiary.placeholders.displayName')"
+                :disabled="isLoading"
+                class="w-full"
+              />
+            </UFormField>
 
             <!-- Email -->
-            <div>
-              <UFormField
-                :label="t('beneficiary.fields.email')"
-                :error="getFieldError('email')"
-              >
-                <UInput
-                  v-model="form.email"
-                  type="email"
-                  :placeholder="t('beneficiary.placeholders.email')"
-                  :disabled="isLoading"
-                  class="w-full"
-                  :class="{ 'border-red-500': hasFieldError('email') }"
-                />
-              </UFormField>
-            </div>
+            <UFormField
+              :label="t('beneficiary.fields.email')"
+              :error="getFieldError('email')"
+            >
+              <UInput
+                v-model="form.email"
+                type="email"
+                :placeholder="t('beneficiary.placeholders.email')"
+                :disabled="isLoading"
+                class="w-full"
+                :class="{ 'border-red-500': hasFieldError('email') }"
+              />
+            </UFormField>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <!-- Date of Birth -->
-            <UFormField
-              :label="t('beneficiary.fields.dateOfBirth')"
-              :error="getFieldError('dob')"
-            >
-              <UInput
-                v-model="form.dob as unknown as AcceptableValue"
-                type="date"
-                :disabled="isLoading"
-                class="w-full"
-              />
-            </UFormField>
-            <!-- Gender -->
-            <UFormField
-              :label="t('beneficiary.fields.gender')"
-              :error="getFieldError('gender')"
-            >
-              <USelect
-                v-model="form.gender"
-                :items="genderOptions"
-                :placeholder="t('beneficiary.placeholders.gender')"
-                :disabled="isLoading"
-                class="w-full"
-              />
-            </UFormField>
-          </div>
           <!-- Phone -->
-          <div>
-            <UFormField
-              :label="t('beneficiary.fields.phone')"
-              :error="getFieldError('phone')"
-            >
-              <UInput
-                v-model="form.phone"
-                type="tel"
-                :placeholder="t('beneficiary.placeholders.phone')"
-                :disabled="isLoading"
-                class="w-full"
-              />
-            </UFormField>
-          </div>
+          <UFormField
+            :label="t('beneficiary.fields.phone')"
+            :error="getFieldError('phone')"
+          >
+            <UInput
+              v-model="form.phone"
+              type="tel"
+              :placeholder="t('beneficiary.placeholders.phone')"
+              :disabled="isLoading"
+              class="w-full"
+            />
+          </UFormField>
           <!-- Address -->
-          <div>
-            <UFormField
-              :label="t('beneficiary.fields.address')"
-              :error="getFieldError('address')"
-            >
-              <UTextarea
-                v-model="form.address"
-                :placeholder="t('beneficiary.placeholders.address')"
-                :disabled="isLoading"
-                class="w-full"
-                :rows="3"
-              />
-            </UFormField>
-          </div>
+          <UFormField
+            :label="t('beneficiary.fields.address')"
+            :error="getFieldError('address')"
+          >
+            <UTextarea
+              v-model="form.address"
+              :placeholder="t('beneficiary.placeholders.address')"
+              :disabled="isLoading"
+              class="w-full"
+              :rows="3"
+            />
+          </UFormField>
         </UForm>
       </template>
 
