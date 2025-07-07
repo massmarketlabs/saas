@@ -14,6 +14,8 @@ const { t } = useI18n()
 
 const router = useRouter()
 
+const org = useOrganizationStore()
+
 const localePath = useLocalePath()
 
 const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }) => {
@@ -45,7 +47,7 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
       label: t('beneficiary.actions.viewProfile'),
       icon: 'i-lucide-user',
       async onSelect() {
-        router.push(localePath(`/admin/beneficiary/${beneficiary.id}`))
+        router.push(localePath(`/${org.myOrganization?.slug}/admin/beneficiary/${beneficiary.id}`))
       }
     },
     {
