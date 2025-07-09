@@ -11,7 +11,6 @@ definePageMeta({
 type Beneficiary = typeof beneficiary.$inferSelect
 
 const tableKey = ref(0)
-const table = ref()
 const { t } = useI18n()
 
 const router = useRouter()
@@ -108,8 +107,6 @@ const filters: AdminTableFilter[] = reactive([
 
 const reloadTable = async () => {
   tableKey.value++ // This forces the table to re-render
-
-  await table.value?.fetchTableData?.()
 }
 </script>
 
@@ -123,7 +120,7 @@ const reloadTable = async () => {
     </template>
     <AdminTable
       :key="tableKey"
-      :ref="table"
+      ref="table"
       :columns="columns"
       :filters="filters"
       :fetch-data="fetchData"
