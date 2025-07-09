@@ -1,6 +1,8 @@
 <script setup lang="ts">
+// /app/pages/[org-slug]/admin/beneficiary/components/create-modal.vue
 import type { FormErrorEvent } from '@nuxt/ui'
 import type { BeneficiaryFormData } from '~~/server/api/admin/beneficiary/index.post'
+import { FetchError } from 'ofetch'
 import { ZodError } from 'zod/v4'
 import { createBeneficiarySchema } from '~~/server/api/admin/beneficiary/index.post'
 
@@ -12,6 +14,7 @@ const isModalOpen = ref(false)
 const isLoading = ref(false)
 const org = useOrganizationStore()
 const toast = useToast()
+
 // Form state with proper typing
 const form = ref<BeneficiaryFormData>({
   // Required fields
@@ -31,7 +34,7 @@ const form = ref<BeneficiaryFormData>({
   address: '',
   gid: '',
   joined_at: '',
-  organization_id: org.myOrganization!.slug // TODO: Clean up forcing slug
+  organization_id: org.myOrganization?.id || '' // Use organization ID instead of slug
 })
 
 // Reset form function with proper typing
@@ -51,7 +54,7 @@ const resetForm = () => {
     address: '',
     gid: '',
     joined_at: new Date().toISOString().split('T')[0],
-    organization_id: org.myOrganization!.slug // TODO: Clean up forcing slug
+    organization_id: org.myOrganization?.id || '' // Use organization ID instead of slug
   }
 
   form.value = { ...defaultForm }
@@ -78,49 +81,89 @@ watch([() => form.value.first_name_en, () => form.value.last_name_en], () => {
 onMounted(() => {
   form.value.joined_at = new Date().toISOString().split('T')[0]
 })
-
 // Form submission with proper error handling
 const handleSubmit = async () => {
   try {
     isLoading.value = true
     formErrors.value = {}
 
-    // Validate the form
+    // Validate the form client-side first
+    // I think this will auto throw ZodError
     const validatedData = createBeneficiarySchema.parse(form.value)
-    console.log({ validatedData })
 
-    // Here you would typically call your API endpoint
+    // Call the API endpoint
     const result = await $fetch('/api/admin/beneficiary', {
       method: 'POST',
       body: validatedData
     })
 
-    if (!result?.data) {
-      console.log({ result })
-      toast.add({ color: 'error', title: 'Unable to submit', description: 'Details of error' })
-      return
-    }
-    console.log('Form submitted:', validatedData)
+    console.log({ result })
 
-    // Reset form and close modal
-    resetForm()
-    isModalOpen.value = false
+    // if (!result?.success) {
+    //   toast.add({
+    //     color: 'error',
+    //     title: 'Submission Failed',
+    //     description: 'Unable to create beneficiary. Please try again.'
+    //   })
+    //   return
+    // }
+
+    console.log('Beneficiary created successfully:', result)
 
     // Show success message
-    // You might want to emit an event or show a toast notification
-  } catch (error: any) {
+    // toast.add({
+    //   color: 'success',
+    //   title: 'Success!',
+    //   description: result.message || 'Beneficiary created successfully'
+    // })
+
+    // Reset form and close modal
+    // resetForm()
+    // isModalOpen.value = false
+
+    // Emit event to refresh data in parent component
+    // You might want to use a composable or emit to parent
+    // await refreshCookie('beneficiaries') // or your refresh method
+  } catch (error) {
+    console.error('Error creating beneficiary:', error)
+
     if (error instanceof ZodError) {
-      console.log({ error: error.issues })
-      // Handle Zod validation errors with proper typing
+      // Handle client-side Zod validation errors
       const errorMap: Partial<Record<keyof BeneficiaryFormData, string>> = {}
       error.issues.forEach((err) => {
         const fieldName = err.path[0] as keyof BeneficiaryFormData
         errorMap[fieldName] = err.message
       })
       formErrors.value = errorMap
+
+      toast.add({
+        color: 'error',
+        title: 'Validation Error',
+        description: 'Please check the form fields and try again.'
+      })
+    } else if (error instanceof FetchError) {
+      console.log(error.data)
+      // Handle API errors
+      const errorMap: Partial<Record<keyof BeneficiaryFormData, string>> = {}
+      error.data.data.errors.forEach((err) => {
+        const fieldName = err.field as keyof BeneficiaryFormData
+        errorMap[fieldName] = err.message
+      })
+      formErrors.value = errorMap
+
+      toast.add({
+        color: 'error',
+        title: 'Validation Error',
+        description: 'Please check the form fields and try again.'
+      })
     } else {
-      console.error('Error creating beneficiary:', error)
-      // Handle other errors
+      console.log({ error })
+      // Handle unexpected errors
+      toast.add({
+        color: 'error',
+        title: 'Unexpected Error',
+        description: 'An unexpected error occurred. Please try again.'
+      })
     }
   } finally {
     isLoading.value = false
@@ -131,6 +174,8 @@ const handleSubmit = async () => {
 watch(isModalOpen, (isOpen) => {
   if (!isOpen) {
     formErrors.value = {}
+    // Optionally reset form when modal closes
+    // resetForm()
   }
 })
 
@@ -142,6 +187,7 @@ const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined
 const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
   return Boolean(formErrors.value[fieldName])
 }
+
 async function onError(event: FormErrorEvent) {
   if (event?.errors?.[0]?.id) {
     const element = document.getElementById(event.errors[0].id)
@@ -235,6 +281,7 @@ async function onError(event: FormErrorEvent) {
                 v-model="form.gid"
                 :placeholder="t('beneficiary.placeholders.gid')"
                 :disabled="isLoading"
+                :class="{ 'border-red-500': hasFieldError('gid') }"
                 class="w-full"
               />
               <template #hint>
@@ -255,6 +302,7 @@ async function onError(event: FormErrorEvent) {
                   v-model="form.dob"
                   type="date"
                   :disabled="isLoading"
+                  :class="{ 'border-red-500': hasFieldError('dob') }"
                   class="w-full"
                 />
               </UFormField>
@@ -269,6 +317,7 @@ async function onError(event: FormErrorEvent) {
                   :items="genderOptions"
                   :placeholder="t('beneficiary.placeholders.gender')"
                   :disabled="isLoading"
+                  :class="{ 'border-red-500': hasFieldError('gender') }"
                   class="w-full"
                 />
               </UFormField>
@@ -291,6 +340,7 @@ async function onError(event: FormErrorEvent) {
                     v-model="form.first_name_ar"
                     :placeholder="t('beneficiary.placeholders.firstNameAr')"
                     :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('first_name_ar') }"
                     dir="rtl"
                   />
                 </UFormField>
@@ -304,6 +354,7 @@ async function onError(event: FormErrorEvent) {
                     v-model="form.middle_name_ar"
                     :placeholder="t('beneficiary.placeholders.middleNameAr')"
                     :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('middle_name_ar') }"
                     dir="rtl"
                   />
                 </UFormField>
@@ -317,6 +368,7 @@ async function onError(event: FormErrorEvent) {
                     v-model="form.last_name_ar"
                     :placeholder="t('beneficiary.placeholders.lastNameAr')"
                     :disabled="isLoading"
+                    :class="{ 'border-red-500': hasFieldError('last_name_ar') }"
                     dir="rtl"
                   />
                 </UFormField>
@@ -332,6 +384,7 @@ async function onError(event: FormErrorEvent) {
                 v-model="form.display_name"
                 :placeholder="t('beneficiary.placeholders.displayName')"
                 :disabled="isLoading"
+                :class="{ 'border-red-500': hasFieldError('display_name') }"
                 class="w-full"
               />
             </UFormField>
@@ -346,8 +399,8 @@ async function onError(event: FormErrorEvent) {
                 type="email"
                 :placeholder="t('beneficiary.placeholders.email')"
                 :disabled="isLoading"
-                class="w-full"
                 :class="{ 'border-red-500': hasFieldError('email') }"
+                class="w-full"
               />
             </UFormField>
           </div>
@@ -362,6 +415,7 @@ async function onError(event: FormErrorEvent) {
               type="tel"
               :placeholder="t('beneficiary.placeholders.phone')"
               :disabled="isLoading"
+              :class="{ 'border-red-500': hasFieldError('phone') }"
               class="w-full"
             />
           </UFormField>
@@ -374,6 +428,7 @@ async function onError(event: FormErrorEvent) {
               v-model="form.address"
               :placeholder="t('beneficiary.placeholders.address')"
               :disabled="isLoading"
+              :class="{ 'border-red-500': hasFieldError('address') }"
               class="w-full"
               :rows="3"
             />
@@ -395,7 +450,7 @@ async function onError(event: FormErrorEvent) {
           <UButton
             type="button"
             :loading="isLoading"
-            :disabled="isLoading "
+            :disabled="isLoading"
             @click="handleSubmit"
           >
             {{ t('beneficiary.actions.create.submit') }}
