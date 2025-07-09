@@ -1,31 +1,47 @@
 <script setup lang="ts">
 // /app/pages/[org-slug]/admin/beneficiary/components/create-modal.vue
+
 import type { FormErrorEvent } from '@nuxt/ui'
-import type { BeneficiaryFormData } from '~~/server/api/admin/beneficiary/index.post'
+import type { BeneficiaryFormData, CreateBeneficiaryResponse } from '~~/server/api/admin/beneficiary/index.post'
 import { FetchError } from 'ofetch'
 import { ZodError } from 'zod/v4'
-import { createBeneficiarySchema } from '~~/server/api/admin/beneficiary/index.post'
+import {
 
-const { t } = defineProps<{
+  createBeneficiarySchema
+} from '~~/server/api/admin/beneficiary/index.post'
+
+// Type for translation function
+interface TranFunction {
+  (key: string): string
+}
+
+// Props with proper typing
+interface Props {
   t: TranFunction
-}>()
+}
 
+const { t } = defineProps<Props>()
+const emit = defineEmits(['beneficiaryCreated'])
+
+// Reactive state with proper typing
 const isModalOpen = ref(false)
 const isLoading = ref(false)
-const org = useOrganizationStore()
 const toast = useToast()
 
-// Form state with proper typing
-const form = ref<BeneficiaryFormData>({
-  // Required fields
+// Type for form errors - more specific than the original
+type FormErrors = Partial<Record<keyof BeneficiaryFormData, string>>
+
+// Form validation state
+const formErrors = ref<FormErrors>({})
+
+// Form state with proper default values and typing
+const createDefaultForm = (): BeneficiaryFormData => ({
   first_name_en: '',
   middle_name_en: '',
   last_name_en: '',
-  dob: new Date().toISOString(),
+  dob: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
   gender: 'other',
-
-  // Optional name fields
-  email: '',
+  email: null,
   first_name_ar: '',
   middle_name_ar: '',
   last_name_ar: '',
@@ -33,31 +49,15 @@ const form = ref<BeneficiaryFormData>({
   phone: '',
   address: '',
   gid: '',
-  joined_at: '',
-  organization_id: org.myOrganization?.id || '' // Use organization ID instead of slug
+  organization_id: ''
 })
 
-// Reset form function with proper typing
-const resetForm = () => {
-  const defaultForm: BeneficiaryFormData = {
-    first_name_en: '',
-    last_name_en: '',
-    email: '',
-    middle_name_en: '',
-    first_name_ar: '',
-    middle_name_ar: '',
-    last_name_ar: '',
-    display_name: '',
-    dob: new Date().toISOString(),
-    gender: 'other',
-    phone: '',
-    address: '',
-    gid: '',
-    joined_at: new Date().toISOString().split('T')[0],
-    organization_id: org.myOrganization?.id || '' // Use organization ID instead of slug
-  }
+const form = ref<BeneficiaryFormData>(createDefaultForm())
 
-  form.value = { ...defaultForm }
+// Reset form function
+const resetForm = (): void => {
+  form.value = createDefaultForm()
+  formErrors.value = {}
 }
 
 // Gender options with proper typing
@@ -65,74 +65,96 @@ const genderOptions = [
   { label: t('beneficiary.gender.male'), value: 'male' as const },
   { label: t('beneficiary.gender.female'), value: 'female' as const },
   { label: t('beneficiary.gender.other'), value: 'other' as const }
-]
+] as const
 
-// Form validation state - properly typed error object
-const formErrors = ref<Partial<Record<keyof BeneficiaryFormData, string>>>({})
+// Type-safe field error helpers
+const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined => {
+  return formErrors.value[fieldName]
+}
+
+const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
+  return Boolean(formErrors.value[fieldName])
+}
+
+// Type-safe error handling for API responses
+interface APIValidationError {
+  field: string
+  message: string
+  code: 'validation_error'
+}
+
+interface APIErrorResponse {
+  data: {
+    errors: APIValidationError[]
+  }
+}
+
+// Helper to handle API validation errors
+const handleAPIValidationErrors = (errors: APIValidationError[]): void => {
+  const errorMap: FormErrors = {}
+
+  errors.forEach((err) => {
+    const fieldName = err.field as keyof BeneficiaryFormData
+    if (fieldName in form.value) {
+      errorMap[fieldName] = err.message
+    }
+  })
+
+  formErrors.value = errorMap
+}
 
 // Generate display name automatically
-watch([() => form.value.first_name_en, () => form.value.last_name_en], () => {
-  if (form.value.first_name_en && form.value.last_name_en) {
-    form.value.display_name = `${form.value.first_name_en} ${form.value.last_name_en}`
+watch(
+  [() => form.value.first_name_en, () => form.value.last_name_en],
+  ([firstName, lastName]) => {
+    if (firstName && lastName) {
+      form.value.display_name = `${firstName} ${lastName}`
+    }
   }
-})
+)
 
-// Set joined_at to today by default
-onMounted(() => {
-  form.value.joined_at = new Date().toISOString().split('T')[0]
-})
-// Form submission with proper error handling
-const handleSubmit = async () => {
+// Form submission with comprehensive error handling
+const handleSubmit = async (): Promise<void> => {
   try {
     isLoading.value = true
     formErrors.value = {}
 
-    // Validate the form client-side first
-    // I think this will auto throw ZodError
+    // Client-side validation first
     const validatedData = createBeneficiarySchema.parse(form.value)
 
-    // Call the API endpoint
-    const result = await $fetch('/api/admin/beneficiary', {
+    // Make API call with proper typing
+    const result = await $fetch<CreateBeneficiaryResponse>('/api/admin/beneficiary', {
       method: 'POST',
       body: validatedData
     })
 
-    console.log({ result })
-
-    // if (!result?.success) {
-    //   toast.add({
-    //     color: 'error',
-    //     title: 'Submission Failed',
-    //     description: 'Unable to create beneficiary. Please try again.'
-    //   })
-    //   return
-    // }
-
     console.log('Beneficiary created successfully:', result)
 
     // Show success message
-    // toast.add({
-    //   color: 'success',
-    //   title: 'Success!',
-    //   description: result.message || 'Beneficiary created successfully'
-    // })
+    toast.add({
+      color: 'success',
+      title: 'Success!',
+      description: result.message || 'Beneficiary created successfully'
+    })
 
-    // Reset form and close modal
-    // resetForm()
-    // isModalOpen.value = false
+    // Reset and close
+    resetForm()
+    isModalOpen.value = false
 
-    // Emit event to refresh data in parent component
-    // You might want to use a composable or emit to parent
-    // await refreshCookie('beneficiaries') // or your refresh method
+    // Emit event for parent component to refresh data
+    // You can add an emit here if needed
+    emit('beneficiaryCreated')
   } catch (error) {
     console.error('Error creating beneficiary:', error)
 
     if (error instanceof ZodError) {
-      // Handle client-side Zod validation errors
-      const errorMap: Partial<Record<keyof BeneficiaryFormData, string>> = {}
-      error.issues.forEach((err) => {
-        const fieldName = err.path[0] as keyof BeneficiaryFormData
-        errorMap[fieldName] = err.message
+      // Handle client-side validation errors
+      const errorMap: FormErrors = {}
+      error.issues.forEach((issue) => {
+        const fieldName = issue.path[0] as keyof BeneficiaryFormData
+        if (fieldName in form.value) {
+          errorMap[fieldName] = issue.message
+        }
       })
       formErrors.value = errorMap
 
@@ -142,22 +164,25 @@ const handleSubmit = async () => {
         description: 'Please check the form fields and try again.'
       })
     } else if (error instanceof FetchError) {
-      console.log(error.data)
-      // Handle API errors
-      const errorMap: Partial<Record<keyof BeneficiaryFormData, string>> = {}
-      error.data.data.errors.forEach((err) => {
-        const fieldName = err.field as keyof BeneficiaryFormData
-        errorMap[fieldName] = err.message
-      })
-      formErrors.value = errorMap
+      // Handle server-side validation errors
+      const errorResponse = error.data as APIErrorResponse
 
-      toast.add({
-        color: 'error',
-        title: 'Validation Error',
-        description: 'Please check the form fields and try again.'
-      })
+      if (errorResponse?.data?.errors) {
+        handleAPIValidationErrors(errorResponse.data.errors)
+
+        toast.add({
+          color: 'error',
+          title: 'Validation Error',
+          description: 'Please check the form fields and try again.'
+        })
+      } else {
+        toast.add({
+          color: 'error',
+          title: 'Server Error',
+          description: error.statusMessage || 'Server error occurred. Please try again.'
+        })
+      }
     } else {
-      console.log({ error })
       // Handle unexpected errors
       toast.add({
         color: 'error',
@@ -170,31 +195,26 @@ const handleSubmit = async () => {
   }
 }
 
-// Reset form when modal closes
+// Reset errors when modal closes
 watch(isModalOpen, (isOpen) => {
   if (!isOpen) {
     formErrors.value = {}
-    // Optionally reset form when modal closes
-    // resetForm()
   }
 })
 
-// Type-safe field getters for easier access
-const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined => {
-  return formErrors.value[fieldName]
-}
-
-const hasFieldError = (fieldName: keyof BeneficiaryFormData): boolean => {
-  return Boolean(formErrors.value[fieldName])
-}
-
-async function onError(event: FormErrorEvent) {
+// Type-safe form error handler
+const onError = async (event: FormErrorEvent): Promise<void> => {
   if (event?.errors?.[0]?.id) {
     const element = document.getElementById(event.errors[0].id)
     element?.focus()
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 }
+
+// Set joined_at to today by default on component mount
+onMounted(() => {
+  form.value.dob = new Date().toISOString().split('T')[0]
+})
 </script>
 
 <template>
@@ -226,6 +246,7 @@ async function onError(event: FormErrorEvent) {
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('beneficiary.sections.required') }}
             </h3>
+
             <!-- English Name -->
             <FlexThreeColumn>
               <template #left>
@@ -242,6 +263,7 @@ async function onError(event: FormErrorEvent) {
                   />
                 </UFormField>
               </template>
+
               <template #middle>
                 <UFormField
                   :label="t('beneficiary.fields.middleName')"
@@ -256,6 +278,7 @@ async function onError(event: FormErrorEvent) {
                   />
                 </UFormField>
               </template>
+
               <template #right>
                 <UFormField
                   :label="t('beneficiary.fields.lastName')"
@@ -271,6 +294,7 @@ async function onError(event: FormErrorEvent) {
                 </UFormField>
               </template>
             </FlexThreeColumn>
+
             <!-- GID -->
             <UFormField
               :label="t('beneficiary.fields.gid')"
@@ -290,6 +314,7 @@ async function onError(event: FormErrorEvent) {
                 </span>
               </template>
             </UFormField>
+
             <!-- DOB and Gender -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <!-- Date of Birth -->
@@ -306,6 +331,7 @@ async function onError(event: FormErrorEvent) {
                   class="w-full"
                 />
               </UFormField>
+
               <!-- Gender -->
               <UFormField
                 :label="t('beneficiary.fields.gender')"
@@ -314,7 +340,7 @@ async function onError(event: FormErrorEvent) {
               >
                 <USelect
                   v-model="form.gender"
-                  :items="genderOptions"
+                  :options="genderOptions"
                   :placeholder="t('beneficiary.placeholders.gender')"
                   :disabled="isLoading"
                   :class="{ 'border-red-500': hasFieldError('gender') }"
@@ -324,11 +350,12 @@ async function onError(event: FormErrorEvent) {
             </div>
           </div>
 
-          <!-- Optional Name Information Section -->
+          <!-- Optional Information Section -->
           <div class="space-y-3">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ t('beneficiary.sections.additionalDetails') }}
             </h3>
+
             <!-- Arabic Names -->
             <FlexThreeColumn>
               <template #left>
@@ -345,6 +372,7 @@ async function onError(event: FormErrorEvent) {
                   />
                 </UFormField>
               </template>
+
               <template #middle>
                 <UFormField
                   :label="t('beneficiary.fields.middleNameAr')"
@@ -359,6 +387,7 @@ async function onError(event: FormErrorEvent) {
                   />
                 </UFormField>
               </template>
+
               <template #right>
                 <UFormField
                   :label="t('beneficiary.fields.lastNameAr')"
@@ -403,36 +432,37 @@ async function onError(event: FormErrorEvent) {
                 class="w-full"
               />
             </UFormField>
-          </div>
 
-          <!-- Phone -->
-          <UFormField
-            :label="t('beneficiary.fields.phone')"
-            :error="getFieldError('phone')"
-          >
-            <UInput
-              v-model="form.phone"
-              type="tel"
-              :placeholder="t('beneficiary.placeholders.phone')"
-              :disabled="isLoading"
-              :class="{ 'border-red-500': hasFieldError('phone') }"
-              class="w-full"
-            />
-          </UFormField>
-          <!-- Address -->
-          <UFormField
-            :label="t('beneficiary.fields.address')"
-            :error="getFieldError('address')"
-          >
-            <UTextarea
-              v-model="form.address"
-              :placeholder="t('beneficiary.placeholders.address')"
-              :disabled="isLoading"
-              :class="{ 'border-red-500': hasFieldError('address') }"
-              class="w-full"
-              :rows="3"
-            />
-          </UFormField>
+            <!-- Phone -->
+            <UFormField
+              :label="t('beneficiary.fields.phone')"
+              :error="getFieldError('phone')"
+            >
+              <UInput
+                v-model="form.phone"
+                type="tel"
+                :placeholder="t('beneficiary.placeholders.phone')"
+                :disabled="isLoading"
+                :class="{ 'border-red-500': hasFieldError('phone') }"
+                class="w-full"
+              />
+            </UFormField>
+
+            <!-- Address -->
+            <UFormField
+              :label="t('beneficiary.fields.address')"
+              :error="getFieldError('address')"
+            >
+              <UTextarea
+                v-model="form.address"
+                :placeholder="t('beneficiary.placeholders.address')"
+                :disabled="isLoading"
+                :class="{ 'border-red-500': hasFieldError('address') }"
+                class="w-full"
+                :rows="3"
+              />
+            </UFormField>
+          </div>
         </UForm>
       </template>
 

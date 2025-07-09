@@ -10,6 +10,8 @@ definePageMeta({
 
 type Beneficiary = typeof beneficiary.$inferSelect
 
+const tableKey = ref(0)
+const table = ref()
 const { t } = useI18n()
 
 const router = useRouter()
@@ -103,15 +105,25 @@ const filters: AdminTableFilter[] = reactive([
     value: { start: undefined, end: undefined }
   }
 ])
+
+const reloadTable = async () => {
+  tableKey.value++ // This forces the table to re-render
+
+  await table.value?.fetchTableData?.()
+}
 </script>
 
 <template>
   <NuxtLayout name="admin">
     <template #navRight>
-      <CreateModal :t="t" />
+      <CreateModal
+        :t="t"
+        @beneficiary-created="reloadTable"
+      />
     </template>
     <AdminTable
-      ref="table"
+      :key="tableKey"
+      :ref="table"
       :columns="columns"
       :filters="filters"
       :fetch-data="fetchData"

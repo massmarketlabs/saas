@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+// AdminTable.vue
 import type { UTableInstance } from './types'
 import { useDebounceFn } from '@vueuse/core'
 import { FetchError } from 'ofetch'

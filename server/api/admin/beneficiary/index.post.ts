@@ -21,9 +21,9 @@ export const createBeneficiarySchema = createInsertSchema(beneficiary, {
   last_name_en: z.string().min(1, 'Last name is required'),
   gid: z.string().min(1, 'Government Issued Identification Number is required'),
   gender: z.enum(['male', 'female', 'other']),
-  email: z.email().or(z.literal('')),
+  email: z.email().or(z.null()),
   phone: z.string().optional()
-})
+}).omit({ created_at: true, joined_at: true, updated_at: true })
 
 const getCurrentUserOrganizationMembership = async (
   session?: Awaited<ReturnType<typeof getAuthSession>>
@@ -65,7 +65,13 @@ const checkExistingGID = async (gid: string, orgId: string) => {
 // Infer the type from the schema
 export type BeneficiaryFormData = z.infer<typeof createBeneficiarySchema>
 
-export default defineEventHandler(async (event) => {
+export interface CreateBeneficiaryResponse {
+  statusCode: number
+  data: typeof beneficiary.$inferSelect
+  message: string
+}
+
+export default defineEventHandler(async (event): Promise<CreateBeneficiaryResponse> => {
   try {
     // Get the authenticated user
     const session = await getAuthSession(event)
@@ -93,7 +99,6 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     // Parse and validate request body
-    // const parsedData = await readValidatedBody(event, createBeneficiarySchema.safeParseAsync)
     const validatedData = await createBeneficiarySchema
       .parseAsync(body)
       .then(async (parsedData) => {
