@@ -105,9 +105,7 @@ const filters: AdminTableFilter[] = reactive([
   }
 ])
 
-const reloadTable = async () => {
-  tableKey.value++ // This forces the table to re-render
-}
+const { refresh } = useAdminTable()
 </script>
 
 <template>
@@ -115,7 +113,7 @@ const reloadTable = async () => {
     <template #navRight>
       <CreateModal
         :t="t"
-        @beneficiary-created="reloadTable"
+        @beneficiary-created="refresh"
       />
     </template>
     <AdminTable
