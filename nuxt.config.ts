@@ -18,6 +18,13 @@ export default defineNuxtConfig({
     ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
     ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
+  // Add Vite SSR configuration to fix the "Cannot read properties of undefined (reading 'body')" error
+  vite: {
+    ssr: {
+      noExternal: ['nuxt-charts', '@unovis/ts'],
+      external: ['to-px']
+    }
+  },
   ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
     ? {
         hub: {
@@ -37,12 +44,7 @@ export default defineNuxtConfig({
   i18n: {
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
-    locales: [
-      { code: 'en', language: 'en-US', name: 'English' },
-      { code: 'zh-CN', language: 'zh-CN', name: '简体中文' },
-      { code: 'ja', language: 'ja-JP', name: '日本語' },
-      { code: 'fr', language: 'fr-FR', name: 'Français' }
-    ],
+    locales,
     defaultLocale: 'en',
     bundle: {
       optimizeTranslationDirective: false
@@ -52,7 +54,8 @@ export default defineNuxtConfig({
     exclude: [
       '/admin/**',
       '/403',
-      '/profile'
+      '/profile',
+      ...adminExcludes
     ]
   },
   seo: {
@@ -94,7 +97,6 @@ export default defineNuxtConfig({
           pagesToRemove.push(page)
         }
       })
-
       pagesToRemove.forEach((page: NuxtPage) => {
         pages.splice(pages.indexOf(page), 1)
       })

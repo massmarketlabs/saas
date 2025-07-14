@@ -2,9 +2,9 @@
 definePageMeta({
   layout: false
 })
-const { t } = useI18n()
+// const { t } = useI18n()
 const localePath = useLocalePath()
-const { user } = useAuth()
+// const { user } = useAuth()
 const orgStore = useOrganizationStore()
 await orgStore.fetchOrganizations()
 
@@ -41,7 +41,9 @@ const menuItems = [{
       icon: 'eos-icons:system-ok-outlined'
     }
   ]
-}, { slot: 'admin' }] satisfies NavigationMenuItem[]
+}, {
+  slot: 'userNavigation'
+}] satisfies NavigationMenuItem[]
 </script>
 
 <template>
@@ -50,17 +52,10 @@ const menuItems = [{
       <UNavigationMenu
         orientation="horizontal"
         :items="menuItems"
+        variant="link"
       >
-        <template #admin>
-          <UButton
-            v-if="orgStore.myOrganization && user?.role == 'admin'"
-            variant="outline"
-            color="neutral"
-            class="flex items-center gap-2"
-            :to="localePath(`/${orgStore.myOrganization.slug}/admin/dashboard`)"
-          >
-            {{ t('global.nav.admin') }}
-          </UButton>
+        <template #userNavigation>
+          <UserNavigation />
         </template>
       </UNavigationMenu>
     </template>

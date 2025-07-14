@@ -3,11 +3,10 @@ import type { Organization } from 'better-auth/plugins'
 export const useOrganizationStore = defineStore('organizations', () => {
   const toast = useToast()
   const { organization } = useAuth()
-  const route = useRoute()
 
   const organizationsList = ref<Organization[]>([])
-
-  const myOrganization = computed(() => organizationsList.value.find(org => org.slug === route.params.orgslug))
+  // It is assumed that all users currently are assigned to one organization.
+  const myOrganization = computed(() => organizationsList.value[0])
 
   const fetchOrganizations = async () => {
     if (organizationsList.value.length !== 0) {

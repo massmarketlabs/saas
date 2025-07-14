@@ -10,7 +10,10 @@ import * as schema from '../database/schema'
 import { user } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
-import { cacheClient, resendInstance } from './drivers'
+import {
+  // cacheClient,
+  resendInstance
+} from './drivers'
 import { runtimeConfig } from './runtimeConfig'
 // import { setupStripe } from './stripe'
 
@@ -34,7 +37,7 @@ const createBetterAuth = () => betterAuth({
       }
     }
   },
-  secondaryStorage: cacheClient,
+  // secondaryStorage: cacheClient,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

@@ -37,11 +37,10 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
         />
         <span>
           {{ user?.name }}
-          <!-- <UBadge
-            v-if="activeSubscription"
-            label="Pro"
-          /> -->
         </span>
+        <!-- <UBadge
+          label="Pro"
+        /> -->
       </UButton>
     </UDropdownMenu>
     <UButton
