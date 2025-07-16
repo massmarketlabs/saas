@@ -50,6 +50,7 @@ const navigation = [
           color="neutral"
           variant="ghost"
           icon="i-lucide-menu"
+          aria-label="menu"
         />
       </UDropdownMenu>
     </div>

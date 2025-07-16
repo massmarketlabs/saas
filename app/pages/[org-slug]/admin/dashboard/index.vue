@@ -38,33 +38,34 @@ const stats = ref([
   }
 ])
 
-const RevenueData = [
-  { month: 'January', desktop: 186, mobile: 80 },
-  { month: 'February', desktop: 305, mobile: 200 },
-  { month: 'March', desktop: 237, mobile: 120 },
-  { month: 'April', desktop: 73, mobile: 190 },
-  { month: 'May', desktop: 209, mobile: 130 },
-  { month: 'June', desktop: 214, mobile: 140 }
-]
-const RevenueCategoriesMultple = {
-  desktop: { name: 'Desktop', color: '#029752' },
-  mobile: { name: 'Mobile', color: '#4ade80' }
-}
+// const RevenueData = [
+//   { month: 'January', desktop: 186, mobile: 80 },
+//   { month: 'February', desktop: 305, mobile: 200 },
+//   { month: 'March', desktop: 237, mobile: 120 },
+//   { month: 'April', desktop: 73, mobile: 190 },
+//   { month: 'May', desktop: 209, mobile: 130 },
+//   { month: 'June', desktop: 214, mobile: 140 }
+// ]
+// const RevenueCategoriesMultple = {
+//   desktop: { name: 'Desktop', color: '#029752' },
+//   mobile: { name: 'Mobile', color: '#4ade80' }
+// }
 
-const categories: Record<string, BulletLegendItemInterface> = {
-  desktop: { name: 'Desktop', color: '#029752' },
-  mobile: { name: 'Mobile', color: '#4ade80' }
-}
+// const categories: Record<string, BulletLegendItemInterface> = {
+//   desktop: { name: 'Desktop', color: '#029752' },
+//   mobile: { name: 'Mobile', color: '#4ade80' }
+// }
 
-const AreaChartData = [
-  { date: '2024-04-01', desktop: 222, mobile: 150 },
-  { date: '2024-04-02', desktop: 180, mobile: 97 },
-  { date: '2024-04-03', desktop: 167, mobile: 120 },
-  { date: '2024-04-04', desktop: 260, mobile: 240 },
-  { date: '2024-04-05', desktop: 240, mobile: 290 }
-]
+// const AreaChartData = [
+//   { date: '2024-04-01', desktop: 222, mobile: 150 },
+//   { date: '2024-04-02', desktop: 180, mobile: 97 },
+//   { date: '2024-04-03', desktop: 167, mobile: 120 },
+//   { date: '2024-04-04', desktop: 260, mobile: 240 },
+//   { date: '2024-04-05', desktop: 240, mobile: 290 }
+// ]
 
-const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
+// const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
+
 </script>
 
 <template>
@@ -105,7 +106,8 @@ const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
 
       <!-- Charts -->
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <UCard>
+        <!-- <UCard>
+
           <AreaChart
             :data="AreaChartData"
             :height="250"
@@ -116,8 +118,8 @@ const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
             legend-poisition="top"
             :x-formatter="xFormatter"
           />
-        </UCard>
-        <UCard>
+        </UCard> -->
+        <!-- <UCard>
           <BarChart
             :data="RevenueData"
             :stacked="true"
@@ -133,7 +135,7 @@ const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
             :y-formatter="(i: number): string => `${RevenueData[i]!.month}`"
             :legend-position="LegendPosition.Top"
           />
-        </UCard>
+        </UCard> -->
       </div>
     </div>
   </NuxtLayout>

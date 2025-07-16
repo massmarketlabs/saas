@@ -10,7 +10,10 @@ import * as schema from '../database/schema'
 import { user } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
-import { cacheClient, resendInstance } from './drivers'
+import {
+  // cacheClient,
+  resendInstance
+} from './drivers'
 import { runtimeConfig } from './runtimeConfig'
 // import { setupStripe } from './stripe'
 
@@ -34,7 +37,7 @@ const createBetterAuth = () => betterAuth({
       }
     }
   },
-  secondaryStorage: cacheClient,
+  // secondaryStorage: cacheClient,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
@@ -188,11 +191,11 @@ const createBetterAuth = () => betterAuth({
 
 let _auth: ReturnType<typeof betterAuth>
 
-if (typeof useRuntimeConfig === 'undefined') {
+// Used by npm run auth:schema only.
+const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/database/schema/auth.ts'))
+if (isAuthSchemaCommand) {
   _auth = createBetterAuth()
 }
-
-// Used by npm run auth:schema only.
 export const auth = _auth!
 
 export const useServerAuth = () => {

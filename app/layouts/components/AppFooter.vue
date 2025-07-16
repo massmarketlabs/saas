@@ -30,6 +30,7 @@ const runtimeConfig = useRuntimeConfig()
             color="neutral"
             :href="runtimeConfig.public.appRepo"
             target="_blank"
+            aria-label="Github"
             rel="noopener noreferrer"
           />
         </div>

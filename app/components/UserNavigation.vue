@@ -1,9 +1,12 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { loggedIn, signOut, user, organization } = useAuth()
-const orgs = await organization.list()
-const orgSlug = computed(() => `/${orgs?.data?.[0]?.slug}/admin/dashboard`)
+const { loggedIn, signOut, user } = useAuth()
+const orgs = useOrganizationStore()
+await orgs.fetchOrganizations()
+
+const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
+
 </script>
 
 <template>
@@ -35,15 +38,15 @@ const orgSlug = computed(() => `/${orgs?.data?.[0]?.slug}/admin/dashboard`)
         />
         <span>
           {{ user?.name }}
-          <!-- <UBadge
-            v-if="activeSubscription"
-            label="Pro"
-          /> -->
+
         </span>
+        <!-- <UBadge
+          label="Pro"
+        /> -->
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="orgs.data && orgs.data[0] && user?.role == 'admin'"
+      v-if="orgs.myOrganization && user?.role == 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"

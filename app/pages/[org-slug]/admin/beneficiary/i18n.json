@@ -3,9 +3,51 @@
     "beneficiary": {
       "title": "Beneficiary",
       "actions": {
-        "createBeneficiary": "Create Beneficiary",
+        "create": {
+          "description": "Let's start an amazing journey.",
+          "title": "Create Beneficiary",
+          "submit": "Submit"
+        },
         "viewProfile": "View Profile"
       },
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "middleName": "Middle Name",
+        "email": "Email",
+        "displayName": "Display Name",
+        "firstNameAr": "First Name (AR)",
+        "middleNameAr": "Middle Name (AR)",
+        "lastNameAr": "Last Name (AR)",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "phone": "Phone",
+        "address": "Address",
+        "gid": "Government Issued Identification Number",
+        "role": "Role",
+        "joinedAt": "Joined At"
+      },
+      "hints": {
+        "gid": "(Check ID Card)"
+      },
+      "placeholders": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "middleName": "Middle Name",
+        "email": "Email",
+        "displayName": "Display Name",
+        "firstNameAr": "First Name (AR)",
+        "middleNameAr": "Middle Name (AR)",
+        "lastNameAr": "Last Name (AR)",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "phone": "Phone",
+        "address": "Address",
+        "gid": "Government Issued Identification Number",
+        "role": "Role",
+        "joinedAt": "Joined At"
+      },
+
       "profile": {
         "profileInformation": "Profile Information",
         "basicInformation": "Basic Information",
@@ -43,6 +85,15 @@
           "primary": "Primary Contact",
           "relationship": "Relationship"
         }
+      },
+      "sections": {
+        "required": "Required Details",
+        "additionalDetails": "Additional Details"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
       }
     }
   },
@@ -50,7 +101,11 @@
     "beneficiary": {
       "title": "المستفيد",
       "actions": {
-        "createBeneficiary": "إنشاء المستفيد",
+        "create": {
+          "title": "إنشاء المستفيد",
+          "description": "لنبدأ رحلة مذهلة."
+        },
+
         "viewProfile": "عرض الملف الشخصي"
       },
       "profile": {

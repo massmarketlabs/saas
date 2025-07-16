@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="T">
+// AdminTable.vue
 import type { UTableInstance } from './types'
 import { useDebounceFn } from '@vueuse/core'
 import { FetchError } from 'ofetch'
@@ -247,14 +248,14 @@ defineExpose({
       </template>
     </UTable>
     <Pagination
-      :model-value="page"
+      :page="page"
       :limit="limit"
       :total="total"
       :hide-pagination="hidePagination"
       :can-select="canSelect"
       :selected-row-count="selectedRowCount"
       :row-count="rowCount"
-      @update:model-value="updatePage"
+      @update:page="updatePage"
       @update:limit="updateLimit"
     />
   </div>

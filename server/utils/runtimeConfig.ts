@@ -22,10 +22,14 @@ export const generateRuntimeConfig = () => ({
   // DB
   redisUrl: process.env.NUXT_REDIS_URL,
   databaseUrl: process.env.NUXT_DATABASE_URL,
+  // S3 Storage
+  r2_endpoint: process.env.R2_ENDPOINT,
+  r2_access_key_id: process.env.R2_ACCESS_KEY_ID,
+  r2_secret_access_key: process.env.R2_SECRET_ACCESS_KEY,
   public: {
     baseURL: process.env.NUXT_APP_URL,
     appName: process.env.NUXT_APP_NAME,
-    appEnv: process.env.NUXT_APP_ENV,
+    appEnv: process.env.NODE_ENV,
     appRepo: process.env.NUXT_APP_REPO,
     appNotifyEmail: process.env.NUXT_APP_NOTIFY_EMAIL,
     appContactEmail: process.env.NUXT_APP_CONTACT_EMAIL,

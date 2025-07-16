@@ -1,5 +1,6 @@
 import { boolean, date, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
-import { user } from './auth'
+import { organization, user } from './auth'
+
 import { audit_fields } from './shared'
 // import type { SQL } from 'drizzle-orm'
 // import { sql } from 'drizzle-orm'
@@ -36,8 +37,10 @@ export const beneficiary = pgTable('beneficiary', {
 
   // Organization fields
   gid: text('gid').unique(), // Global identifier
-  role: text('role'),
+  // role: text('role'),
   joined_at: date('joined_at'),
+  organization_id: text('organization_id').references(() => organization.id).notNull(),
+
   // TODO: Search needs to be not null, generatedAlwaysAs might suffice
   // search: tsvector('search')
   //   .generatedAlwaysAs(

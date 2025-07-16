@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-04-01',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
+
   modules: [
     '@nuxt/ui',
     '@nuxt/eslint',
@@ -18,6 +19,13 @@ export default defineNuxtConfig({
     ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
     ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
+  // Add Vite SSR configuration to fix the "Cannot read properties of undefined (reading 'body')" error
+  vite: {
+    ssr: {
+      noExternal: ['nuxt-charts', '@unovis/ts'],
+      external: ['to-px']
+    }
+  },
   ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
     ? {
         hub: {
@@ -46,13 +54,18 @@ export default defineNuxtConfig({
   sitemap: {
     exclude: [
       '/admin/**',
+      '/403',
+      '/profile',
       ...adminExcludes
     ]
+  },
+  seo: {
+    canonicalLowercase: false
   },
   robots: {
     disallow: [
       '/admin',
-      ...adminExcludes.map(path => path.replace('/**', ''))
+      '/profile'
     ]
   },
   eslint: {
@@ -85,7 +98,6 @@ export default defineNuxtConfig({
           pagesToRemove.push(page)
         }
       })
-
       pagesToRemove.forEach((page: NuxtPage) => {
         pages.splice(pages.indexOf(page), 1)
       })
@@ -99,7 +111,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no',
+      viewport: 'width=device-width, initial-scale=1, maximum-scale=5.0, minimum-scale=1.0',
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicons/favicon-96x96.png', sizes: '96x96' },
         { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
