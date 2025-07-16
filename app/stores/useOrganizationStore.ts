@@ -2,14 +2,14 @@ import type { Organization } from 'better-auth/plugins'
 
 export const useOrganizationStore = defineStore('organizations', () => {
   const toast = useToast()
-  const { organization } = useAuth()
+  const { organization, user } = useAuth()
 
   const organizationsList = ref<Organization[]>([])
   // It is assumed that all users currently are assigned to one organization.
   const myOrganization = computed(() => organizationsList.value[0])
 
   const fetchOrganizations = async () => {
-    if (organizationsList.value.length !== 0) {
+    if (organizationsList.value.length !== 0 || !user.value) {
       return
     }
     const orgs = await organization.list()
