@@ -56,6 +56,15 @@ menus.value.forEach((group) => {
 const clickSignOut = () => {
   signOut({ redirectTo: localePath('/signin') })
 }
+
+const { start } = useLoadingIndicator({
+  duration: 2000,
+  throttle: 200,
+  estimatedProgress: (duration, elapsed) => (2 / Math.PI * 100) * Math.atan(elapsed / duration * 100 / 50)
+
+})
+
+start({ force: true })
 </script>
 
 <template>
