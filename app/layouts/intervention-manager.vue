@@ -5,6 +5,7 @@ definePageMeta({
 // const { t } = useI18n()
 const localePath = useLocalePath()
 // const { user } = useAuth()
+
 const orgStore = useOrganizationStore()
 await orgStore.fetchOrganizations()
 
@@ -44,6 +45,7 @@ const menuItems = [{
 }, {
   slot: 'userNavigation'
 }] satisfies NavigationMenuItem[]
+
 </script>
 
 <template>

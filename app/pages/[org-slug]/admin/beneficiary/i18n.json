@@ -47,6 +47,7 @@
         "role": "Role",
         "joinedAt": "Joined At"
       },
+
       "profile": {
         "profileInformation": "Profile Information",
         "basicInformation": "Basic Information",
@@ -104,6 +105,7 @@
           "title": "إنشاء المستفيد",
           "description": "لنبدأ رحلة مذهلة."
         },
+
         "viewProfile": "عرض الملف الشخصي"
       },
       "profile": {

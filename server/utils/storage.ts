@@ -7,5 +7,6 @@ export const s3Client = new S3Client({
   credentials: {
     accessKeyId: runtimeConfig.r2_access_key_id,
     secretAccessKey: runtimeConfig.r2_secret_access_key
+
   }
 })

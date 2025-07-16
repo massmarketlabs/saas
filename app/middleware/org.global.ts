@@ -18,6 +18,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
       throw createError(orgs.error || 'Unable to fetch organizations')
     }
 
+
     if (!orgs.data || orgs.data.length === 0) {
       return navigateTo(localePath('/organization/onboarding'))
     }

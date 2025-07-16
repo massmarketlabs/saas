@@ -4,6 +4,7 @@
 import type { approval_request, beneficiary, beneficiary_intervention_enrollment, beneficiary_relationships, emergency_contacts, program_enrollment, programs } from '~~/server/database/schema'
 
 definePageMeta({ layout: false })
+
 interface BeneficiaryAggregate {
   rootTable: string
   data: typeof beneficiary.$inferSelect &
@@ -15,6 +16,7 @@ interface BeneficiaryAggregate {
 }
 
 const org = useOrganizationStore()
+
 const copied = ref(false)
 
 const { t, locale } = useI18n()

@@ -6,6 +6,7 @@ const orgs = useOrganizationStore()
 await orgs.fetchOrganizations()
 
 const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
+
 </script>
 
 <template>
@@ -37,6 +38,7 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
         />
         <span>
           {{ user?.name }}
+
         </span>
         <!-- <UBadge
           label="Pro"

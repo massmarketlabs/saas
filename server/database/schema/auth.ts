@@ -25,6 +25,7 @@ export const session = pgTable('session', {
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   impersonatedBy: text('impersonated_by'),
   activeOrganizationId: text('active_organization_id')
+
 })
 
 export const account = pgTable('account', {
@@ -68,6 +69,7 @@ export const member = pgTable('member', {
   role: text('role').default('member').notNull(),
   createdAt: timestamp('created_at').notNull()
 })
+
 
 export const invitation = pgTable('invitation', {
   id: text('id').primaryKey(),

@@ -65,6 +65,7 @@ const stats = ref([
 // ]
 
 // const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
+
 </script>
 
 <template>
@@ -106,6 +107,7 @@ const stats = ref([
       <!-- Charts -->
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <!-- <UCard>
+
           <AreaChart
             :data="AreaChartData"
             :height="250"

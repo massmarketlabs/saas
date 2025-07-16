@@ -4,6 +4,7 @@
 import type { beneficiary } from '~~/server/database/schema'
 import CreateModal from './components/create-modal.vue'
 
+
 definePageMeta({
   layout: false
 })
@@ -11,6 +12,7 @@ definePageMeta({
 type Beneficiary = typeof beneficiary.$inferSelect
 
 const tableKey = ref(0)
+
 const { t } = useI18n()
 
 const router = useRouter()
@@ -106,6 +108,7 @@ const filters: AdminTableFilter[] = reactive([
 ])
 
 const { refresh } = useAdminTable()
+
 </script>
 
 <template>
