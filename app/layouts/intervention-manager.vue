@@ -45,7 +45,6 @@ const menuItems = [{
 }, {
   slot: 'userNavigation'
 }] satisfies NavigationMenuItem[]
-
 </script>
 
 <template>

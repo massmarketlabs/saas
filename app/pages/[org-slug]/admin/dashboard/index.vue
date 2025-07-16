@@ -65,7 +65,6 @@ const stats = ref([
 // ]
 
 // const xFormatter = (i: number): string | number => AreaChartData[i]?.date || ''
-
 </script>
 
 <template>

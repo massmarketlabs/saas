@@ -4,7 +4,6 @@
 import type { beneficiary } from '~~/server/database/schema'
 import CreateModal from './components/create-modal.vue'
 
-
 definePageMeta({
   layout: false
 })
@@ -108,7 +107,6 @@ const filters: AdminTableFilter[] = reactive([
 ])
 
 const { refresh } = useAdminTable()
-
 </script>
 
 <template>
