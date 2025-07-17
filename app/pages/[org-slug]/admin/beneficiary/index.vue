@@ -2,7 +2,8 @@
 
 <script lang="ts" setup>
 import type { beneficiary } from '~~/server/database/schema'
-import CreateModal from './components/create-modal.vue'
+import ModalCreate from './components/modal-create.vue'
+import ModalDeleteConfirmation from './components/modal-delete-confirmation.vue'
 
 definePageMeta({
   layout: false
@@ -10,7 +11,7 @@ definePageMeta({
 
 type Beneficiary = typeof beneficiary.$inferSelect
 
-const tableKey = ref(0)
+const toDeleteBeneficiary = ref<null | Beneficiary>(null)
 
 const { t } = useI18n()
 
@@ -35,6 +36,7 @@ const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }
     total: result.total
   }
 }
+
 const getRowItems = (row: globalThis.Row<Beneficiary>) => {
   const beneficiary = row.original
   return [
@@ -56,11 +58,13 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
       label: t('global.page.delete'),
       icon: 'i-lucide-trash',
       color: 'error',
-      async onSelect() {
+      onSelect() {
+        toDeleteBeneficiary.value = beneficiary
       }
     }
   ]
 }
+
 const columns: AdminTableColumn<Beneficiary>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'first_name_en', header: 'First Name' },
@@ -107,18 +111,26 @@ const filters: AdminTableFilter[] = reactive([
 ])
 
 const { refresh } = useAdminTable()
+
+const closeDeleteModal = () => {
+  toDeleteBeneficiary.value = null
+}
 </script>
 
 <template>
   <NuxtLayout name="admin">
     <template #navRight>
-      <CreateModal
+      <ModalCreate
         :t="t"
         @beneficiary-created="refresh"
       />
     </template>
+    <ModalDeleteConfirmation
+      :close-delete-modal="closeDeleteModal"
+      :to-delete-beneficiary="toDeleteBeneficiary"
+      :refresh="refresh"
+    />
     <AdminTable
-      :key="tableKey"
       ref="table"
       :columns="columns"
       :filters="filters"
