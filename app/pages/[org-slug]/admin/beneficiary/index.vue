@@ -11,8 +11,13 @@ definePageMeta({
 type Beneficiary = typeof beneficiary.$inferSelect
 
 const tableKey = ref(0)
+const deleteLoading = ref(false)
+
+const toDeleteBeneficiary = ref<null | Beneficiary>(null)
 
 const { t } = useI18n()
+
+const toast = useToast()
 
 const router = useRouter()
 
@@ -56,7 +61,8 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
       label: t('global.page.delete'),
       icon: 'i-lucide-trash',
       color: 'error',
-      async onSelect() {
+      onSelect() {
+        toDeleteBeneficiary.value = beneficiary
       }
     }
   ]
@@ -107,6 +113,30 @@ const filters: AdminTableFilter[] = reactive([
 ])
 
 const { refresh } = useAdminTable()
+
+function closeDeleteModal() {
+  toDeleteBeneficiary.value = null
+}
+
+async function handleDelete() {
+  try {
+    deleteLoading.value = true
+    const resp = await $fetch('/api/admin/beneficiary', { method: 'DELETE', body: { id: toDeleteBeneficiary.value?.id } })
+
+    if (resp.length)
+    {
+      toast.add({ color: 'success', title: `Successfully deleted ${resp[0]?.id}` })
+      closeDeleteModal()
+      refresh()
+    }
+    // deleteLoading.value = false
+  } catch (error) {
+    console.error(error)
+    // deleteLoading.value = false
+  } finally {
+    deleteLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -117,6 +147,35 @@ const { refresh } = useAdminTable()
         @beneficiary-created="refresh"
       />
     </template>
+    <UModal
+      :open="!!toDeleteBeneficiary"
+      title="Are you sure?"
+      :description="`Beneficiary: ${toDeleteBeneficiary?.first_name_en} ${toDeleteBeneficiary?.last_name_en}`"
+      @update:open="closeDeleteModal"
+    >
+      <template #body>
+        <span> This will be permanent and all data associated with this beneficiary will be lost for ever.</span>
+      </template>
+      <template #footer>
+        <div class="flex gap-2">
+          <UButton
+            variant="outline"
+            :disabled="deleteLoading"
+            @click="closeDeleteModal"
+          >
+            Cancel
+          </UButton>
+          <UButton
+            color="error"
+            :disabled="deleteLoading"
+            :loading="deleteLoading"
+            @click="handleDelete"
+          >
+            Delete
+          </UButton>
+        </div>
+      </template>
+    </UModal>
     <AdminTable
       :key="tableKey"
       ref="table"

@@ -6,7 +6,6 @@ import type { BeneficiaryFormData, CreateBeneficiaryResponse } from '~~/server/a
 import { FetchError } from 'ofetch'
 import { ZodError } from 'zod/v4'
 import {
-
   createBeneficiarySchema
 } from '~~/server/api/admin/beneficiary/index.post'
 
