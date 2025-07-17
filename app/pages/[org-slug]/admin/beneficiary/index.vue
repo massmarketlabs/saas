@@ -2,7 +2,8 @@
 
 <script lang="ts" setup>
 import type { beneficiary } from '~~/server/database/schema'
-import CreateModal from './components/create-modal.vue'
+import ModalCreate from './components/modal-create.vue'
+import ModalDeleteConfirmation from './components/modal-delete-confirmation.vue'
 
 definePageMeta({
   layout: false
@@ -10,14 +11,9 @@ definePageMeta({
 
 type Beneficiary = typeof beneficiary.$inferSelect
 
-const tableKey = ref(0)
-const deleteLoading = ref(false)
-
 const toDeleteBeneficiary = ref<null | Beneficiary>(null)
 
 const { t } = useI18n()
-
-const toast = useToast()
 
 const router = useRouter()
 
@@ -40,6 +36,7 @@ const fetchData: FetchDataFn<Beneficiary> = async ({ page, limit, sort, filter }
     total: result.total
   }
 }
+
 const getRowItems = (row: globalThis.Row<Beneficiary>) => {
   const beneficiary = row.original
   return [
@@ -67,6 +64,7 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
     }
   ]
 }
+
 const columns: AdminTableColumn<Beneficiary>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'first_name_en', header: 'First Name' },
@@ -114,70 +112,25 @@ const filters: AdminTableFilter[] = reactive([
 
 const { refresh } = useAdminTable()
 
-function closeDeleteModal() {
+const closeDeleteModal = () => {
   toDeleteBeneficiary.value = null
-}
-
-async function handleDelete() {
-  try {
-    deleteLoading.value = true
-    const resp = await $fetch('/api/admin/beneficiary', { method: 'DELETE', body: { id: toDeleteBeneficiary.value?.id } })
-
-    if (resp.length)
-    {
-      toast.add({ color: 'success', title: `Successfully deleted ${resp[0]?.id}` })
-      closeDeleteModal()
-      refresh()
-    }
-    // deleteLoading.value = false
-  } catch (error) {
-    console.error(error)
-    // deleteLoading.value = false
-  } finally {
-    deleteLoading.value = false
-  }
 }
 </script>
 
 <template>
   <NuxtLayout name="admin">
     <template #navRight>
-      <CreateModal
+      <ModalCreate
         :t="t"
         @beneficiary-created="refresh"
       />
     </template>
-    <UModal
-      :open="!!toDeleteBeneficiary"
-      title="Are you sure?"
-      :description="`Beneficiary: ${toDeleteBeneficiary?.first_name_en} ${toDeleteBeneficiary?.last_name_en}`"
-      @update:open="closeDeleteModal"
-    >
-      <template #body>
-        <span> This will be permanent and all data associated with this beneficiary will be lost for ever.</span>
-      </template>
-      <template #footer>
-        <div class="flex gap-2">
-          <UButton
-            variant="outline"
-            :disabled="deleteLoading"
-            @click="closeDeleteModal"
-          >
-            Cancel
-          </UButton>
-          <UButton
-            color="error"
-            :disabled="deleteLoading"
-            :loading="deleteLoading"
-            @click="handleDelete"
-          >
-            Delete
-          </UButton>
-        </div>
-      </template>
-    </UModal>
+    <ModalDeleteConfirmation
+      :close-delete-modal="closeDeleteModal"
+      :to-delete-beneficiary="toDeleteBeneficiary"
+      :refresh="refresh"
+    />
     <AdminTable
-      :key="tableKey"
       ref="table"
       :columns="columns"
       :filters="filters"
