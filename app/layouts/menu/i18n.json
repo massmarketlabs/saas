@@ -15,7 +15,10 @@
       "beneficiary": "Beneficiary",
       "interventions": "Interventions",
       "evaluation": "Evaluation",
-      "interventionManager": "Intervention Manager"
+      "interventionManager": "Intervention Manager",
+      "organization": "Organization",
+      "settings": "Settings",
+      "finance": "Finance"
     }
   },
   "ar": {
@@ -34,7 +37,11 @@
       "beneficiary": "المستفيد",
       "interventions": "التدخلات",
       "evaluation": "تقييم",
-      "interventionManager": "إدارة التدخلات"
+      "interventionManager": "إدارة التدخلات",
+      "organization": "المنظمة",
+      "settings": "إعدادات",
+      "finance": "تمويل"
+
     }
   }
 }

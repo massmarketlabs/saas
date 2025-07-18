@@ -5,7 +5,7 @@ definePageMeta({
   layout: false
 })
 
-const { user, client } = useAuth()
+const { user, client, fetchSession } = useAuth()
 
 const runtimeConfig = useRuntimeConfig()
 const toast = useToast()
@@ -62,7 +62,7 @@ const onSubmit = async (payload: FormSubmitEvent<Partial<Schema>>) => {
   const checkSlug = await client.organization.checkSlug({ slug })
 
   if (checkSlug.error) {
-    toast.add({ color: 'error', title: 'Unable to check if the slug exists. Please try again later. ', description: 'If the issue persists, contact an administrator.' })
+    toast.add({ color: 'error', title: checkSlug.error.message, description: checkSlug.error.statusText })
     return
   }
 
@@ -87,8 +87,13 @@ const onSubmit = async (payload: FormSubmitEvent<Partial<Schema>>) => {
     organizationSlug: slug
   })
 
+  // await client.signOut()
+  // await signOut({ redirectTo: localePath('/signin') })
+  await fetchSession()
+
   // Start redirect process
   await navigateTo(localePath(`${slug}/admin`))
+  // await navigateTo(localePath('/'))
 }
 </script>
 

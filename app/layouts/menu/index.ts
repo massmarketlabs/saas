@@ -30,6 +30,9 @@ export const getMenus = (
 ): NavigationMenuItem[][] => {
   if (!organizationSlug)
     return []
+
+  const programsMenuOpts = programListToMenu(localePath, programsList, organizationSlug)
+
   return [
     [
       {
@@ -38,21 +41,22 @@ export const getMenus = (
         to: localePath(`/${organizationSlug}/admin/dashboard`)
       },
       {
-        label: t('menu.users'),
-        icon: 'i-lucide-users',
-        to: localePath(`/${organizationSlug}/admin/user`)
+        label: t('menu.finance'),
+        icon: 'i-lucide-chart-candlestick',
+        to: localePath(`/${organizationSlug}/admin/donors`),
+        children: [{
+          label: t('menu.donors'),
+          icon: 'hugeicons:money-receive-circle',
+          to: localePath(`/${organizationSlug}/admin/donors`)
+        }]
       },
-      {
-        label: t('menu.donors'),
-        icon: 'hugeicons:money-receive-circle',
-        to: localePath(`/${organizationSlug}/admin/donors`)
-      },
+
       {
         label: t('menu.programs'),
         icon: 'material-symbols:deployed-code-outline-sharp',
-        // to: localePath('/admin/programs')
+        to: programsMenuOpts[0]?.to,
         children: [
-          ...programListToMenu(localePath, programsList, organizationSlug)
+          ...programsMenuOpts
         ]
       },
       {
@@ -61,7 +65,25 @@ export const getMenus = (
         to: localePath(`/${organizationSlug}/admin/beneficiary`)
       },
       {
+        label: t('menu.organization'),
+        icon: 'i-lucide-building',
+        to: localePath(`/${organizationSlug}/admin/organization/user`),
+        children: [
+          {
+            label: t('menu.users'),
+            icon: 'i-lucide-users',
+            to: localePath(`/${organizationSlug}/admin/organization/user`)
+          },
+          {
+            label: t('menu.settings'),
+            icon: 'i-lucide-cog',
+            to: localePath(`/${organizationSlug}/admin/organization/settings`)
+          }
+        ]
+      },
+      {
         label: t('menu.maintenance'),
+        to: localePath(`/${organizationSlug}/admin/maintenance/audit-log`),
         icon: 'i-lucide-wrench',
         children: [
           {

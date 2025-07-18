@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { loggedIn, signOut, user } = useAuth()
+const authClient = useAuth()
 const orgs = useOrganizationStore()
 await orgs.fetchOrganizations()
 
@@ -9,7 +9,7 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
 </script>
 
 <template>
-  <template v-if="loggedIn">
+  <template v-if="authClient.loggedIn.value">
     <UDropdownMenu
       :items="[
         {
@@ -20,7 +20,7 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
         {
           label: t('global.auth.signOut'),
           icon: 'i-lucide-log-out',
-          onSelect: () => signOut()
+          onSelect: () => authClient.signOut({ redirectTo: localePath('/') })
         }
       ]"
     >
@@ -30,13 +30,13 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
         class="flex items-center gap-2"
       >
         <UAvatar
-          v-if="user?.image"
-          :src="user?.image"
-          :alt="user?.name"
+          v-if="authClient.user?.value?.image"
+          :src="authClient.user?.value?.image"
+          :alt="authClient.user?.value?.name"
           size="sm"
         />
         <span>
-          {{ user?.name }}
+          {{ authClient.user?.value?.name }}
 
         </span>
         <!-- <UBadge
@@ -45,7 +45,7 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="orgs.myOrganization && user?.role == 'admin'"
+      v-if="orgs.myOrganization && authClient.user?.value?.role == 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"
