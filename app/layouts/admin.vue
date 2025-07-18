@@ -64,7 +64,9 @@ const { start } = useLoadingIndicator({
 
 })
 
-start({ force: true })
+if (import.meta.client) {
+  start({ force: true })
+}
 </script>
 
 <template>
