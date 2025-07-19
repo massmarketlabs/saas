@@ -2,28 +2,27 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import { useOrganizationStore } from '~/stores/useOrganizationStore'
 import CreateProgramModal from './components/CreateProgramModal.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
 
 const isCollapsed = ref(false)
 
-const { user, signOut } = useAuth()
+const { user, signOut, organization, client } = useAuth()
 
-const router = useRouter()
 const route = useRoute()
-const orgStore = useOrganizationStore()
-await orgStore.fetchOrganizations()
+
+const organizationList = client.useListOrganizations()
+const activeOrganization = client.useActiveOrganization()
 
 const localePath = useLocalePath()
 
 const { t } = useI18n()
 
 defineShortcuts({
-  'g-1': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/dashboard`)),
-  'g-2': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/user`)),
-  'g-3': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/donors`))
+  'g-1': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/dashboard`)),
+  'g-2': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/user`)),
+  'g-3': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/donors`))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
@@ -33,7 +32,9 @@ const programStore = useProgramStore()
 await programStore.fetchPrograms()
 
 const { programs } = storeToRefs(programStore)
-const menus = computed(() => getMenus(t, localePath, programs.value, orgStore.myOrganization?.slug))
+const activeOrganizationId = computed(() => activeOrganization.value.data?.id)
+const activeOrganizationSlug = computed(() => activeOrganization.value.data?.slug)
+const menus = computed(() => getMenus(t, localePath, programs.value, activeOrganizationSlug.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -67,6 +68,21 @@ const { start } = useLoadingIndicator({
 if (import.meta.client) {
   start({ force: true })
 }
+
+const handleChangeActiveOrganization = async (payload: string) => {
+  try {
+    // Set the active organization using the selected ID
+    await organization.setActive({ organizationId: payload })
+    // Navigate to the new organization's dashboard
+    const newOrg = organizationList.value.data?.find(o => o.id === payload)
+    if (newOrg?.slug) {
+      await navigateTo(localePath(`/${newOrg.slug}/admin/dashboard`))
+    }
+  } catch (error) {
+    console.error('Failed to change active organization:', error)
+    // Optionally show an error toast/notification here
+  }
+}
 </script>
 
 <template>
@@ -75,37 +91,42 @@ if (import.meta.client) {
       class="fixed top-0 ltr:left-0 rtl:right-0 transition-all duration-300 hidden sm:block"
       :class="[isCollapsed ? 'w-15' : 'w-64']"
     >
-      <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800">
-        <a
+      <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800 w-full">
+        <div
           v-if="!isCollapsed"
-          class="ps-2.5"
+          class="w-full ps-2.5 flex flex-col gap-2 pl-2 pr-2 "
         >
           <!-- <Logo /> -->
-          <span
-            class="ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
-          >
+          <span class="text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis">
             {{ t('global.appName') }}
           </span>
-        </a>
-        <span
-          v-if="!isCollapsed"
-          class="ps-2.5 ml-2 text-md font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
-        >
-          {{ orgStore.myOrganization?.name }}
-        </span>
-        <Logo
-          v-if="isCollapsed"
-          class="h-6 w-6 ml-1"
-        />
-        <div
-          class="flex mb-2 mt-3"
-          :class="{ 'pl-2 pr-2': !isCollapsed }"
-        >
+          <USelect
+            v-model="activeOrganizationId"
+            class="text-sm h-8 font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis w-full"
+            :items="organizationList.data?.map((o) => {
+              return {
+                value: o.id,
+                label: o.name
+              }
+            })"
+            :loading="activeOrganization.isPending
+              || organizationList.isPending
+            "
+            icon="i-lucide-building"
+            size="sm"
+            @update:model-value="handleChangeActiveOrganization"
+          />
           <SearchPalette
             :collapsed="isCollapsed"
             :t="t"
+            class="mb-3"
+            :class="{ 'pl-2 pr-2': !isCollapsed }"
           />
         </div>
+        <!-- <Logo
+          v-if="isCollapsed"
+          class="h-6 w-6 ml-1"
+        /> -->
         <UNavigationMenu
           :items="menus"
           :collapsed="isCollapsed"

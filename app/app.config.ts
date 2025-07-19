@@ -5,6 +5,9 @@ export default defineAppConfig({
       primary: 'emerald',
       neutral: 'slate'
     },
+    skeleton: {
+      base: 'animate-pulse rounded-md bg-elevated'
+    },
     button: {
       defaultVariants: {
         // Set default button color to neutral

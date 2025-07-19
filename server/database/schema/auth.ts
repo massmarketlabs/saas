@@ -25,7 +25,6 @@ export const session = pgTable('session', {
   userId: text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   impersonatedBy: text('impersonated_by'),
   activeOrganizationId: text('active_organization_id')
-
 })
 
 export const account = pgTable('account', {

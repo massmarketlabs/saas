@@ -10,8 +10,6 @@ const { t } = useI18n()
 
 const localePath = useLocalePath()
 
-const router = useRouter()
-
 const isDonorModalOpen = ref(false)
 
 const fetchData: FetchDataFn<Programs> = async ({ page, limit, sort, filter }) => {
@@ -51,7 +49,7 @@ const columns: AdminTableColumn<Programs>[] = [
           label: t('programs.actions.viewProgram'),
           icon: 'i-lucide-user',
           async onSelect() {
-            router.push(localePath(`/admin/programs/${row.original.id}`))
+            await navigateTo(localePath(`/admin/programs/${row.original.id}`))
           }
         },
         {

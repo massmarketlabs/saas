@@ -96,6 +96,26 @@ export default defineEventHandler(async (event): Promise<CreateBeneficiaryRespon
 
     const orgId = memberDetails.organizationId
 
+    const auth = useServerAuth()
+
+    const hasPermission = await auth.api.hasPermission({
+      headers: event.headers,
+      body: {
+        permissions: {
+          beneficiary: ['create']
+        },
+        organizationId: orgId
+      }
+    })
+
+    if (!hasPermission.success) {
+      throw createError({
+        statusCode: 403,
+        message: 'User must have create permissions for beneficiaries',
+        statusMessage: 'Forbidden'
+      })
+    }
+
     const body = await readBody(event)
 
     // Parse and validate request body

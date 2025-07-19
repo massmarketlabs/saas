@@ -2,20 +2,17 @@
 definePageMeta({
   layout: false
 })
-// const { t } = useI18n()
 const localePath = useLocalePath()
-// const { user } = useAuth()
-
-const orgStore = useOrganizationStore()
-await orgStore.fetchOrganizations()
+const { client } = useAuth()
+const activeOrganization = client.useActiveOrganization()
 
 const menuItems = [{
   label: 'Dashboard',
-  to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/dashboard`),
+  to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/dashboard`),
   icon: 'i-lucide-layout-dashboard'
 }, {
   label: 'Calendar',
-  to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/calendar`),
+  to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/calendar`),
   icon: 'i-lucide-calendar'
 }, {
   label: 'Help',
@@ -23,22 +20,22 @@ const menuItems = [{
   children: [
     {
       label: 'Video Tutorials',
-      to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/help/tutorial`),
+      to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/help/tutorial`),
       icon: 'material-symbols:auto-videocam-outline-sharp'
     },
     {
       label: 'Documentation',
-      to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/help/docs`),
+      to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/help/docs`),
       icon: 'material-symbols:docs'
     },
     {
       label: 'Community',
-      to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/help/community`),
+      to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/help/community`),
       icon: 'iconoir:community'
     },
     {
       label: 'System Check',
-      to: localePath(`/${orgStore.myOrganization?.slug}/intervention-manager/help/system`),
+      to: localePath(`/${activeOrganization.value.data?.slug}/intervention-manager/help/system`),
       icon: 'eos-icons:system-ok-outlined'
     }
   ]

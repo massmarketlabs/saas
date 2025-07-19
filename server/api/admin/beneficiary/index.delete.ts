@@ -19,6 +19,25 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    const auth = useServerAuth()
+
+    const hasPermission = await auth.api.hasPermission({
+      headers: event.headers,
+      body: {
+        permission: {
+          beneficiary: ['delete']
+        }
+      }
+    })
+
+    if (!hasPermission.success) {
+      throw createError({
+        statusCode: 403,
+        message: 'User does not have "delete" permissions',
+        statusMessage: 'Forbidden'
+      })
+    }
+
     const body = await readBody(event)
 
     const payload = deleteBeneficiarySchema.parse(body)

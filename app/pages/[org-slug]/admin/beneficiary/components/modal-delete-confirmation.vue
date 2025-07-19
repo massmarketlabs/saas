@@ -34,7 +34,7 @@ async function handleDelete() {
 <template>
   <UModal
     :open="!!toDeleteBeneficiary"
-    title="Are you sure?"
+    title="Permanently Delete Beneficiary"
     :description="`Beneficiary: ${toDeleteBeneficiary?.first_name_en} ${toDeleteBeneficiary?.last_name_en}`"
     @update:open="closeDeleteModal"
   >

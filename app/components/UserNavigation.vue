@@ -1,28 +1,30 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
+
 const localePath = useLocalePath()
 const { t } = useI18n()
 const authClient = useAuth()
-const orgs = useOrganizationStore()
-await orgs.fetchOrganizations()
+const activeOrg = authClient.client.useActiveOrganization()
 
-const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
+const orgSlug = computed(() => `/${activeOrg.value.data?.slug}/admin/dashboard`)
+const profileMenuItems: DropdownMenuItem[] = [
+  {
+    label: t('global.auth.profile'),
+    icon: 'i-lucide-user',
+    to: localePath('/profile')
+  },
+  {
+    label: t('global.auth.signOut'),
+    icon: 'i-lucide-log-out',
+    onSelect: () => authClient.signOut({ redirectTo: localePath('/') })
+  }
+]
 </script>
 
 <template>
   <template v-if="authClient.loggedIn.value">
     <UDropdownMenu
-      :items="[
-        {
-          label: t('global.auth.profile'),
-          icon: 'i-lucide-user',
-          to: localePath('/profile')
-        },
-        {
-          label: t('global.auth.signOut'),
-          icon: 'i-lucide-log-out',
-          onSelect: () => authClient.signOut({ redirectTo: localePath('/') })
-        }
-      ]"
+      :items="profileMenuItems"
     >
       <UButton
         variant="ghost"
@@ -45,7 +47,7 @@ const orgSlug = computed(() => `/${orgs.myOrganization?.slug}/admin/dashboard`)
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="orgs.myOrganization && authClient.user?.value?.role == 'admin'"
+      v-if="activeOrg.data && authClient.user?.value?.role == 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"

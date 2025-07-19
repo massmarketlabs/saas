@@ -8,6 +8,7 @@ import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
 import { adminClient, organizationClient } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
+import { ac, admin, project_manager, user as userPermission } from '~~/server/utils/permissions'
 
 export function useAuth() {
   const url = useRequestURL()
@@ -20,7 +21,14 @@ export function useAuth() {
     },
     plugins: [
       adminClient(),
-      organizationClient()
+      organizationClient({
+        ac,
+        roles: {
+          admin,
+          user: userPermission,
+          project_manager
+        }
+      })
       // stripeClient({
       //   subscription: true
       // })

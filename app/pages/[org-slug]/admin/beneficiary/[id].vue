@@ -14,9 +14,8 @@ interface BeneficiaryAggregate {
     { beneficiary_intervention_enrollment: typeof beneficiary_intervention_enrollment.$inferSelect[] } &
     { program_enrollment: typeof program_enrollment.$inferSelect[] }
 }
-
-const org = useOrganizationStore()
-
+const { client } = useAuth()
+const activeOrganization = client.useActiveOrganization()
 const copied = ref(false)
 
 const { t, locale } = useI18n()
@@ -56,10 +55,11 @@ function copy() {
   <NuxtLayout name="admin">
     <template #navRight>
       <UButton
-        :to="localePath(`/${org.myOrganization?.slug}/admin/beneficiary`)"
+        :to="localePath(`/${activeOrganization.data?.slug}/admin/beneficiary`)"
         variant="outline"
         color="neutral"
         icon="i-lucide-arrow-left"
+        :loading="activeOrganization.isPending"
       >
         {{ t('global.page.back') }}
       </UButton>

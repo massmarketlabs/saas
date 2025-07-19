@@ -5,8 +5,8 @@ const { t } = defineProps<{
 const router = useRouter()
 const localePath = useLocalePath()
 const collapsed = defineModel('collapsed', { default: false })
-const orgs = useOrganizationStore()
-
+const { client } = useAuth()
+const activeOrganization = client.useActiveOrganization()
 const groups = ref([
   {
     id: 'Routes',
@@ -15,7 +15,7 @@ const groups = ref([
       {
         label: t('menu.dashboard'),
         icon: 'i-lucide-layout-dashboard',
-        to: localePath(`/${orgs.myOrganization?.slug}/admin/dashboard`),
+        to: localePath(`/${activeOrganization.value.data?.slug}/admin/dashboard`),
         kbds: [
           'G',
           '1'
@@ -24,7 +24,7 @@ const groups = ref([
       {
         label: t('menu.users'),
         icon: 'i-lucide-users',
-        to: localePath(`/${orgs.myOrganization?.slug}/admin/user`),
+        to: localePath(`/${activeOrganization.value.data?.slug}/admin/user`),
         kbds: [
           'G',
           '2'

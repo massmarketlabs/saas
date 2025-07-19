@@ -2,19 +2,21 @@ import type { H3Event } from 'h3'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { admin, openAPI, organization } from 'better-auth/plugins'
+import { admin as adminPlugin, openAPI, organization } from 'better-auth/plugins'
 import { eq } from 'drizzle-orm'
 import { v7 as uuidv7 } from 'uuid'
-// import { user as userSchema } from '~~/server/database/schema'
+import { getDefaultOrganization } from '../database/repository/organization'
 import * as schema from '../database/schema'
-import { user } from '../database/schema'
+import { user as userSchema } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import {
   // cacheClient,
   resendInstance
 } from './drivers'
+import { ac, admin, owner, project_manager, user } from './permissions'
 import { runtimeConfig } from './runtimeConfig'
+
 // import { setupStripe } from './stripe'
 
 console.log(`Base URL is ${runtimeConfig.public.baseURL}`)
@@ -95,10 +97,6 @@ const createBetterAuth = () => betterAuth({
     }
   },
   socialProviders: {
-    // github: {
-    //   clientId: runtimeConfig.githubClientId!,
-    //   clientSecret: runtimeConfig.githubClientSecret!
-    // },
     google: {
       clientId: runtimeConfig.googleClientId!,
       clientSecret: runtimeConfig.googleClientSecret!
@@ -107,6 +105,22 @@ const createBetterAuth = () => betterAuth({
   account: {
     accountLinking: {
       enabled: true
+    },
+    updateAccountOnSignIn: true
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        before: async (session) => {
+          const org = await getDefaultOrganization(session.userId)
+          return {
+            data: {
+              ...session,
+              activeOrganizationId: org?.id
+            }
+          }
+        }
+      }
     }
   },
   hooks: {
@@ -161,16 +175,23 @@ const createBetterAuth = () => betterAuth({
   },
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
-    admin(),
+    adminPlugin(),
     organization({
+      ac,
+      roles: {
+        admin,
+        user,
+        project_manager,
+        owner
+      },
       organizationCreation: {
         afterCreate: async ({ user: activeUser, organization }) => {
           // Assign the creator the 'admin' role for the newly created organization
           const db = getDB()
 
-          await db.update(user)
+          await db.update(userSchema)
             .set({ role: 'admin' })
-            .where(eq(user.id, activeUser.id))
+            .where(eq(userSchema.id, activeUser.id))
 
           // Optionally log this as an audit event
           await logAuditEvent({
@@ -189,7 +210,7 @@ const createBetterAuth = () => betterAuth({
   ]
 })
 
-let _auth: ReturnType<typeof betterAuth>
+let _auth: ReturnType<typeof createBetterAuth>
 
 // Used by npm run auth:schema only.
 const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/database/schema/auth.ts'))

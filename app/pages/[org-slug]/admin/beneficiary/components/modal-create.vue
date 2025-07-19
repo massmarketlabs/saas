@@ -64,7 +64,7 @@ const genderOptions = [
   { label: t('beneficiary.gender.male'), value: 'male' as const },
   { label: t('beneficiary.gender.female'), value: 'female' as const },
   { label: t('beneficiary.gender.other'), value: 'other' as const }
-] as const
+]
 
 // Type-safe field error helpers
 const getFieldError = (fieldName: keyof BeneficiaryFormData): string | undefined => {
@@ -144,7 +144,7 @@ const handleSubmit = async (): Promise<void> => {
     // You can add an emit here if needed
     emit('beneficiaryCreated')
   } catch (error) {
-    console.error('Error creating beneficiary:', error)
+    console.error('Error creating beneficiary:', { error })
 
     if (error instanceof ZodError) {
       // Handle client-side validation errors
@@ -177,8 +177,8 @@ const handleSubmit = async (): Promise<void> => {
       } else {
         toast.add({
           color: 'error',
-          title: 'Server Error',
-          description: error.statusMessage || 'Server error occurred. Please try again.'
+          title: error.data.statusMessage || 'Server Error',
+          description: error.data.message || 'Server error occurred. Please try again.'
         })
       }
     } else {
@@ -339,7 +339,7 @@ onMounted(() => {
               >
                 <USelect
                   v-model="form.gender"
-                  :options="genderOptions"
+                  :items="genderOptions"
                   :placeholder="t('beneficiary.placeholders.gender')"
                   :disabled="isLoading"
                   :class="{ 'border-red-500': hasFieldError('gender') }"
