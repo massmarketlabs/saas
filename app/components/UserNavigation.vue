@@ -3,10 +3,9 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
-const authClient = useAuth()
-const activeOrg = authClient.client.useActiveOrganization()
+const { activeOrganization, user, loggedIn, signOut } = useAuth()
 
-const orgSlug = computed(() => `/${activeOrg.value.data?.slug}/admin/dashboard`)
+const orgSlug = computed(() => `/${activeOrganization.value?.slug}/admin/dashboard`)
 const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.profile'),
@@ -16,13 +15,13 @@ const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.signOut'),
     icon: 'i-lucide-log-out',
-    onSelect: () => authClient.signOut({ redirectTo: localePath('/') })
+    onSelect: () => signOut({ redirectTo: localePath('/') })
   }
 ]
 </script>
 
 <template>
-  <template v-if="authClient.loggedIn.value">
+  <template v-if="loggedIn">
     <UDropdownMenu
       :items="profileMenuItems"
     >
@@ -32,13 +31,13 @@ const profileMenuItems: DropdownMenuItem[] = [
         class="flex items-center gap-2"
       >
         <UAvatar
-          v-if="authClient.user?.value?.image"
-          :src="authClient.user?.value?.image"
-          :alt="authClient.user?.value?.name"
+          v-if="user?.image"
+          :src="user.image"
+          :alt="user.name"
           size="sm"
         />
         <span>
-          {{ authClient.user?.value?.name }}
+          {{ user?.name }}
 
         </span>
         <!-- <UBadge
@@ -47,7 +46,7 @@ const profileMenuItems: DropdownMenuItem[] = [
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="activeOrg.data && authClient.user?.value?.role == 'admin'"
+      v-if="activeOrganization && user?.role === 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"

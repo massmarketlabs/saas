@@ -8,21 +8,18 @@ import { getMenus } from './menu'
 
 const isCollapsed = ref(false)
 
-const { user, signOut, organization, client } = useAuth()
+const { user, signOut, handleChangeActiveOrganization, activeOrganization, organizations, sessionFetching } = useAuth()
 
 const route = useRoute()
-
-const organizationList = client.useListOrganizations()
-const activeOrganization = client.useActiveOrganization()
 
 const localePath = useLocalePath()
 
 const { t } = useI18n()
 
 defineShortcuts({
-  'g-1': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/dashboard`)),
-  'g-2': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/user`)),
-  'g-3': async () => await navigateTo(localePath(`${activeOrganization.value.data?.slug}/admin/donors`))
+  'g-1': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/dashboard`)),
+  'g-2': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/organization/user`)),
+  'g-3': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/donors`))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
@@ -32,8 +29,8 @@ const programStore = useProgramStore()
 await programStore.fetchPrograms()
 
 const { programs } = storeToRefs(programStore)
-const activeOrganizationId = computed(() => activeOrganization.value.data?.id)
-const activeOrganizationSlug = computed(() => activeOrganization.value.data?.slug)
+const activeOrganizationId = computed(() => activeOrganization.value?.id)
+const activeOrganizationSlug = computed(() => activeOrganization.value?.slug)
 const menus = computed(() => getMenus(t, localePath, programs.value, activeOrganizationSlug.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
@@ -68,21 +65,6 @@ const { start } = useLoadingIndicator({
 if (import.meta.client) {
   start({ force: true })
 }
-
-const handleChangeActiveOrganization = async (payload: string) => {
-  try {
-    // Set the active organization using the selected ID
-    await organization.setActive({ organizationId: payload })
-    // Navigate to the new organization's dashboard
-    const newOrg = organizationList.value.data?.find(o => o.id === payload)
-    if (newOrg?.slug) {
-      await navigateTo(localePath(`/${newOrg.slug}/admin/dashboard`))
-    }
-  } catch (error) {
-    console.error('Failed to change active organization:', error)
-    // Optionally show an error toast/notification here
-  }
-}
 </script>
 
 <template>
@@ -103,18 +85,16 @@ const handleChangeActiveOrganization = async (payload: string) => {
           <USelect
             v-model="activeOrganizationId"
             class="text-sm h-8 font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis w-full"
-            :items="organizationList.data?.map((o) => {
+            :items="organizations?.map((o) => {
               return {
                 value: o.id,
                 label: o.name
               }
             })"
-            :loading="activeOrganization.isPending
-              || organizationList.isPending
-            "
             icon="i-lucide-building"
             size="sm"
-            @update:model-value="handleChangeActiveOrganization"
+            :loading="sessionFetching"
+            @update:model-value="async (val) => await handleChangeActiveOrganization(val)"
           />
           <SearchPalette
             :collapsed="isCollapsed"

@@ -6,7 +6,10 @@ definePageMeta({
   layout: false
 })
 const { t } = useI18n()
-const { loggedIn, subscription } = useAuth()
+const {
+  loggedIn
+  // subscription
+} = useAuth()
 const localePath = useLocalePath()
 const runtimeConfig = useRuntimeConfig()
 const billingPeriod = ref('monthly')
@@ -42,14 +45,14 @@ const plans = [
     click: async () => {
       if (!loggedIn.value) {
         navigateTo(localePath('/signin?redirect=/pricing'))
-        return
+        // return
       }
-      const result = await subscription.upgrade({
-        plan: `pro-${billingPeriod.value}`,
-        successUrl: localePath('/'),
-        cancelUrl: localePath('/pricing')
-      })
-      console.log(result)
+      // const result = await subscription.upgrade({
+      //   plan: `pro-${billingPeriod.value}`,
+      //   successUrl: localePath('/'),
+      //   cancelUrl: localePath('/pricing')
+      // })
+      // console.log(result)
     }
   },
   {

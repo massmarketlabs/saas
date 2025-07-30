@@ -4,6 +4,8 @@
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { programs } from '~~/server/database/schema'
 
+definePageMeta({ layout: false })
+
 type Programs = typeof programs.$inferSelect
 
 const { t } = useI18n()

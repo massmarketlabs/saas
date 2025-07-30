@@ -4,6 +4,7 @@ import type {
   ClientOptions,
   InferSessionFromClient
 } from 'better-auth/client'
+import type { Member, Organization } from 'better-auth/plugins'
 import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
 import { adminClient, organizationClient } from 'better-auth/client/plugins'
@@ -12,6 +13,9 @@ import { ac, admin, project_manager, user as userPermission } from '~~/server/ut
 
 export function useAuth() {
   const url = useRequestURL()
+  const localePath = useLocalePath()
+  const toast = useToast()
+
   const headers = import.meta.server ? useRequestHeaders() : undefined
 
   const client = createAuthClient({
@@ -37,6 +41,9 @@ export function useAuth() {
 
   const session = useState<InferSessionFromClient<ClientOptions> | null>('auth:session', () => null)
   const user = useState<UserWithRole | null>('auth:user', () => null)
+  const activeOrganization = useState<Organization | null>('auth:activeOrganization', () => null)
+  const organizations = useState<Organization[] | null>('auth:organizations', () => null)
+  const activeMember = useState<Member | null>('auth:member', () => null)
   // const subscriptions = useState<Subscription[]>('auth:subscriptions', () => [])
   const sessionFetching = import.meta.server ? ref(false) : useState('auth:sessionFetching', () => false)
 
@@ -45,17 +52,79 @@ export function useAuth() {
       return
     }
     sessionFetching.value = true
-    const { data } = await client.useSession(useFetch)
-    session.value = data.value?.session || null
-    user.value = data.value?.user ? { ...data.value.user, role: data.value.user.role ?? undefined } : null
-    // if (user.value) {
-    //   const { data: subscriptionData } = await client.subscription.list()
-    //   subscriptions.value = subscriptionData || []
-    // } else {
-    //   subscriptions.value = []
-    // }
-    sessionFetching.value = false
-    return data
+
+    try {
+      // Fetch all data concurrently instead of sequentially
+      const [
+        sessionReq,
+        activeOrgReq,
+        orgsReq,
+        activeMemberReq
+      ] = await Promise.all([
+        client.useSession(useFetch),
+        client.organization.getFullOrganization(),
+        client.organization.list(),
+        client.organization.getActiveMember()
+      ])
+
+      // Update state with fetched data
+      const { data } = sessionReq
+      session.value = data.value?.session || null
+      user.value = data.value?.user ? { ...data.value.user, role: data.value.user.role ?? undefined } : null
+      activeOrganization.value = activeOrgReq.data
+      organizations.value = orgsReq.data
+      activeMember.value = activeMemberReq.data
+
+      // if (user.value) {
+      //   const { data: subscriptionData } = await client.subscription.list()
+      //   subscriptions.value = subscriptionData || []
+      // } else {
+      //   subscriptions.value = []
+      // }
+
+      return data
+    } finally {
+      sessionFetching.value = false
+    }
+  }
+
+  const handleChangeActiveOrganization = async (payload: string) => {
+    try {
+      sessionFetching.value = true
+      // Set the active organization using the selected ID
+      const resp = await client.organization.setActive({ organizationId: payload })
+      if (resp.data) {
+        activeOrganization.value = resp.data
+        await navigateTo(localePath(`/${resp.data.slug}/admin/dashboard`))
+      }
+    } catch (error) {
+      console.error('Failed to change active organization:', error)
+      // Optionally show an error toast/notification here
+    } finally {
+      sessionFetching.value = false
+    }
+  }
+
+  const signOut = async ({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) => {
+    const res = await client.signOut()
+    if (res.error) {
+      toast.add({
+        color: 'error',
+        title: res.error.message
+      })
+      return res
+    }
+
+    session.value = null
+    user.value = null
+    activeOrganization.value = null
+    organizations.value = null
+    activeMember.value = null
+
+    if (redirectTo) {
+      await navigateTo(redirectTo)
+    }
+    return res
   }
 
   if (import.meta.client) {
@@ -84,16 +153,13 @@ export function useAuth() {
     sendVerificationEmail: client.sendVerificationEmail,
     organization: client.organization,
     errorCodes: client.$ERROR_CODES,
-    async signOut({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) {
-      const res = await client.signOut()
-      session.value = null
-      user.value = null
-      if (redirectTo) {
-        await navigateTo(redirectTo)
-      }
-      return res
-    },
+    client,
+    activeOrganization,
+    organizations,
+    activeMember,
+    sessionFetching,
+    signOut,
     fetchSession,
-    client
+    handleChangeActiveOrganization
   }
 }

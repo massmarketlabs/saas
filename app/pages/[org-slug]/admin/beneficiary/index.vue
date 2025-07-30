@@ -15,9 +15,7 @@ const toDeleteBeneficiary = ref<null | Beneficiary>(null)
 
 const { t } = useI18n()
 
-const { client } = useAuth()
-
-const activeOrganization = client.useActiveOrganization()
+const { activeOrganization } = useAuth()
 
 const localePath = useLocalePath()
 
@@ -51,7 +49,7 @@ const getRowItems = (row: globalThis.Row<Beneficiary>) => {
       label: t('beneficiary.actions.viewProfile'),
       icon: 'i-lucide-user',
       async onSelect() {
-        await navigateTo(localePath(`/${activeOrganization.value.data?.slug}/admin/beneficiary/${beneficiary.id}`))
+        await navigateTo(localePath(`/${activeOrganization.value?.slug}/admin/beneficiary/${beneficiary.id}`))
       }
     },
     {

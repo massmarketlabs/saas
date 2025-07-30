@@ -18,12 +18,12 @@ definePageMeta({
 
 const localePath = useLocalePath()
 
+const { activeOrganization, sessionFetching } = useAuth()
 const { t } = useI18n()
 
 const route = useRoute()
 
 const id = route.params.id
-
 const { data } = await useFetch<Program>('/api/admin/aggregate/programs', { query: { id } })
 
 useHead({ title: `Programs | ${data.value?.data?.name}` })
@@ -33,13 +33,12 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
   <NuxtLayout name="admin">
     <template #navRight>
       <UButton
-        :to="localePath('/admin/programs')"
+        :to="localePath(`/${sessionFetching ? '' : activeOrganization?.slug}/admin/programs`)"
         variant="outline"
         color="neutral"
         icon="i-lucide-arrow-left"
-      >
-        {{ t('global.page.back') }}
-      </UButton>
+        :label="t('global.page.back')"
+      />
     </template>
     <!-- Interventions -->
     <UCard class="mb-4">
