@@ -16,8 +16,8 @@ export default defineNuxtConfig({
     'nuxt-charts',
     '@pinia/nuxt',
     'reka-ui/nuxt',
-    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
-    ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
+    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : [])
+    // ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
   // Add Vite SSR configuration to fix the "Cannot read properties of undefined (reading 'body')" error
   vite: {
@@ -26,19 +26,19 @@ export default defineNuxtConfig({
       external: ['to-px']
     }
   },
-  ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
-    ? {
-        hub: {
-          workers: true,
-          kv: true,
-          bindings: {
-            hyperdrive: {
-              HYPERDRIVE: process.env.NUXT_CF_HYPERDRIVE_ID as string
-            }
-          }
-        }
-      }
-    : {}),
+  // ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
+  //   ? {
+  //       hub: {
+  //         workers: true,
+  //         kv: true,
+  //         bindings: {
+  //           hyperdrive: {
+  //             HYPERDRIVE: process.env.NUXT_CF_HYPERDRIVE_ID as string
+  //           }
+  //         }
+  //       }
+  //     }
+  //   : {}),
   pinia: {
     storesDirs: ['./app/stores/**']
   },

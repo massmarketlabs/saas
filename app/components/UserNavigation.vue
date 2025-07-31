@@ -15,7 +15,7 @@ const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.signOut'),
     icon: 'i-lucide-log-out',
-    onSelect: () => signOut({ redirectTo: localePath('/') })
+    onSelect: async () => await signOut({ redirectTo: localePath('/') })
   }
 ]
 </script>

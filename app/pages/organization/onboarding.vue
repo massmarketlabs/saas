@@ -92,7 +92,7 @@ const onSubmit = async (payload: FormSubmitEvent<Partial<Schema>>) => {
   await fetchSession()
 
   // Start redirect process
-  await navigateTo(localePath(`${slug}/admin`))
+  await navigateTo(localePath(`/${slug}/admin/dashboard`))
   // await navigateTo(localePath('/'))
 }
 </script>

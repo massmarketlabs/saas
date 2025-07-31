@@ -51,8 +51,8 @@ menus.value.forEach((group) => {
   menuIterator(group)
 })
 
-const clickSignOut = () => {
-  signOut({ redirectTo: localePath('/signin') })
+const clickSignOut = async () => {
+  await signOut({ redirectTo: localePath('/') })
 }
 
 const { start } = useLoadingIndicator({

@@ -24,7 +24,18 @@ console.log(`Base URL is ${runtimeConfig.public.baseURL}`)
 const createBetterAuth = () => betterAuth({
   baseURL: runtimeConfig.public.baseURL,
   secret: runtimeConfig.betterAuthSecret,
-  trustedOrigins: ['http://localhost:3000', 'https://tyo.massmarketlabs.com'],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60 // Cache duration in seconds
+    }
+  },
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://localhost:8787',
+    'http://tyo.massmarketlabs.com',
+    'https://tyo.massmarketlabs.com'
+  ],
   database: drizzleAdapter(
     getDB(),
     {

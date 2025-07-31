@@ -55,25 +55,48 @@ export function useAuth() {
 
     try {
       // Fetch all data concurrently instead of sequentially
-      const [
-        sessionReq,
-        activeOrgReq,
-        orgsReq,
-        activeMemberReq
-      ] = await Promise.all([
-        client.useSession(useFetch),
-        client.organization.getFullOrganization(),
-        client.organization.list(),
-        client.organization.getActiveMember()
-      ])
+      const sessionReq = await client.useSession(useFetch)
 
       // Update state with fetched data
-      const { data } = sessionReq
-      session.value = data.value?.session || null
-      user.value = data.value?.user ? { ...data.value.user, role: data.value.user.role ?? undefined } : null
-      activeOrganization.value = activeOrgReq.data
-      organizations.value = orgsReq.data
-      activeMember.value = activeMemberReq.data
+      if (sessionReq.error.value) {
+        console.error('sessionReq ', sessionReq.error.value)
+      } else {
+        session.value = sessionReq.data.value?.session || null
+        user.value = sessionReq.data.value?.user ? { ...sessionReq.data.value.user, role: sessionReq.data.value.user.role ?? undefined } : null
+      }
+
+      await Promise.all([
+        client.organization.getFullOrganization({
+          fetchOptions: {
+            onSuccess: (activeOrgReq) => {
+              activeOrganization.value = activeOrgReq.data
+            },
+            onError: (activeOrgReq) => {
+              console.error('activeOrgReq: ', activeOrgReq.error)
+            }
+          }
+        }),
+        client.organization.list({
+          fetchOptions: {
+            onSuccess: (orgsReq) => {
+              organizations.value = orgsReq.data
+            },
+            onError: (orgsReq) => {
+              console.error('organizations: ', orgsReq.error)
+            }
+          }
+        }),
+        client.organization.getActiveMember({
+          fetchOptions: {
+            onSuccess: (activeMemberReq) => {
+              activeMember.value = activeMemberReq.data
+            },
+            onError: (activeMemberReq) => {
+              console.error('activeMember: ', activeMemberReq.error)
+            }
+          }
+        })
+      ])
 
       // if (user.value) {
       //   const { data: subscriptionData } = await client.subscription.list()
@@ -82,7 +105,7 @@ export function useAuth() {
       //   subscriptions.value = []
       // }
 
-      return data
+      // return data
     } finally {
       sessionFetching.value = false
     }
@@ -106,34 +129,54 @@ export function useAuth() {
   }
 
   const signOut = async ({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) => {
-    const res = await client.signOut()
-    if (res.error) {
-      toast.add({
-        color: 'error',
-        title: res.error.message
+    try {
+      sessionFetching.value = true
+      const res = await client.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            session.value = null
+            user.value = null
+            activeOrganization.value = null
+            organizations.value = null
+            activeMember.value = null
+
+            clearNuxtState([
+              'auth:session',
+              'auth:user',
+              'auth:activeOrganization', // This was missing
+              'auth:organizations',
+              'auth:member',
+              'auth:sessionFetching' // Consider clearing this too
+            ])
+          },
+          onError: (res) => {
+            toast.add({
+              color: 'error',
+              title: res.error.message
+            })
+          }
+        }
       })
+
+      if (redirectTo) {
+        await navigateTo(redirectTo)
+      }
+
       return res
+    } catch (err) {
+      console.error('error signing out', err)
+    } finally {
+      sessionFetching.value = false
     }
-
-    session.value = null
-    user.value = null
-    activeOrganization.value = null
-    organizations.value = null
-    activeMember.value = null
-
-    if (redirectTo) {
-      await navigateTo(redirectTo)
-    }
-    return res
   }
 
-  if (import.meta.client) {
-    client.$store.listen('$sessionSignal', async (signal) => {
-      if (!signal)
-        return
-      await fetchSession()
-    })
-  }
+  // if (import.meta.client) {
+  //   client.$store.listen('$sessionSignal', async (signal) => {
+  //     if (!signal || sessionFetching.value)
+  //       return
+  //     await fetchSession()
+  //   })
+  // }
 
   return {
     session,
