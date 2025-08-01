@@ -11,7 +11,7 @@
       "home": "Home",
       "auditLog": "Audit Log",
       "donors": "Donors",
-      "programs": "Programs",
+      "programs": "Program",
       "beneficiary": "Beneficiary",
       "interventions": "Interventions",
       "evaluation": "Evaluation",
@@ -41,7 +41,6 @@
       "organization": "المنظمة",
       "settings": "إعدادات",
       "finance": "تمويل"
-
     }
   }
 }

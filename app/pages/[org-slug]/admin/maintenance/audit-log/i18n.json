@@ -5,7 +5,8 @@
       "category": "Category",
       "categories": {
         "auth": "Authentication",
-        "email": "Email"
+        "email": "Email",
+        "organization": "Organization"
       },
       "action": "Action",
       "targetType": "Target Type",
@@ -27,7 +28,8 @@
       "category": "الفئة",
       "categories": {
         "auth": "المصادقة",
-        "email": "البريد الإلكتروني"
+        "email": "البريد الإلكتروني",
+        "organization": "المنظمة"
       },
       "action": "الإجراء",
       "targetType": "نوع الهدف",
