@@ -28,10 +28,10 @@ const pathNameParentMap: StringDict<NavigationMenuItem | undefined> = {}
 const programStore = useProgramStore()
 await programStore.fetchPrograms()
 
-const { programs } = storeToRefs(programStore)
+// const { programs } = storeToRefs(programStore)
 const activeOrganizationId = computed(() => activeOrganization.value?.id)
 const activeOrganizationSlug = computed(() => activeOrganization.value?.slug)
-const menus = computed(() => getMenus(t, localePath, programs.value, activeOrganizationSlug.value))
+const menus = computed(() => getMenus(t, localePath, programStore.programs, activeOrganizationSlug.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`

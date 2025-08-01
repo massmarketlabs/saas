@@ -74,7 +74,11 @@ const onSubmit = async (payload: FormSubmitEvent<Partial<Schema>>) => {
   // Send JSON to create the organization
   const organization = { name, slug, logo: logoUrl }
 
-  const createOrgRequest = await client.organization.create(organization)
+  const createOrgRequest = await client.organization.create({
+    ...organization,
+    keepCurrentActiveOrganization: false,
+    userId: user.value?.id
+  })
   if (createOrgRequest.error) {
     toast.add({ color: 'error', title: 'Unable to create organization. Please Try again later.', description: 'If this issue persists, please contact an administrator.' })
     return

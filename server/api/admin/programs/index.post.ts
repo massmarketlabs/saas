@@ -14,6 +14,15 @@ export type InsertProgramInput = z.infer<typeof insertProgramSchema>
 // Define POST handler
 export default defineEventHandler(async (event: H3Event) => {
   try {
+    const user = await requireAuth(event)
+
+    if (!user.session.activeOrganizationId) {
+      throw createError({
+        message: 'Active Organization ID not set',
+        statusCode: 400
+      })
+    }
+
     const body = await readBody(event)
 
     // Validate with Zod
@@ -22,7 +31,16 @@ export default defineEventHandler(async (event: H3Event) => {
     // Get db connection
     const db = await useDB()
     // Insert into database
-    const result = await db.insert(programs).values(data).returning()
+    const result = await db.insert(programs).values({ ...data, organization_id: user.session.activeOrganizationId }).returning()
+
+    await logAuditEvent({
+      userId: user.session.userId,
+      category: 'organization',
+      action: `Program ${data.name} created`,
+      status: 'success',
+      ipAddress: getRequestIP(event),
+      userAgent: event.headers.get('user-agent') ?? undefined
+    })
 
     return {
       success: true,
@@ -34,7 +52,8 @@ export default defineEventHandler(async (event: H3Event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Validation error',
-        data: error.flatten()
+        data: error
+
       })
     }
 

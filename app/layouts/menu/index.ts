@@ -28,8 +28,9 @@ export const getMenus = (
   programsList: Program[] | undefined,
   organizationSlug?: string
 ): NavigationMenuItem[][] => {
-  if (!organizationSlug)
+  if (!organizationSlug) {
     return []
+  }
 
   const programsMenuOpts = programListToMenu(localePath, programsList, organizationSlug)
 

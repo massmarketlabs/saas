@@ -24,13 +24,14 @@ export const useProgramStore = defineStore('programs', () => {
     loading.value = true
     error.value = null
     try {
-      const { data, error: fetchError } = await useFetch<PageData<Programs>>('/api/admin/list/programs', {
+      const { data, error: fetchError } = await useFetch('/api/admin/programs', {
         key: 'programs',
         server: true
       })
       if (fetchError.value)
         throw fetchError.value
-      programs.value = data.value?.data || []
+
+      programs.value = data.value || []
     } catch (err) {
       error.value = err as Error
     } finally {

@@ -163,7 +163,7 @@ const fetchRoleCount = async (filter: FilterCondition[]) => {
 }
 
 const fetchData: FetchDataFn<UserWithRole> = async ({ page, limit, sort, filter }) => {
-  fetchRoleCount(filter)
+  await fetchRoleCount(filter)
   const result = await $fetch<PageData<UserWithRole>>('/api/admin/list/user', {
     query: {
       page,
