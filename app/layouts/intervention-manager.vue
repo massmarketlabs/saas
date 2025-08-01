@@ -10,10 +10,6 @@ const menuItems = [{
   to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/dashboard`),
   icon: 'i-lucide-layout-dashboard'
 }, {
-  label: 'Calendar',
-  to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/calendar`),
-  icon: 'i-lucide-calendar'
-}, {
   label: 'Help',
   icon: 'material-symbols:contact-support-rounded',
   children: [

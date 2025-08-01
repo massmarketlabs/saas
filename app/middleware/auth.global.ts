@@ -34,14 +34,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   const {
     loggedIn,
-    user,
-    fetchSession
+    user
+    // fetchSession
   } = useAuth()
   // console.log('middleware')
   const redirectOptions = useRuntimeConfig().public.auth
   const { only, redirectUserTo, redirectGuestTo } = defu(to.meta?.auth, redirectOptions)
 
-  await fetchSession()
+  // await fetchSession()
 
   const localePath = useLocalePath()
 
