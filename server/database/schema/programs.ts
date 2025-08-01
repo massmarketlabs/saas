@@ -1,5 +1,5 @@
 import { date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { organization } from './auth'
+import { organization, user } from './auth'
 import { beneficiary } from './beneficiary'
 import { audit_fields } from './shared'
 
@@ -46,6 +46,7 @@ export const interventions = pgTable('interventions', {
   name: text('name').notNull(),
   term_id: uuid('term_id').references(() => terms.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
+  created_by: text('created_by').references(() => user.id).notNull(),
   // Audit fields
   ...audit_fields
 })

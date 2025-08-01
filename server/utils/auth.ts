@@ -262,3 +262,16 @@ export const requireAuth = async (event: H3Event) => {
   event.context.auth = session!
   return session!
 }
+
+export const requireAuthWithOrganizationId = async (event: H3Event) => {
+  const session = await requireAuth(event)
+
+  if (!session.session.activeOrganizationId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Active Organization ID not set'
+    })
+  }
+
+  return session as typeof session & { session: { activeOrganizationId: string } }
+}

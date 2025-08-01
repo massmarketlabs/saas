@@ -4,6 +4,7 @@ import { createError } from 'h3'
 // server/api/admin/programs/post.ts
 import { z } from 'zod/v4'
 import { programs } from '~~/server/database/schema'
+import { requireAuthWithOrganizationId } from '~~/server/utils/auth'
 
 export const insertProgramSchema = z.object({
   name: z.string().min(1, 'Name is required')
@@ -14,14 +15,7 @@ export type InsertProgramInput = z.infer<typeof insertProgramSchema>
 // Define POST handler
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const user = await requireAuth(event)
-
-    if (!user.session.activeOrganizationId) {
-      throw createError({
-        message: 'Active Organization ID not set',
-        statusCode: 400
-      })
-    }
+    const user = await requireAuthWithOrganizationId(event)
 
     const body = await readBody(event)
 

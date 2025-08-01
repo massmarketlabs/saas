@@ -71,7 +71,7 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
       >
         <UButton
           variant="link"
-          :to="localePath(`/admin/programs/${id}/intervention/${interventionItem.id}`)"
+          :to="localePath(`/${activeOrganization?.slug}/admin/programs/${id}/intervention/${interventionItem.id}`)"
         >
           <span>
             {{ interventionItem.name }}
@@ -79,81 +79,5 @@ useHead({ title: `Programs | ${data.value?.data?.name}` })
         </UButton>
       </div>
     </UCard>
-    <!-- Terms -->
-    <UCard class="mb-4">
-      <template #header>
-        <div class="flex justify-between">
-          <span class="text-2xl font-bold">Terms</span>
-          <UModal
-            title="Create a Term"
-            description="Eiusmod incididunt deserunt excepteur minim ex eiusmod adipisicing fugiat sunt ut excepteur."
-          >
-            <UButton
-              size="md"
-              icon="i-lucide-plus"
-              :label="t('global.page.create')"
-            />
-
-            <template #body>
-              <Placeholder class="h-48" />
-            </template>
-          </UModal>
-        </div>
-      </template>
-      <span v-if="!data?.data.terms || data?.data.terms.length === 0">
-        No data available
-      </span>
-      <UButton
-        v-for="(termItem) in data?.data.terms"
-        v-else
-        :key="termItem.id"
-        :to="localePath(`/admin/programs/${id}/term/${termItem.id}`)"
-        variant="link"
-      >
-        <span>
-          {{ termItem.name }}
-        </span>
-      </UButton>
-    </UCard>
-    <!-- Program Enrollment -->
-    <UCard class="mb-4">
-      <template #header>
-        <div class="flex justify-between">
-          <span class="text-2xl font-bold">Program Enrollment</span>
-          <UModal
-            title="Create a Program Enrollment"
-            description="Lorem officia esse eu labore nulla."
-          >
-            <UButton
-              size="md"
-              icon="i-lucide-plus"
-              :label="t('global.page.create')"
-            />
-            <template #body>
-              <Placeholder class="h-48" />
-            </template>
-          </UModal>
-        </div>
-      </template>
-      <span v-if="!data?.data.program_enrollment || data?.data.program_enrollment.length === 0">
-        No data available
-      </span>
-      <div
-        v-for="(programEnrollmentItem) in data?.data.program_enrollment"
-        v-else
-        :key="programEnrollmentItem.id"
-      >
-        <span>
-          Beneficiary ID: {{ programEnrollmentItem.beneficiary_id }}
-        </span>
-      </div>
-    </UCard>
-    <!-- Raw Data -->
-    <!-- <UCard>
-      <template #header>
-        <span>Raw Data</span>
-      </template>
-      <pre> {{ data }} </pre>
-    </UCard> -->
   </NuxtLayout>
 </template>

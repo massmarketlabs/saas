@@ -16,6 +16,8 @@ interface Intervention {
     & DataMap
 }
 
+definePageMeta({ layout: false })
+
 const route = useRoute()
 
 const id = route.params.id // Program ID
