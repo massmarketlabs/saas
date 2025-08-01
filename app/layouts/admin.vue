@@ -2,7 +2,7 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import CreateProgramModal from './components/CreateProgramModal.vue'
+import ModalCreateProgram from './components/ModalCreateProgram.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
 
@@ -114,7 +114,7 @@ if (import.meta.client) {
           class="data-[orientation=vertical]:w-full flex-1 overflow-y-auto"
         >
           <template #add>
-            <CreateProgramModal />
+            <ModalCreateProgram />
           </template>
         </UNavigationMenu>
         <div class="flex flex-col pl-1 pr-2">
@@ -188,7 +188,7 @@ if (import.meta.client) {
                   class="data-[orientation=vertical]:w-full"
                 >
                   <template #add>
-                    <CreateProgramModal />
+                    <ModalCreateProgram />
                   </template>
                 </UNavigationMenu>
               </div>
