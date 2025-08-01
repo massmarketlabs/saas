@@ -1,14 +1,19 @@
-import { date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { date, integer, jsonb, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 import { organization, user } from './auth'
 import { beneficiary } from './beneficiary'
 import { audit_fields } from './shared'
 
+// ========================
+// Program Status Enum
+// ========================
+export const program_status_enum = pgEnum('status', ['active', 'inactive'])
 // ========================
 // Programs
 // ========================
 export const programs = pgTable('programs', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
+  description: text('description'),
   organization_id: text('organization_id').references(() => organization.id).notNull(),
   // Audit fields
   ...audit_fields
@@ -21,6 +26,7 @@ export const program_enrollment = pgTable('program_enrollment', {
   id: uuid('id').defaultRandom().primaryKey(),
   beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
+  status: program_status_enum().notNull().default('active'),
   // Audit fields
   ...audit_fields
 })
