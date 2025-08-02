@@ -94,11 +94,6 @@ export const getMenus = (
         label: t('menu.home'),
         icon: 'i-lucide-home',
         to: localePath('/')
-      },
-      {
-        label: t('menu.interventionManager'),
-        icon: 'mdi:google-classroom',
-        to: localePath(`/intervention-manager/dashboard`)
       }
     ]
   ]

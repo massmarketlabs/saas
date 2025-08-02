@@ -77,7 +77,7 @@ export function useAuth() {
       sessionFetching.value = true
       const res = await client.signOut({
         fetchOptions: {
-          onSuccess: () => {
+          onSuccess: async () => {
             session.value = null
             user.value = null
 
@@ -86,6 +86,9 @@ export function useAuth() {
               'auth:user',
               'auth:sessionFetching' // Consider clearing this too
             ])
+            if (redirectTo) {
+              await navigateTo(redirectTo)
+            }
           },
           onError: (res) => {
             toast.add({
@@ -95,10 +98,6 @@ export function useAuth() {
           }
         }
       })
-
-      if (redirectTo) {
-        await navigateTo(redirectTo)
-      }
 
       return res
     } catch (err) {

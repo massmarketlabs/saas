@@ -1,12 +1,15 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: false
+  layout: false,
+  auth: {
+    only: 'user'
+  }
 })
 const localePath = useLocalePath()
 
 const menuItems = [{
   label: 'Dashboard',
-  to: localePath(`/intervention-manager/dashboard`),
+  to: localePath(`/`),
   icon: 'i-lucide-layout-dashboard'
 }, {
   label: 'Help',
@@ -14,22 +17,22 @@ const menuItems = [{
   children: [
     {
       label: 'Video Tutorials',
-      to: localePath(`/intervention-manager/help/tutorial`),
+      to: localePath(`/help/tutorial`),
       icon: 'material-symbols:auto-videocam-outline-sharp'
     },
     {
       label: 'Documentation',
-      to: localePath(`/intervention-manager/help/docs`),
+      to: localePath(`/help/docs`),
       icon: 'material-symbols:docs'
     },
     {
       label: 'Community',
-      to: localePath(`/intervention-manager/help/community`),
+      to: localePath(`/help/community`),
       icon: 'iconoir:community'
     },
     {
       label: 'System Check',
-      to: localePath(`/intervention-manager/help/system`),
+      to: localePath(`/help/system`),
       icon: 'eos-icons:system-ok-outlined'
     }
   ]
