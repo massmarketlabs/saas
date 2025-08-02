@@ -3,11 +3,10 @@ definePageMeta({
   layout: false
 })
 const localePath = useLocalePath()
-const { activeOrganization } = useAuth()
 
 const menuItems = [{
   label: 'Dashboard',
-  to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/dashboard`),
+  to: localePath(`/intervention-manager/dashboard`),
   icon: 'i-lucide-layout-dashboard'
 }, {
   label: 'Help',
@@ -15,22 +14,22 @@ const menuItems = [{
   children: [
     {
       label: 'Video Tutorials',
-      to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/help/tutorial`),
+      to: localePath(`/intervention-manager/help/tutorial`),
       icon: 'material-symbols:auto-videocam-outline-sharp'
     },
     {
       label: 'Documentation',
-      to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/help/docs`),
+      to: localePath(`/intervention-manager/help/docs`),
       icon: 'material-symbols:docs'
     },
     {
       label: 'Community',
-      to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/help/community`),
+      to: localePath(`/intervention-manager/help/community`),
       icon: 'iconoir:community'
     },
     {
       label: 'System Check',
-      to: localePath(`/${activeOrganization.value?.slug}/intervention-manager/help/system`),
+      to: localePath(`/intervention-manager/help/system`),
       icon: 'eos-icons:system-ok-outlined'
     }
   ]

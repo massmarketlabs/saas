@@ -1,21 +1,18 @@
-import type { H3Event } from 'h3'
-// import { insertProgramSchema } from '~~/server/validators/programs'
-import { createError } from 'h3'
 // server/api/admin/programs/post.ts
+import type { H3Event } from 'h3'
+import { createInsertSchema } from 'drizzle-zod'
+import { createError } from 'h3'
 import { z } from 'zod/v4'
 import { programs } from '~~/server/database/schema'
-import { requireAuthWithOrganizationId } from '~~/server/utils/auth'
 
-export const insertProgramSchema = z.object({
-  name: z.string().min(1, 'Name is required')
-})
+export const insertProgramSchema = createInsertSchema(programs)
 
 export type InsertProgramInput = z.infer<typeof insertProgramSchema>
 
 // Define POST handler
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const user = await requireAuthWithOrganizationId(event)
+    const user = await requireAuth(event)
 
     const body = await readBody(event)
 
@@ -25,7 +22,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Get db connection
     const db = await useDB()
     // Insert into database
-    const result = await db.insert(programs).values({ ...data, organization_id: user.session.activeOrganizationId }).returning()
+    const result = await db.insert(programs).values(data).returning()
 
     await logAuditEvent({
       userId: user.session.userId,

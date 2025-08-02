@@ -1,6 +1,5 @@
 import { date, integer, jsonb, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { organization, user } from './auth'
-import { beneficiary } from './beneficiary'
+import { user } from './auth'
 import { audit_fields } from './shared'
 
 // ========================
@@ -14,8 +13,6 @@ export const programs = pgTable('programs', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   description: text('description'),
-  organization_id: text('organization_id').references(() => organization.id).notNull(),
-  // Audit fields
   ...audit_fields
 })
 
@@ -24,10 +21,9 @@ export const programs = pgTable('programs', {
 // ========================
 export const program_enrollment = pgTable('program_enrollment', {
   id: uuid('id').defaultRandom().primaryKey(),
-  beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
+  user_id: text('user_id').references(() => user.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
   status: program_status_enum().notNull().default('active'),
-  // Audit fields
   ...audit_fields
 })
 
@@ -40,7 +36,6 @@ export const terms = pgTable('terms', {
   program_id: uuid('program_id').notNull().references(() => programs.id),
   start_date: date('start_date').notNull(),
   end_date: date('end_date').notNull(),
-  // Audit fields
   ...audit_fields
 })
 
@@ -53,28 +48,16 @@ export const interventions = pgTable('interventions', {
   term_id: uuid('term_id').references(() => terms.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
   created_by: text('created_by').references(() => user.id).notNull(),
-  // Audit fields
   ...audit_fields
 })
 
 // ========================
-// Intervention Enrollment Type
-// ========================
-// export const intervention_enrollment_type = pgTable('intervention_enrollment_type', {
-//   id: uuid('id').primaryKey().defaultRandom(),
-//   code: varchar('code', { length: 3 }).notNull().unique(),
-//   name: text('name').notNull().unique(),
-//   ...audit_fields
-// })
-
-// ========================
 // Intervention ↔ Enrollment
 // ========================
-export const beneficiary_intervention_enrollment = pgTable('beneficiary_intervention_enrollment', {
+export const intervention_enrollment = pgTable('intervention_enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
   intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
-  beneficiary_id: uuid('beneficiary_id').references(() => beneficiary.id).notNull(),
-  // enrollment_type_id: uuid('enrollment_type_id').references(() => intervention_enrollment_type.id).notNull(),
+  user_id: text('user_id').references(() => user.id).notNull(),
   ...audit_fields
 })
 

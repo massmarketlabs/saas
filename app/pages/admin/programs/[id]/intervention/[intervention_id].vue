@@ -63,7 +63,6 @@ definePageMeta({
 })
 
 const localePath = useLocalePath()
-const { activeOrganization, sessionFetching } = useAuth()
 const { t } = useI18n()
 const route = useRoute()
 const interventionId = route.params.interventionId
@@ -198,7 +197,7 @@ useHead({ title: `Intervention | ${mockData.value.data.name}` })
   <NuxtLayout name="admin">
     <template #navRight>
       <UButton
-        :to="localePath(`/${sessionFetching ? '' : activeOrganization?.slug}/admin/programs/${programId}`)"
+        :to="localePath(`/admin/programs/${programId}`)"
         variant="outline"
         color="neutral"
         icon="i-lucide-arrow-left"

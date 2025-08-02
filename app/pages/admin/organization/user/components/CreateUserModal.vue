@@ -13,9 +13,9 @@ const { client } = useAuth()
 
 const schema = z.object({
   name: z.string().min(4, t('user.validation.nameMin', { n: 4 })),
-  email: z.string().email(t('user.validation.emailInvalid')),
+  email: z.email(t('user.validation.emailInvalid')),
   password: z.string().min(8, t('user.validation.passwordMin', { n: 8 })),
-  role: z.enum(['user', 'admin'])
+  role: z.enum(['beneficiary', 'instructor', 'admin'])
 })
 type Schema = zodOutput<typeof schema>
 
@@ -23,7 +23,7 @@ const state = reactive({
   name: '',
   email: '',
   password: '',
-  role: 'user' as const
+  role: 'beneficiary' as const
 })
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
@@ -97,10 +97,8 @@ const onCancel = () => {
             v-model="state.role"
             class="w-full"
             :items="[
-              { label: t('user.roles.user'), value: 'user' },
-              { label: t('user.roles.teacher'), value: 'teacher' },
-              { label: t('user.roles.socialWorker'), value: 'social_worker' },
-              { label: t('user.roles.caseManager'), value: 'case_manager' },
+              { label: t('user.roles.beneficiary'), value: 'beneficiary' },
+              { label: t('user.roles.instructor'), value: 'instructor' },
               { label: t('user.roles.admin'), value: 'admin' }
             ]"
           />

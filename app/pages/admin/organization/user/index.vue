@@ -26,11 +26,9 @@ const filters: AdminTableFilter[] = reactive([
     field: 'role',
     type: 'checkbox',
     items: [
-      { label: t('user.roles.user'), id: 'user', count: 0 },
-      { label: t('user.roles.admin'), id: 'admin', count: 0 }
-      // { label: t('user.roles.teacher'), id: 'teacher', count: 0 },
-      // { label: t('user.roles.caseManager'), id: 'case_manager', count: 0 },
-      // { label: t('user.roles.socialWorker'), id: 'social_worker', count: 0 }
+      { label: t('user.roles.beneficiary'), id: 'beneficiary', count: 0 },
+      { label: t('user.roles.admin'), id: 'admin', count: 0 },
+      { label: t('user.roles.instructor'), id: 'instructor', count: 0 }
     ],
     value: []
   },
@@ -91,7 +89,7 @@ const getActionItems = (row: Row<UserWithRole>) => {
 }
 
 const getRoleDropdownItems = (original: UserWithRole) => {
-  const roles = ['user', 'admin'] as const
+  const roles = ['beneficiary', 'admin', 'instructor'] as const
   return roles.map((role) => {
     return {
       label: t(`user.roles.${role}`),

@@ -6,9 +6,10 @@ import ModalCreateProgram from './components/ModalCreateProgram.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
 
+const runtimeConfig = useRuntimeConfig()
 const isCollapsed = ref(false)
 
-const { user, signOut, handleChangeActiveOrganization, activeOrganization, organizations, sessionFetching } = useAuth()
+const { user, signOut } = useAuth()
 
 const route = useRoute()
 
@@ -17,9 +18,9 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 
 defineShortcuts({
-  'g-1': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/dashboard`)),
-  'g-2': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/organization/user`)),
-  'g-3': async () => await navigateTo(localePath(`${activeOrganization.value?.slug}/admin/donors`))
+  'g-1': async () => await navigateTo(localePath(`/admin/dashboard`)),
+  'g-2': async () => await navigateTo(localePath(`/admin/organization/user`)),
+  'g-3': async () => await navigateTo(localePath(`/admin/donors`))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
@@ -29,9 +30,7 @@ const programStore = useProgramStore()
 await programStore.fetchPrograms()
 
 // const { programs } = storeToRefs(programStore)
-const activeOrganizationId = computed(() => activeOrganization.value?.id)
-const activeOrganizationSlug = computed(() => activeOrganization.value?.slug)
-const menus = computed(() => getMenus(t, localePath, programStore.programs, activeOrganizationSlug.value))
+const menus = computed(() => getMenus(t, localePath, programStore.programs))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -82,20 +81,8 @@ if (import.meta.client) {
           <span class="text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis">
             {{ t('global.appName') }}
           </span>
-          <USelect
-            v-model="activeOrganizationId"
-            class="text-sm h-8 font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis w-full"
-            :items="organizations?.map((o) => {
-              return {
-                value: o.id,
-                label: o.name
-              }
-            })"
-            icon="i-lucide-building"
-            size="sm"
-            :loading="sessionFetching"
-            @update:model-value="async (val) => await handleChangeActiveOrganization(val)"
-          />
+
+          <h5>{{ runtimeConfig.public.companyName }}</h5>
           <SearchPalette
             :collapsed="isCollapsed"
             :t="t"

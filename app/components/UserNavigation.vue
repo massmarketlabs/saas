@@ -3,9 +3,9 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { activeOrganization, user, loggedIn, signOut } = useAuth()
+const { user, loggedIn, signOut } = useAuth()
 
-const orgSlug = computed(() => `/${activeOrganization.value?.slug}/admin/dashboard`)
+const orgSlug = computed(() => `/admin/dashboard`)
 const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.profile'),
@@ -46,7 +46,7 @@ const profileMenuItems: DropdownMenuItem[] = [
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="activeOrganization && user?.role === 'admin'"
+      v-if="user?.role === 'admin'"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"

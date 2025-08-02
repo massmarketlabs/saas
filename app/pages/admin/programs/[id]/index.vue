@@ -17,7 +17,6 @@ definePageMeta({
 })
 
 const localePath = useLocalePath()
-const { activeOrganization, sessionFetching } = useAuth()
 const { t } = useI18n()
 const route = useRoute()
 const id = route.params.id
@@ -42,7 +41,7 @@ const programStats = computed(() => ({
   <NuxtLayout name="admin">
     <template #navRight>
       <UButton
-        :to="localePath(`/${sessionFetching ? '' : activeOrganization?.slug}/admin/programs`)"
+        :to="localePath(`/admin/programs`)"
         variant="outline"
         color="neutral"
         icon="i-lucide-arrow-left"
@@ -241,7 +240,7 @@ const programStats = computed(() => ({
                       </div>
                       <div>
                         <p class="font-medium">
-                          Student ID: {{ enrollment.beneficiary_id }}
+                          Student ID: {{ enrollment.user_id }}
                         </p>
                         <p class="text-sm text-gray-500">
                           Enrolled: {{ new Date(enrollment.created_at).toLocaleDateString() }}
@@ -450,7 +449,7 @@ const programStats = computed(() => ({
                 <div class="flex items-center justify-between">
                   <NuxtLink
                     variant="link"
-                    :to="localePath(`/${activeOrganization?.slug}/admin/programs/${id}/intervention/${interventionItem.id}`)"
+                    :to="localePath(`/admin/programs/${id}/intervention/${interventionItem.id}`)"
                     class="text-left flex-1 justify-start p-0 h-auto"
                   >
                     <!-- <div class="flex items-center gap-2"> -->

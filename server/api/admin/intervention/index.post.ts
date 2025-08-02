@@ -1,13 +1,12 @@
 import { createInsertSchema } from 'drizzle-zod'
 import { interventions } from '~~/server/database/schema'
-import { requireAuthWithOrganizationId } from '~~/server/utils/auth'
 
 export type RequestCreateIntervention = typeof interventions.$inferInsert
 
 export const requestCreateInterventionSchema = createInsertSchema(interventions).omit({ created_by: true })
 
 export default defineEventHandler(async (event) => {
-  const user = await requireAuthWithOrganizationId(event)
+  const user = await requireAuth(event)
   const body = await readValidatedBody(event, requestCreateInterventionSchema.safeParse)
 
   if (body.error) {

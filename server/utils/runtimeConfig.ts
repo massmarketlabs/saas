@@ -29,6 +29,7 @@ export const generateRuntimeConfig = () => ({
   public: {
     baseURL: process.env.NUXT_APP_URL,
     appName: process.env.NUXT_APP_NAME,
+    companyName: process.env.NUXT_COMPANY_NAME,
     appEnv: process.env.NODE_ENV,
     appRepo: process.env.NUXT_APP_REPO,
     appNotifyEmail: process.env.NUXT_APP_NOTIFY_EMAIL,

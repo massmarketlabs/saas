@@ -28,11 +28,9 @@
         "passwordMin": "Password must be at least {n} characters"
       },
       "roles": {
-        "user": "User",
+        "beneficiary": "Beneficiary",
         "admin": "Administrator",
-        "teacher": "Teacher",
-        "socialWorker": "Social Worker",
-        "caseManager": "Case Manager"
+        "instructor": "Instructor"
       },
       "modals": {
         "createUser": "Create New User",
@@ -81,11 +79,9 @@
         "passwordMin": "يجب أن تكون كلمة المرور {n} أحرف على الأقل"
       },
       "roles": {
-        "user": "مستخدم",
+        "beneficiary": "المستفيد",
         "admin": "مدير",
-        "teacher": "مدرس",
-        "socialWorker": "عامل اجتماعي",
-        "caseManager": "مدير الحالة"
+        "instructor": "مدرس"
       },
       "modals": {
         "createUser": "إنشاء مستخدم جديد",

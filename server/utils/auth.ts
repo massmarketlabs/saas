@@ -2,19 +2,17 @@ import type { H3Event } from 'h3'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { admin as adminPlugin, openAPI, organization } from 'better-auth/plugins'
-import { eq } from 'drizzle-orm'
+import { admin as adminPlugin, openAPI } from 'better-auth/plugins'
 import { v7 as uuidv7 } from 'uuid'
-import { getDefaultOrganization } from '../database/repository/organization'
 import * as schema from '../database/schema'
-import { user as userSchema } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import {
   // cacheClient,
   resendInstance
 } from './drivers'
-import { ac, admin, owner, project_manager, user } from './permissions'
+import { ac, admin, beneficiary, instructor } from './permissions'
+// import { ac, admin, project_manager } from './permissions'
 import { runtimeConfig } from './runtimeConfig'
 
 // import { setupStripe } from './stripe'
@@ -119,21 +117,6 @@ const createBetterAuth = () => betterAuth({
     },
     updateAccountOnSignIn: true
   },
-  databaseHooks: {
-    session: {
-      create: {
-        before: async (session) => {
-          const org = await getDefaultOrganization(session.userId)
-          return {
-            data: {
-              ...session,
-              activeOrganizationId: org?.id
-            }
-          }
-        }
-      }
-    }
-  },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       const ipAddress = ctx.getHeader('x-forwarded-for')
@@ -186,36 +169,14 @@ const createBetterAuth = () => betterAuth({
   },
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
-    adminPlugin(),
-    organization({
+    adminPlugin({
       ac,
       roles: {
         admin,
-        user,
-        project_manager,
-        owner
+        beneficiary,
+        instructor
       },
-      organizationCreation: {
-        afterCreate: async ({ user: activeUser, organization }) => {
-          // Assign the creator the 'admin' role for the newly created organization
-          const db = getDB()
-
-          await db.update(userSchema)
-            .set({ role: 'admin' })
-            .where(eq(userSchema.id, activeUser.id))
-
-          // Optionally log this as an audit event
-          await logAuditEvent({
-            userId: activeUser.id,
-            category: 'organization',
-            action: 'assign_admin_role',
-            targetType: 'organization',
-            targetId: organization.id,
-            status: 'success',
-            details: `User ${activeUser.id} assigned as admin to organization ${organization.id}`
-          })
-        }
-      }
+      defaultRole: 'beneficiary'
     })
     // setupStripe()
   ]
@@ -261,17 +222,4 @@ export const requireAuth = async (event: H3Event) => {
   // Save the session to the event context for later use
   event.context.auth = session!
   return session!
-}
-
-export const requireAuthWithOrganizationId = async (event: H3Event) => {
-  const session = await requireAuth(event)
-
-  if (!session.session.activeOrganizationId) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Active Organization ID not set'
-    })
-  }
-
-  return session as typeof session & { session: { activeOrganizationId: string } }
 }

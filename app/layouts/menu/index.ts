@@ -5,15 +5,14 @@ type Program = typeof programs.$inferSelect
 
 function programListToMenu(
   localePath: LocalePathFunction,
-  programsList: Program[] | undefined,
-  organizationSlug: string
+  programsList: Program[] | undefined
 ): NavigationMenuItem[] {
   if (!programsList) {
     return []
   }
 
   const menu = programsList.map((x) => {
-    const navigationItem: NavigationMenuItem = { label: x.name, to: localePath(`/${organizationSlug}/admin/programs/${x.id}`) }
+    const navigationItem: NavigationMenuItem = { label: x.name, to: localePath(`/admin/programs/${x.id}`) }
     return navigationItem
   })
   const addSlot: NavigationMenuItem = { slot: 'add' as const }
@@ -25,30 +24,25 @@ function programListToMenu(
 export const getMenus = (
   t: TranFunction,
   localePath: LocalePathFunction,
-  programsList: Program[] | undefined,
-  organizationSlug?: string
+  programsList: Program[] | undefined
 ): NavigationMenuItem[][] => {
-  if (!organizationSlug) {
-    return []
-  }
-
-  const programsMenuOpts = programListToMenu(localePath, programsList, organizationSlug)
+  const programsMenuOpts = programListToMenu(localePath, programsList)
 
   return [
     [
       {
         label: t('menu.dashboard'),
         icon: 'i-lucide-layout-dashboard',
-        to: localePath(`/${organizationSlug}/admin/dashboard`)
+        to: localePath(`/admin/dashboard`)
       },
       {
         label: t('menu.finance'),
         icon: 'i-lucide-chart-candlestick',
-        to: localePath(`/${organizationSlug}/admin/donors`),
+        to: localePath(`/admin/donors`),
         children: [{
           label: t('menu.donors'),
           icon: 'hugeicons:money-receive-circle',
-          to: localePath(`/${organizationSlug}/admin/donors`)
+          to: localePath(`/admin/donors`)
         }]
       },
 
@@ -61,41 +55,36 @@ export const getMenus = (
         ]
       },
       {
-        label: t('menu.beneficiary'),
-        icon: 'hugeicons:student',
-        to: localePath(`/${organizationSlug}/admin/beneficiary`)
-      },
-      {
         label: t('menu.organization'),
         icon: 'i-lucide-building',
-        to: localePath(`/${organizationSlug}/admin/organization/user`),
+        to: localePath(`/admin/organization/user`),
         children: [
           {
             label: t('menu.users'),
             icon: 'i-lucide-users',
-            to: localePath(`/${organizationSlug}/admin/organization/user`)
+            to: localePath(`/admin/organization/user`)
           },
           {
             label: t('menu.settings'),
             icon: 'i-lucide-cog',
-            to: localePath(`/${organizationSlug}/admin/organization/settings`)
+            to: localePath(`/admin/organization/settings`)
           }
         ]
       },
       {
         label: t('menu.maintenance'),
-        to: localePath(`/${organizationSlug}/admin/maintenance/audit-log`),
+        to: localePath(`/admin/maintenance/audit-log`),
         icon: 'i-lucide-wrench',
         children: [
           {
             label: t('menu.auditLog'),
             icon: 'i-lucide-history',
-            to: localePath(`/${organizationSlug}/admin/maintenance/audit-log`)
+            to: localePath(`/admin/maintenance/audit-log`)
           },
           {
             label: t('menu.dbStats'),
             icon: 'i-lucide-database',
-            to: localePath(`/${organizationSlug}/admin/maintenance/db-stats`)
+            to: localePath(`/admin/maintenance/db-stats`)
           }
         ]
       }
@@ -109,7 +98,7 @@ export const getMenus = (
       {
         label: t('menu.interventionManager'),
         icon: 'mdi:google-classroom',
-        to: localePath(`/${organizationSlug}/intervention-manager/dashboard`)
+        to: localePath(`/intervention-manager/dashboard`)
       }
     ]
   ]
