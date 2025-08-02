@@ -26,11 +26,9 @@ defineShortcuts({
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
 const pathNameParentMap: StringDict<NavigationMenuItem | undefined> = {}
 
-const programStore = useProgramStore()
-await programStore.fetchPrograms()
+const { data: programs } = await useProgramList()
 
-// const { programs } = storeToRefs(programStore)
-const menus = computed(() => getMenus(t, localePath, programStore.programs))
+const menus = computed(() => getMenus(t, localePath, programs.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -101,7 +99,9 @@ if (import.meta.client) {
           class="data-[orientation=vertical]:w-full flex-1 overflow-y-auto"
         >
           <template #add>
-            <ModalCreateProgram />
+            <ClientOnly>
+              <ModalCreateProgram />
+            </ClientOnly>
           </template>
         </UNavigationMenu>
         <div class="flex flex-col pl-1 pr-2">

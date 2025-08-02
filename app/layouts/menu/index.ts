@@ -8,7 +8,7 @@ function programListToMenu(
   programsList: Program[] | undefined
 ): NavigationMenuItem[] {
   if (!programsList) {
-    return []
+    return [{ slot: 'add' }]
   }
 
   const menu = programsList.map((x) => {

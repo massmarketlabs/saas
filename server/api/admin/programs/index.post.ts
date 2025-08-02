@@ -1,33 +1,33 @@
 // server/api/admin/programs/post.ts
 import type { H3Event } from 'h3'
-import { createInsertSchema } from 'drizzle-zod'
 import { createError } from 'h3'
 import { z } from 'zod/v4'
-import { programs } from '~~/server/database/schema'
-
-export const insertProgramSchema = createInsertSchema(programs)
-
-export type InsertProgramInput = z.infer<typeof insertProgramSchema>
+import { dbQueries, insertProgramSchema } from '~~/server/database'
 
 // Define POST handler
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const user = await requireAuth(event)
 
-    const body = await readBody(event)
-
     // Validate with Zod
-    const data = insertProgramSchema.parse(body)
+    const body = await readValidatedBody(event, insertProgramSchema.safeParse)
+
+    if (body.error) {
+      throw createError({
+        statusCode: 400,
+        data: body.error
+      })
+    }
 
     // Get db connection
     const db = await useDB()
     // Insert into database
-    const result = await db.insert(programs).values(data).returning()
+    const result = await dbQueries(db).program.insert(body.data)
 
     await logAuditEvent({
       userId: user.session.userId,
       category: 'organization',
-      action: `Program ${data.name} created`,
+      action: `Program ${result[0].name} created`,
       status: 'success',
       ipAddress: getRequestIP(event),
       userAgent: event.headers.get('user-agent') ?? undefined
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     return {
       success: true,
-      data: result[0]
+      data: result
     }
   } catch (error) {
     // Handle Zod errors or others

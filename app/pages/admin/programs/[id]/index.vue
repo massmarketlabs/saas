@@ -20,7 +20,9 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 const route = useRoute()
 const id = route.params.id
-const { data } = await useFetch<Program>('/api/admin/aggregate/programs', { query: { id } })
+
+const requestFetch = useRequestFetch()
+const { data } = await useAsyncData<Program>(`program-${id}`, async () => await requestFetch('/api/admin/aggregate/programs', { query: { id } }))
 
 useHead({ title: `Programs | ${data.value?.data?.name}` })
 

@@ -129,19 +129,5 @@ export default defineNuxtConfig({
     rollupConfig: {
       external: process.env.NUXT_NITRO_PRESET != 'node-server' ? ['pg-native'] : undefined
     }
-  },
-  routeRules: {
-    '/intervention-manager': {
-      redirect: {
-        to: '/intervention-manager/dashboard',
-        statusCode: 301 // Permanent redirect
-      }
-    },
-    '/ar/intervention-manager': {
-      redirect: {
-        to: '/ar/intervention-manager/dashboard',
-        statusCode: 301 // Permanent redirect
-      }
-    }
   }
 })

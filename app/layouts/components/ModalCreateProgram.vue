@@ -1,53 +1,49 @@
 <script setup lang="ts">
-import type { FormError } from '@nuxt/ui'
-import * as z from 'zod'
+import type { RequestInsertProgram } from '~~/server/database'
+import { insertProgramSchema } from '~~/server/database'
 
-type CreateProgramSchema = z.output<typeof schema>
-
+const form = useTemplateRef('form')
 const isOpen = ref(false)
-const state = reactive<Partial<CreateProgramSchema>>({})
-
-const schema = z.object({
-  name: z.string().min(2)
-})
-
-const programStore = useProgramStore()
-
+const isLoading = ref(false)
+const state = reactive<Partial<RequestInsertProgram>>({})
+// const programStore = useProgramStore()
+const { refresh } = await useProgramList()
 const toast = useToast()
 
-const onSubmit = async (event: FormSubmitEvent<CreateProgramSchema>) => {
-  const resp = await useFetch('/api/admin/programs', { method: 'POST', body: event.data })
+const onSubmit = async (event: FormSubmitEvent<RequestInsertProgram>) => {
+  try {
+    isLoading.value = true
+    const resp = await $fetch('/api/admin/programs', { method: 'POST', body: event.data })
 
-  if (resp.error.value) {
-    toast.add({ title: 'Failed Request', color: 'error', description: resp.error.value?.message })
-    return
+    if (!resp.success) {
+      toast.add({ title: 'Failed Request', color: 'error', description: 'Unable to create program' })
+      return
+    }
+
+    // Display Success Toast
+    toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' })
+
+    // Refetch Programs
+    // await programStore.query.execute()
+    await refresh()
+
+    // Clear State
+    state.name = undefined
+    state.description = undefined
+
+    // Close Modal
+    isOpen.value = false
+  } catch (error) {
+    console.error(error)
+  } finally {
+    isLoading.value = false
   }
-
-  // Display Success Toast
-  toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' })
-
-  // Refetch Programs
-  await programStore.fetchPrograms()
-
-  // Clear State
-  state.name = undefined
-
-  // Close Modal
-  isOpen.value = false
-}
-
-const validate = (state: Partial<CreateProgramSchema>) => {
-  const errors: FormError[] = []
-  if (!state.name) {
-    errors.push({ message: 'Name is required', name: 'name' })
-  }
-  return errors
 }
 </script>
 
 <template>
   <UModal
-    v-model="isOpen"
+    v-model:open="isOpen"
     title="Create a Program"
     description="Consectetur non sit labore nostrud consequat dolor aliquip ad consequat duis."
   >
@@ -59,10 +55,10 @@ const validate = (state: Partial<CreateProgramSchema>) => {
     />
     <template #body>
       <UForm
-        :validate="validate"
+        ref="form"
         :state="state"
-        :schema="schema"
-        class="gap-4 flex flex-col w-60"
+        :schema="insertProgramSchema"
+        class="gap-4 flex flex-col"
         @submit="onSubmit"
       >
         <UFormField
@@ -71,15 +67,31 @@ const validate = (state: Partial<CreateProgramSchema>) => {
         >
           <UInput
             v-model="state.name"
+            class="w-full"
             placeholder="Program Name"
           />
         </UFormField>
-        <div>
-          <UButton type="submit">
-            Submit
-          </UButton>
-        </div>
+        <UFormField
+          label="Description"
+          name="description"
+        >
+          <UTextarea
+            v-model="state.description"
+            :maxrows="4"
+            :rows="4"
+            placeholder="Description"
+            class="w-full"
+          />
+        </UFormField>
       </UForm>
+    </template>
+    <template #footer>
+      <UButton
+        :loading="isLoading"
+        @click="form?.submit"
+      >
+        Submit
+      </UButton>
     </template>
   </UModal>
 </template>
