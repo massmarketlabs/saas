@@ -1,8 +1,10 @@
-<!-- app/pages/[org-slug]/intervention-manager/dashboard/index.vue -->
+<!-- app/pages/index.vue -->
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
 import { CalendarDate } from '@internationalized/date'
+
+const localePath = useLocalePath()
 
 definePageMeta({
   layout: false
@@ -138,7 +140,13 @@ const getStatusColor = (status: string) => {
 </script>
 
 <template>
-  <NuxtLayout name="intervention-manager">
+  <NuxtLayout name="default">
+    <template #nav-right>
+      <SiteNavigation
+        :t="t"
+        :locale-path="localePath"
+      />
+    </template>
     <div class="space-y-6">
       <!-- Welcome Header -->
       <UCard class="border-l-2 border-l-primary">

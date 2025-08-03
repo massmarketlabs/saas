@@ -2,10 +2,18 @@
 definePageMeta({
   layout: false
 })
+const { t } = useI18n()
+const localePath = useLocalePath()
 </script>
 
 <template>
-  <NuxtLayout name="intervention-manager">
+  <NuxtLayout name="default">
+    <template #nav-right>
+      <SiteNavigation
+        :t="t"
+        :locale-path="localePath"
+      />
+    </template>
     <span>Hello, tutorial</span>
   </NuxtLayout>
 </template>

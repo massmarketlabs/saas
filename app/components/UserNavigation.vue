@@ -3,9 +3,8 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { user, loggedIn, signOut } = useAuth()
+const { user, loggedIn, signOut, sessionFetching } = useAuth()
 
-const orgSlug = computed(() => `/admin/dashboard`)
 const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.profile'),
@@ -50,7 +49,8 @@ const profileMenuItems: DropdownMenuItem[] = [
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"
-      :to="localePath(orgSlug)"
+      :to="localePath('/admin/dashboard')"
+      :loading="sessionFetching"
     >
       {{ t('global.nav.admin') }}
     </UButton>

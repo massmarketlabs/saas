@@ -1,3 +1,4 @@
+// plugins/auth.client.ts
 export default defineNuxtPlugin({
   enforce: 'pre',
   async setup(nuxtApp) {
