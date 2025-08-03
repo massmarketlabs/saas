@@ -26,19 +26,6 @@ export default defineNuxtConfig({
       external: ['to-px']
     }
   },
-  // ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
-  //   ? {
-  //       hub: {
-  //         workers: true,
-  //         kv: true,
-  //         bindings: {
-  //           hyperdrive: {
-  //             HYPERDRIVE: process.env.NUXT_CF_HYPERDRIVE_ID as string
-  //           }
-  //         }
-  //       }
-  //     }
-  //   : {}),
   pinia: {
     storesDirs: ['./app/stores/**']
   },
@@ -46,10 +33,7 @@ export default defineNuxtConfig({
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
     locales,
-    defaultLocale: 'en',
-    bundle: {
-      optimizeTranslationDirective: false
-    }
+    defaultLocale: 'en'
   },
   sitemap: {
     exclude: [

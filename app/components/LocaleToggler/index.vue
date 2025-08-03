@@ -1,8 +1,8 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
-const { locale, setLocale, locales } = useI18n()
-const { t } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
+
 const localeItems = computed(() => {
   return locales.value.map(item => ({
     label: item.name,
