@@ -4,6 +4,9 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { contributions, donors } from '~~/server/database/schema'
 
+definePageMeta({
+  layout: false
+})
 interface DonorAggregate {
   rootTable: string
   data: typeof donors.$inferSelect & { contributions: typeof contributions.$inferSelect[] }
