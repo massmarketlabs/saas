@@ -1,16 +1,8 @@
 <i18n src="../i18n.json"></i18n>
 
 <script setup lang="ts">
-import type { interventions, program_enrollment, programs, terms } from '~~/server/database/schema'
+// import type { interventions, program_enrollment, programs, terms } from '~~/server/database/schema'
 import { Placeholder } from '#components'
-
-interface Program {
-  rootTable: string
-  data: typeof programs.$inferSelect &
-    { terms: typeof terms.$inferSelect[] } &
-    { interventions: typeof interventions.$inferSelect[] } &
-    { program_enrollment: typeof program_enrollment.$inferSelect[] }
-}
 
 definePageMeta({
   layout: false
@@ -22,14 +14,14 @@ const route = useRoute()
 const id = route.params.id
 
 const requestFetch = useRequestFetch()
-const { data } = await useAsyncData<Program>(`program-${id}`, async () => await requestFetch('/api/admin/aggregate/programs', { query: { id } }))
+const { data } = await useAsyncData(`program-${id}`, async () => await requestFetch(`/api/admin/programs/${id}`))
 
-useHead({ title: `Programs | ${data.value?.data?.name}` })
+useHead({ title: `Programs | ${data.value?.name}` })
 
 // Mock statistics data - replace with actual API call
 const programStats = computed(() => ({
-  totalEnrollments: data.value?.data.program_enrollment?.length || 0,
-  activeEnrollments: data.value?.data.program_enrollment?.filter(e => e.status === 'active')?.length || 0,
+  totalEnrollments: data.value?.program_enrollment?.length || 0,
+  activeEnrollments: data.value?.program_enrollment?.filter(e => e.status === 'active')?.length || 0,
   mostFrequentAbsences: [
     { reason: 'Illness', count: 15, percentage: 35 },
     { reason: 'Family Emergency', count: 8, percentage: 18 },
@@ -43,7 +35,7 @@ const programStats = computed(() => ({
   <NuxtLayout name="admin">
     <template #navRight>
       <UButton
-        :to="localePath(`/admin/programs`)"
+        :to="localePath(`/admin/dashboard`)"
         variant="outline"
         color="neutral"
         icon="i-lucide-arrow-left"
@@ -57,20 +49,30 @@ const programStats = computed(() => ({
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold dark:text-white">
-              {{ data?.data?.name }}
+              {{ data?.name }}
             </h1>
             <p
-              v-if="data?.data?.description"
+              v-if="data?.description"
               class="text-gray-500 mt-1"
             >
-              {{ data?.data?.description || 'No program description' }}
+              {{ data?.description || 'No program description' }}
             </p>
           </div>
-          <div class="flex flex-wrap gap-2">
-            <UBadge class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium">
-              Active Program
+          <template v-if="data?.is_active">
+            <div class="flex flex-wrap gap-2">
+              <UBadge class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium">
+                Active Program
+              </UBadge>
+            </div>
+          </template>
+          <template v-else>
+            <UBadge
+              color="error"
+              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+            >
+              Inactive Program
             </UBadge>
-          </div>
+          </template>
         </div>
       </UCard>
 
@@ -134,7 +136,7 @@ const programStats = computed(() => ({
                 Terms
               </p>
               <p class="text-2xl font-semibold text-gray-500">
-                {{ data?.data?.terms?.length || 0 }}
+                {{ data?.terms?.length || 0 }}
               </p>
             </div>
           </div>
@@ -155,7 +157,7 @@ const programStats = computed(() => ({
                 Interventions
               </p>
               <p class="text-2xl font-semibold text-gray-500">
-                {{ data?.data?.interventions?.length || 0 }}
+                {{ data?.interventions?.length || 0 }}
               </p>
             </div>
           </div>
@@ -203,7 +205,7 @@ const programStats = computed(() => ({
             </template>
 
             <div
-              v-if="!data?.data.program_enrollment || data?.data.program_enrollment.length === 0"
+              v-if="!data?.program_enrollment || data.program_enrollment.length === 0"
               class="text-center py-12"
             >
               <Icon
@@ -227,7 +229,7 @@ const programStats = computed(() => ({
               class="space-y-3"
             >
               <div
-                v-for="enrollment in data?.data.program_enrollment"
+                v-for="enrollment in data.program_enrollment"
                 :key="enrollment.id"
                 class="bg-accented rounded-lg p-4"
               >
@@ -243,6 +245,9 @@ const programStats = computed(() => ({
                       <div>
                         <p class="font-medium">
                           Student ID: {{ enrollment.user_id }}
+                        </p>
+                        <p class="font-medium">
+                          Name: {{ enrollment.user.name }}
                         </p>
                         <p class="text-sm text-gray-500">
                           Enrolled: {{ new Date(enrollment.created_at).toLocaleDateString() }}
@@ -348,7 +353,7 @@ const programStats = computed(() => ({
             </template>
 
             <div
-              v-if="!data?.data.terms || data?.data.terms.length === 0"
+              v-if="!data?.terms || data.terms.length === 0"
               class="text-center py-8"
             >
               <Icon
@@ -365,7 +370,7 @@ const programStats = computed(() => ({
               class="space-y-3"
             >
               <div
-                v-for="term in data?.data.terms"
+                v-for="term in data.terms"
                 :key="term.id"
                 class="bg-accented rounded-lg p-3"
               >
@@ -427,7 +432,7 @@ const programStats = computed(() => ({
             </template>
 
             <div
-              v-if="!data?.data.interventions || data?.data.interventions.length === 0"
+              v-if="!data?.interventions || data.interventions.length === 0"
               class="text-center py-8"
             >
               <Icon
@@ -444,7 +449,7 @@ const programStats = computed(() => ({
               class="space-y-2"
             >
               <div
-                v-for="interventionItem in data?.data.interventions"
+                v-for="interventionItem in data?.interventions"
                 :key="interventionItem.id"
                 class="group bg-accented rounded-lg p-3"
               >
@@ -459,15 +464,28 @@ const programStats = computed(() => ({
                       {{ interventionItem.name }}
                     </p>
                     <p class="font-medium text-gray-500 text-sm">
-                      Fall 2025
+                      {{ interventionItem.term.name }}
                     </p>
                     <!-- </div> -->
                   </NuxtLink>
                   <UDropdownMenu
                     :items="[
-                      [{ label: 'View', icon: 'i-lucide-eye' }],
-                      [{ label: 'Edit', icon: 'i-lucide-edit' }],
-                      [{ label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }]
+                      [
+                        { label: 'View',
+                          icon: 'i-lucide-eye',
+                          onSelect: async () => await navigateTo(`/admin/programs/${interventionItem.program_id}/intervention/${interventionItem.name}`) }
+                      ],
+                      [
+                        { label: 'Edit',
+                          icon: 'i-lucide-edit'
+                        }
+                      ],
+                      [
+                        { label: 'Delete',
+                          icon: 'i-lucide-trash-2',
+                          color: 'error'
+                        }
+                      ]
                     ]"
                   >
                     <UButton

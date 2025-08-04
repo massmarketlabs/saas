@@ -35,7 +35,7 @@ export const program_enrollment = pgTable('program_enrollment', {
 // ========================
 export const terms = pgTable('terms', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(), // e.g. Fall 2025
+  name: text('name').notNull(), // e.g. fter
   program_id: uuid('program_id').notNull().references(() => programs.id),
   start_date: date('start_date').notNull(),
   end_date: date('end_date').notNull(),
@@ -131,13 +131,15 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
     references: [user.id]
   }),
   intervention_enrollment: many(intervention_enrollment),
-  evaluations: many(evaluation)
+  evaluations: many(evaluation),
+  meeting_schedule: many(meeting_schedule),
+  attendance_settings: many(attendance_settings)
 }))
 
 // ========================
 // Intervention Enrollment Relations
 // ========================
-export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one }) => ({
+export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one, many }) => ({
   intervention: one(interventions, {
     fields: [intervention_enrollment.intervention_id],
     references: [interventions.id]
@@ -145,25 +147,8 @@ export const relations_intervention_enrollment = relations(intervention_enrollme
   user: one(user, {
     fields: [intervention_enrollment.user_id],
     references: [user.id]
-  })
-}))
-
-// ========================
-// Updated Interventions Relations (add to existing)
-// ========================
-export const relations_interventions_attendance = relations(interventions, ({ many }) => ({
-  meeting_schedule: many(meeting_schedule),
-  attendance_settings: many(attendance_settings)
-}))
-
-// ========================
-// Updated User Relations (add to existing)
-// ========================
-export const relations_user_attendance = relations(user, ({ many }) => ({
-  instructed_meetings: many(meeting_schedule),
-  attendance_records: many(attendance),
-  marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
-  attendance_reminders: many(attendance_reminders)
+  }),
+  attendance: many(attendance)
 }))
 
 // ========================
@@ -182,5 +167,9 @@ export const relations_evaluation = relations(evaluation, ({ one }) => ({
 export const relations_user = relations(user, ({ many }) => ({
   program_enrollment: many(program_enrollment),
   intervention_enrollment: many(intervention_enrollment),
-  created_interventions: many(interventions)
+  created_interventions: many(interventions),
+  instructed_meetings: many(meeting_schedule),
+  attendance_records: many(attendance),
+  marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
+  attendance_reminders: many(attendance_reminders)
 }))
