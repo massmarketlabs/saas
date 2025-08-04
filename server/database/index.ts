@@ -14,6 +14,23 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
     program: {
       insert: async (payload: RequestInsertProgram) => {
         return await db.insert(schema.programs).values(payload).returning()
+      },
+      getById: async (id: string) => {
+        return await db
+          .query
+          .programs
+          .findFirst({
+            where: (program, { eq }) => eq(program.id, id),
+            with: {
+              program_enrollment: {
+                with: {
+                  user: true
+                }
+              },
+              terms: true,
+              interventions: true
+            }
+          })
       }
     }
   }
