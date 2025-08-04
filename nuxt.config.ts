@@ -110,6 +110,9 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: process.env.NUXT_NITRO_PRESET,
+    experimental: {
+      tasks: true
+    },
     rollupConfig: {
       external: process.env.NUXT_NITRO_PRESET != 'node-server' ? ['pg-native'] : undefined
     }
