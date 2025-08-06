@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import LogoUrl from '/logo-wide.svg'
+import LogoUrl from '/logo.png'
 </script>
 
 <template>
-  <img
-    class=""
+  <NuxtImg
     :src="LogoUrl"
-  >
+  />
 </template>

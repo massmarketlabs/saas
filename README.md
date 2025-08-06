@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.svg" alt="NuxSaaS Logo" width="160" height="160"/>
+  <img src="public/logo.png" alt="NuxSaaS Logo" width="160" height="160"/>
 </p>
 
 <h1 align="center">NuxSaaS</h1>

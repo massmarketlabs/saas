@@ -75,12 +75,18 @@ if (import.meta.client) {
           v-if="!isCollapsed"
           class="w-full ps-2.5 flex flex-col gap-2 pl-2 pr-2 "
         >
-          <!-- <Logo /> -->
-          <span class="text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis">
-            {{ t('global.appName') }}
-          </span>
+          <div class="flex gap-2">
+            <Logo class="w-16 h-16" />
+            <div class="flex flex-col gap-0.5">
+              <h5 class="font-bold text-xl overflow-x-hidden overflow-ellipsis">
+                {{ runtimeConfig.public.companyName }}
+              </h5>
+              <h6 class="text-sm font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis">
+                {{ new Date().toDateString() }}
+              </h6>
+            </div>
+          </div>
 
-          <h5>{{ runtimeConfig.public.companyName }}</h5>
           <SearchPalette
             :collapsed="isCollapsed"
             :t="t"
@@ -88,10 +94,10 @@ if (import.meta.client) {
             :class="{ 'pl-2 pr-2': !isCollapsed }"
           />
         </div>
-        <!-- <Logo
+        <Logo
           v-if="isCollapsed"
-          class="h-6 w-6 ml-1"
-        /> -->
+          class="h-8 w-8"
+        />
         <UNavigationMenu
           :items="menus"
           :collapsed="isCollapsed"

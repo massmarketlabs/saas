@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-const { t } = useI18n()
 const runtimeConfig = useRuntimeConfig()
 </script>
 
@@ -8,8 +7,8 @@ const runtimeConfig = useRuntimeConfig()
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center space-x-2">
-          <UIcon name="i-lucide-code" />
-          <span>{{ t('global.appName') }}</span>
+          <!-- <UIcon name="i-lucide-code" /> -->
+          <Logo class="w-16 h-16" />
           <USeparator
             orientation="vertical"
             class="hidden md:block"
