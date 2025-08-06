@@ -6,7 +6,7 @@ import type {
 } from 'better-auth/client'
 import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
-import { adminClient } from 'better-auth/client/plugins'
+import { adminClient, inferAdditionalFields } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
 import { ac, admin, beneficiary, instructor } from '~~/server/utils/permissions'
 
@@ -22,6 +22,7 @@ export function useAuth() {
       headers
     },
     plugins: [
+      inferAdditionalFields<typeof auth>(),
       adminClient({
         ac,
         roles: {

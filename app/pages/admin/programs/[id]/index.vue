@@ -3,6 +3,7 @@
 <script setup lang="ts">
 // import type { interventions, program_enrollment, programs, terms } from '~~/server/database/schema'
 import { Placeholder } from '#components'
+import { differenceInYears } from 'date-fns'
 
 definePageMeta({
   layout: false
@@ -15,6 +16,25 @@ const id = route.params.id
 
 const requestFetch = useRequestFetch()
 const { data } = await useAsyncData(`program-${id}`, async () => await requestFetch(`/api/admin/programs/${id}`))
+const avgAge = computed(() => {
+  if (!data.value?.program_enrollment?.length) {
+    return 0
+  }
+
+  let totalAge = 0
+  let validParticipants = 0
+
+  data.value.program_enrollment.forEach((enrollment) => {
+    const dob = enrollment.user.dob
+    if (dob) {
+      const age = differenceInYears(new Date(), new Date(dob))
+      totalAge += age
+      validParticipants++
+    }
+  })
+
+  return validParticipants > 0 ? Math.round(totalAge / validParticipants) : 0
+})
 
 useHead({ title: `Programs | ${data.value?.name}` })
 
@@ -120,23 +140,23 @@ const programStats = computed(() => ({
             </div>
           </div>
         </UCard>
-        <!-- Terms -->
+        <!-- Avg. Age -->
         <UCard class="shadow-sm hover:shadow-md transition-shadow">
           <div class="flex items-center">
             <div class="flex-shrink-0">
               <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
                 <Icon
-                  name="i-lucide-calendar"
+                  name="i-lucide-cake"
                   class="text-yellow-600 w-4 h-4"
                 />
               </div>
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium">
-                Terms
+                Avg. Age
               </p>
               <p class="text-2xl font-semibold text-gray-500">
-                {{ data?.terms?.length || 0 }}
+                {{ avgAge }} year(s)
               </p>
             </div>
           </div>
@@ -244,14 +264,26 @@ const programStats = computed(() => ({
                       </div>
                       <div>
                         <p class="font-medium">
-                          Student ID: {{ enrollment.user_id }}
-                        </p>
-                        <p class="font-medium">
                           Name: {{ enrollment.user.name }}
                         </p>
-                        <p class="text-sm text-gray-500">
-                          Enrolled: {{ new Date(enrollment.created_at).toLocaleDateString() }}
-                        </p>
+                        <template
+                          v-if="enrollment.user.dob"
+                        >
+                          <p class="font-medium">
+                            Age: <IntervalToNowWithYearsMonths :start="enrollment.user.dob" />
+                          </p>
+                        </template>
+                        <div class="flex gap-2">
+                          <p
+                            v-if="enrollment.created_at"
+                            class="text-sm text-gray-500"
+                          >
+                            Enrolled: {{ new Date(enrollment.created_at).toLocaleDateString() }}
+                          </p>
+                          <p class="text-sm text-gray-500">
+                            <IntervalToNowWithYearsMonths :start="enrollment.created_at" />
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -324,7 +356,7 @@ const programStats = computed(() => ({
         <!-- Right Column: Terms and Interventions -->
         <div class="space-y-6">
           <!-- Terms Section -->
-          <UCard class="shadow-sm">
+          <!-- <UCard class="shadow-sm">
             <template #header>
               <div class="flex flex-col gap-3">
                 <div class="flex items-center justify-between">
@@ -401,7 +433,7 @@ const programStats = computed(() => ({
                 </div>
               </div>
             </div>
-          </UCard>
+          </UCard> -->
 
           <!-- Interventions Section -->
           <UCard class="shadow-sm">
@@ -454,20 +486,14 @@ const programStats = computed(() => ({
                 class="group bg-accented rounded-lg p-3"
               >
                 <div class="flex items-center justify-between">
-                  <NuxtLink
-                    variant="link"
-                    :to="localePath(`/admin/programs/${id}/intervention/${interventionItem.id}`)"
-                    class="text-left flex-1 justify-start p-0 h-auto"
-                  >
-                    <!-- <div class="flex items-center gap-2"> -->
+                  <div class="text-left flex-1 justify-start p-0 h-auto">
                     <p class="font-medium">
                       {{ interventionItem.name }}
                     </p>
                     <p class="font-medium text-gray-500 text-sm">
                       {{ interventionItem.term.name }}
                     </p>
-                    <!-- </div> -->
-                  </NuxtLink>
+                  </div>
                   <UDropdownMenu
                     :items="[
                       [

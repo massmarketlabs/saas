@@ -36,17 +36,6 @@ export const getMenus = (
         to: localePath(`/admin/dashboard`)
       },
       {
-        label: t('menu.finance'),
-        icon: 'i-lucide-chart-candlestick',
-        to: localePath(`/admin/donors`),
-        children: [{
-          label: t('menu.donors'),
-          icon: 'hugeicons:money-receive-circle',
-          to: localePath(`/admin/donors`)
-        }]
-      },
-
-      {
         label: t('menu.programs'),
         icon: 'material-symbols:deployed-code-outline-sharp',
         to: programsMenuOpts[0]?.to,

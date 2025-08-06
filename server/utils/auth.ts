@@ -179,7 +179,15 @@ const createBetterAuth = () => betterAuth({
       defaultRole: 'beneficiary'
     })
     // setupStripe()
-  ]
+  ],
+  user: {
+    additionalFields: {
+      dob: {
+        type: 'date',
+        returned: true
+      }
+    }
+  }
 })
 
 let _auth: ReturnType<typeof createBetterAuth>

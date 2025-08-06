@@ -33,18 +33,11 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
                   user: true
                 }
               },
-              terms: true,
               interventions: {
                 with: {
                   term: true,
                   intervention_enrollment: {
                     with: {
-                      attendance: {
-                        with: {
-                          user: true,
-                          absence_reason: true
-                        }
-                      },
                       user: true
                     }
                   }

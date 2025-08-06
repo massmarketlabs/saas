@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm'
 import { boolean, date, integer, jsonb, pgEnum, pgTable, text, uuid } from 'drizzle-orm/pg-core'
-import { attendance, attendance_reminders, attendance_settings, meeting_schedule } from './attendance'
+// import { attendance, attendance_reminders, attendance_settings, meeting_schedule } from './attendance'
 import { user } from './auth'
 import { audit_fields } from './shared'
 
@@ -35,8 +35,7 @@ export const program_enrollment = pgTable('program_enrollment', {
 // ========================
 export const terms = pgTable('terms', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(), // e.g. fter
-  program_id: uuid('program_id').notNull().references(() => programs.id),
+  name: text('name').notNull(),
   start_date: date('start_date').notNull(),
   end_date: date('end_date').notNull(),
   ...audit_fields
@@ -48,8 +47,10 @@ export const terms = pgTable('terms', {
 export const interventions = pgTable('interventions', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
-  term_id: uuid('term_id').references(() => terms.id).notNull(),
+  term_id: uuid('term_id').references(() => terms.id).notNull(), // TODO: update this to use intervention_
   program_id: uuid('program_id').references(() => programs.id).notNull(),
+  start_date: date('start_date'),
+  end_date: date('end_date'),
   created_by: text('created_by').references(() => user.id).notNull(),
   ...audit_fields
 })
@@ -106,11 +107,7 @@ export const relations_program_enrollment = relations(program_enrollment, ({ one
 // ========================
 // Terms Relations
 // ========================
-export const relations_terms = relations(terms, ({ one, many }) => ({
-  program: one(programs, {
-    fields: [terms.program_id],
-    references: [programs.id]
-  }),
+export const relations_terms = relations(terms, ({ many }) => ({
   interventions: many(interventions)
 }))
 
@@ -131,15 +128,15 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
     references: [user.id]
   }),
   intervention_enrollment: many(intervention_enrollment),
-  evaluations: many(evaluation),
-  meeting_schedule: many(meeting_schedule),
-  attendance_settings: many(attendance_settings)
+  evaluations: many(evaluation)
+  // meeting_schedule: many(meeting_schedule),
+  // attendance_settings: many(attendance_settings)
 }))
 
 // ========================
 // Intervention Enrollment Relations
 // ========================
-export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one, many }) => ({
+export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one }) => ({
   intervention: one(interventions, {
     fields: [intervention_enrollment.intervention_id],
     references: [interventions.id]
@@ -147,8 +144,8 @@ export const relations_intervention_enrollment = relations(intervention_enrollme
   user: one(user, {
     fields: [intervention_enrollment.user_id],
     references: [user.id]
-  }),
-  attendance: many(attendance)
+  })
+  // attendance: many(attendance)
 }))
 
 // ========================
@@ -167,9 +164,9 @@ export const relations_evaluation = relations(evaluation, ({ one }) => ({
 export const relations_user = relations(user, ({ many }) => ({
   program_enrollment: many(program_enrollment),
   intervention_enrollment: many(intervention_enrollment),
-  created_interventions: many(interventions),
-  instructed_meetings: many(meeting_schedule),
-  attendance_records: many(attendance),
-  marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
-  attendance_reminders: many(attendance_reminders)
+  created_interventions: many(interventions)
+  // instructed_meetings: many(meeting_schedule),
+  // attendance_records: many(attendance),
+  // marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
+  // attendance_reminders: many(attendance_reminders)
 }))

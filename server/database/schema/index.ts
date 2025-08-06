@@ -1,6 +1,4 @@
-export * from './attendance'
 export * from './auditLog'
 export * from './auth'
-export * from './donors'
 export * from './programs'
 export * from './user'
