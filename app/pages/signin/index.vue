@@ -56,7 +56,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   const { error } = await auth.signIn.email({
     email: event.data.email,
     password: event.data.password,
-    rememberMe: event.data.rememberMe
+    rememberMe: event.data.rememberMe,
+    callbackURL: redirectTo.value
   })
   if (error) {
     if (error.code === auth.errorCodes.EMAIL_NOT_VERIFIED) {
@@ -72,6 +73,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   }
   else {
     await navigateTo(redirectTo.value)
+    console.log({ redirectTo: redirectTo.value })
     toast.add({
       title: t('signIn.signInSuccess'),
       color: 'success'

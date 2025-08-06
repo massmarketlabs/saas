@@ -1,0 +1,104 @@
+{
+  "en": {
+    "user": {
+      "title": "User Management",
+      "columns": {
+        "avatar": "Avatar",
+        "email": "Email",
+        "role": "Role"
+      },
+      "status": {
+        "banned": "Banned",
+        "verified": "Verified",
+        "unverified": "Unverified"
+      },
+      "actions": {
+        "createUser": "Create User",
+        "ban": "Ban",
+        "unban": "Unban"
+      },
+      "form": {
+        "email": "Email",
+        "password": "Password",
+        "role": "Role"
+      },
+      "validation": {
+        "nameMin": "Name must be at least {n} characters",
+        "emailInvalid": "Invalid email address",
+        "passwordMin": "Password must be at least {n} characters"
+      },
+      "roles": {
+        "beneficiary": "Beneficiary",
+        "admin": "Administrator",
+        "instructor": "Instructor"
+      },
+      "modals": {
+        "createUser": "Create New User",
+        "ban": {
+          "title": "Ban User",
+          "reason": "Ban Reason",
+          "reasonPlaceholder": "Enter reason for banning user",
+          "period": "Ban Period",
+          "periods": {
+            "permanent": "Permanent",
+            "1_day": "1 Day",
+            "7_days": "7 Days",
+            "30_days": "30 Days"
+          },
+          "submit": "Ban User"
+        }
+      }
+    }
+  },
+  "ar": {
+    "user": {
+      "title": "إدارة المستخدمين",
+      "columns": {
+        "avatar": "الصورة الرمزية",
+        "email": "البريد الإلكتروني",
+        "role": "الدور"
+      },
+      "status": {
+        "banned": "محظور",
+        "verified": "موثق",
+        "unverified": "غير موثق"
+      },
+      "actions": {
+        "createUser": "إنشاء مستخدم",
+        "ban": "حظر",
+        "unban": "رفع الحظر"
+      },
+      "form": {
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "role": "الدور"
+      },
+      "validation": {
+        "nameMin": "يجب أن يكون الاسم {n} أحرف على الأقل",
+        "emailInvalid": "عنوان بريد إلكتروني غير صالح",
+        "passwordMin": "يجب أن تكون كلمة المرور {n} أحرف على الأقل"
+      },
+      "roles": {
+        "beneficiary": "المستفيد",
+        "admin": "مدير",
+        "instructor": "مدرس"
+      },
+      "modals": {
+        "createUser": "إنشاء مستخدم جديد",
+        "ban": {
+          "title": "حظر المستخدم",
+          "reason": "سبب الحظر",
+          "reasonPlaceholder": "أدخل سبب حظر المستخدم",
+          "period": "مدة الحظر",
+          "periods": {
+            "permanent": "دائم",
+            "1_day": "يوم واحد",
+            "7_days": "7 أيام",
+            "30_days": "30 يومًا"
+          },
+          "submit": "حظر المستخدم"
+        }
+      }
+    }
+  }
+}

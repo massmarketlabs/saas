@@ -2,38 +2,33 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import { useOrganizationStore } from '~/stores/useOrganizationStore'
-import CreateProgramModal from './components/CreateProgramModal.vue'
+import ModalCreateProgram from './components/ModalCreateProgram.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
 
+const runtimeConfig = useRuntimeConfig()
 const isCollapsed = ref(false)
 
 const { user, signOut } = useAuth()
 
-const router = useRouter()
 const route = useRoute()
-const orgStore = useOrganizationStore()
-await orgStore.fetchOrganizations()
 
 const localePath = useLocalePath()
 
 const { t } = useI18n()
 
 defineShortcuts({
-  'g-1': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/dashboard`)),
-  'g-2': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/user`)),
-  'g-3': () => router.push(localePath(`${orgStore.myOrganization?.slug}/admin/donors`))
+  'g-1': async () => await navigateTo(localePath(`/admin/dashboard`)),
+  'g-2': async () => await navigateTo(localePath(`/admin/organization/user`)),
+  'g-3': async () => await navigateTo(localePath(`/admin/donors`))
 })
 
 const pathNameItemMap: StringDict<NavigationMenuItem> = {}
 const pathNameParentMap: StringDict<NavigationMenuItem | undefined> = {}
 
-const programStore = useProgramStore()
-await programStore.fetchPrograms()
+const { data: programs } = await useProgramList()
 
-const { programs } = storeToRefs(programStore)
-const menus = computed(() => getMenus(t, localePath, programs.value, orgStore.myOrganization?.slug))
+const menus = computed(() => getMenus(t, localePath, programs.value))
 const menuIterator = (menus: NavigationMenuItem[], parent?: NavigationMenuItem) => {
   for (const menu of menus) {
     const to = `${menu.to}`
@@ -53,8 +48,8 @@ menus.value.forEach((group) => {
   menuIterator(group)
 })
 
-const clickSignOut = () => {
-  signOut({ redirectTo: localePath('/signin') })
+const clickSignOut = async () => {
+  await signOut({ redirectTo: localePath('/signin') })
 }
 
 const { start } = useLoadingIndicator({
@@ -64,7 +59,9 @@ const { start } = useLoadingIndicator({
 
 })
 
-start({ force: true })
+if (import.meta.client) {
+  start({ force: true })
+}
 </script>
 
 <template>
@@ -73,37 +70,28 @@ start({ force: true })
       class="fixed top-0 ltr:left-0 rtl:right-0 transition-all duration-300 hidden sm:block"
       :class="[isCollapsed ? 'w-15' : 'w-64']"
     >
-      <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800">
-        <a
+      <div class="h-screen flex flex-col px-3 py-4 bg-gray-100 dark:bg-gray-800 w-full">
+        <div
           v-if="!isCollapsed"
-          class="ps-2.5"
+          class="w-full ps-2.5 flex flex-col gap-2 pl-2 pr-2 "
         >
           <!-- <Logo /> -->
-          <span
-            class="ml-2 text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
-          >
+          <span class="text-xl font-semibold whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis">
             {{ t('global.appName') }}
           </span>
-        </a>
-        <span
-          v-if="!isCollapsed"
-          class="ps-2.5 ml-2 text-md font-light whitespace-nowrap dark:text-white overflow-x-hidden overflow-ellipsis"
-        >
-          {{ orgStore.myOrganization?.name }}
-        </span>
-        <Logo
-          v-if="isCollapsed"
-          class="h-6 w-6 ml-1"
-        />
-        <div
-          class="flex mb-2 mt-3"
-          :class="{ 'pl-2 pr-2': !isCollapsed }"
-        >
+
+          <h5>{{ runtimeConfig.public.companyName }}</h5>
           <SearchPalette
             :collapsed="isCollapsed"
             :t="t"
+            class="mb-3"
+            :class="{ 'pl-2 pr-2': !isCollapsed }"
           />
         </div>
+        <!-- <Logo
+          v-if="isCollapsed"
+          class="h-6 w-6 ml-1"
+        /> -->
         <UNavigationMenu
           :items="menus"
           :collapsed="isCollapsed"
@@ -111,7 +99,9 @@ start({ force: true })
           class="data-[orientation=vertical]:w-full flex-1 overflow-y-auto"
         >
           <template #add>
-            <CreateProgramModal />
+            <ClientOnly>
+              <ModalCreateProgram />
+            </ClientOnly>
           </template>
         </UNavigationMenu>
         <div class="flex flex-col pl-1 pr-2">
@@ -185,7 +175,7 @@ start({ force: true })
                   class="data-[orientation=vertical]:w-full"
                 >
                   <template #add>
-                    <CreateProgramModal />
+                    <ModalCreateProgram />
                   </template>
                 </UNavigationMenu>
               </div>

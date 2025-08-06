@@ -6,11 +6,14 @@ import type {
 } from 'better-auth/client'
 import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
-import { adminClient, organizationClient } from 'better-auth/client/plugins'
+import { adminClient, inferAdditionalFields } from 'better-auth/client/plugins'
 import { createAuthClient } from 'better-auth/vue'
+import { ac, admin, beneficiary, instructor } from '~~/server/utils/permissions'
 
 export function useAuth() {
   const url = useRequestURL()
+  const toast = useToast()
+
   const headers = import.meta.server ? useRequestHeaders() : undefined
 
   const client = createAuthClient({
@@ -19,8 +22,15 @@ export function useAuth() {
       headers
     },
     plugins: [
-      adminClient(),
-      organizationClient()
+      inferAdditionalFields<typeof auth>(),
+      adminClient({
+        ac,
+        roles: {
+          admin,
+          beneficiary,
+          instructor
+        }
+      })
       // stripeClient({
       //   subscription: true
       // })
@@ -37,26 +47,74 @@ export function useAuth() {
       return
     }
     sessionFetching.value = true
-    const { data } = await client.useSession(useFetch)
-    session.value = data.value?.session || null
-    user.value = data.value?.user ? { ...data.value.user, role: data.value.user.role ?? undefined } : null
-    // if (user.value) {
-    //   const { data: subscriptionData } = await client.subscription.list()
-    //   subscriptions.value = subscriptionData || []
-    // } else {
-    //   subscriptions.value = []
-    // }
-    sessionFetching.value = false
-    return data
+
+    try {
+      // Fetch all data concurrently instead of sequentially
+      const sessionReq = await client.useSession(useFetch)
+
+      // Update state with fetched data
+      if (sessionReq.error.value) {
+        console.error('sessionReq ', sessionReq.error.value)
+      } else {
+        session.value = sessionReq.data.value?.session || null
+        user.value = sessionReq.data.value?.user ? { ...sessionReq.data.value.user, role: sessionReq.data.value.user.role ?? undefined } : null
+      }
+
+      // if (user.value) {
+      //   const { data: subscriptionData } = await client.subscription.list()
+      //   subscriptions.value = subscriptionData || []
+      // } else {
+      //   subscriptions.value = []
+      // }
+
+      // return data
+    } finally {
+      sessionFetching.value = false
+    }
   }
 
-  if (import.meta.client) {
-    client.$store.listen('$sessionSignal', async (signal) => {
-      if (!signal)
-        return
-      await fetchSession()
-    })
+  const signOut = async ({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) => {
+    try {
+      sessionFetching.value = true
+      const res = await client.signOut({
+        fetchOptions: {
+          onSuccess: async () => {
+            session.value = null
+            user.value = null
+
+            clearNuxtState([
+              'auth:session',
+              'auth:user',
+              'auth:sessionFetching' // Consider clearing this too
+            ])
+            if (redirectTo) {
+              await navigateTo(redirectTo)
+            }
+          },
+          onError: (res) => {
+            toast.add({
+              color: 'error',
+              title: res.error.message
+            })
+          }
+        }
+      })
+
+      return res
+    } catch (err) {
+      console.error('error signing out', err)
+    } finally {
+      sessionFetching.value = false
+    }
   }
+
+  // if (import.meta.client) {
+  //   client.$store.listen('$sessionSignal', async (signal) => {
+  //     if (!signal || sessionFetching.value)
+  //       return
+  //     await fetchSession()
+  //   })
+  // }
 
   return {
     session,
@@ -74,18 +132,10 @@ export function useAuth() {
     forgetPassword: client.forgetPassword,
     resetPassword: client.resetPassword,
     sendVerificationEmail: client.sendVerificationEmail,
-    organization: client.organization,
     errorCodes: client.$ERROR_CODES,
-    async signOut({ redirectTo }: { redirectTo?: RouteLocationRaw } = {}) {
-      const res = await client.signOut()
-      session.value = null
-      user.value = null
-      if (redirectTo) {
-        await navigateTo(redirectTo)
-      }
-      return res
-    },
-    fetchSession,
-    client
+    client,
+    sessionFetching,
+    signOut,
+    fetchSession
   }
 }

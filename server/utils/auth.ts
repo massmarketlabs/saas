@@ -2,19 +2,19 @@ import type { H3Event } from 'h3'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
-import { admin, openAPI, organization } from 'better-auth/plugins'
-import { eq } from 'drizzle-orm'
+import { admin as adminPlugin, openAPI } from 'better-auth/plugins'
 import { v7 as uuidv7 } from 'uuid'
-// import { user as userSchema } from '~~/server/database/schema'
 import * as schema from '../database/schema'
-import { user } from '../database/schema'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import {
   // cacheClient,
   resendInstance
 } from './drivers'
+import { ac, admin, beneficiary, instructor } from './permissions'
+// import { ac, admin, project_manager } from './permissions'
 import { runtimeConfig } from './runtimeConfig'
+
 // import { setupStripe } from './stripe'
 
 console.log(`Base URL is ${runtimeConfig.public.baseURL}`)
@@ -22,7 +22,18 @@ console.log(`Base URL is ${runtimeConfig.public.baseURL}`)
 const createBetterAuth = () => betterAuth({
   baseURL: runtimeConfig.public.baseURL,
   secret: runtimeConfig.betterAuthSecret,
-  trustedOrigins: ['http://localhost:3000', 'https://tyo.massmarketlabs.com'],
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60 // Cache duration in seconds
+    }
+  },
+  trustedOrigins: [
+    'http://localhost:3000',
+    'http://localhost:8787',
+    'http://tyo.massmarketlabs.com',
+    'https://tyo.massmarketlabs.com'
+  ],
   database: drizzleAdapter(
     getDB(),
     {
@@ -95,10 +106,6 @@ const createBetterAuth = () => betterAuth({
     }
   },
   socialProviders: {
-    // github: {
-    //   clientId: runtimeConfig.githubClientId!,
-    //   clientSecret: runtimeConfig.githubClientSecret!
-    // },
     google: {
       clientId: runtimeConfig.googleClientId!,
       clientSecret: runtimeConfig.googleClientSecret!
@@ -107,7 +114,8 @@ const createBetterAuth = () => betterAuth({
   account: {
     accountLinking: {
       enabled: true
-    }
+    },
+    updateAccountOnSignIn: true
   },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
@@ -161,35 +169,28 @@ const createBetterAuth = () => betterAuth({
   },
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
-    admin(),
-    organization({
-      organizationCreation: {
-        afterCreate: async ({ user: activeUser, organization }) => {
-          // Assign the creator the 'admin' role for the newly created organization
-          const db = getDB()
-
-          await db.update(user)
-            .set({ role: 'admin' })
-            .where(eq(user.id, activeUser.id))
-
-          // Optionally log this as an audit event
-          await logAuditEvent({
-            userId: activeUser.id,
-            category: 'organization',
-            action: 'assign_admin_role',
-            targetType: 'organization',
-            targetId: organization.id,
-            status: 'success',
-            details: `User ${activeUser.id} assigned as admin to organization ${organization.id}`
-          })
-        }
-      }
+    adminPlugin({
+      ac,
+      roles: {
+        admin,
+        beneficiary,
+        instructor
+      },
+      defaultRole: 'beneficiary'
     })
     // setupStripe()
-  ]
+  ],
+  user: {
+    additionalFields: {
+      dob: {
+        type: 'date',
+        returned: true
+      }
+    }
+  }
 })
 
-let _auth: ReturnType<typeof betterAuth>
+let _auth: ReturnType<typeof createBetterAuth>
 
 // Used by npm run auth:schema only.
 const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/database/schema/auth.ts'))

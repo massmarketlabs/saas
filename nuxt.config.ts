@@ -16,8 +16,8 @@ export default defineNuxtConfig({
     'nuxt-charts',
     '@pinia/nuxt',
     'reka-ui/nuxt',
-    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : []),
-    ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
+    ...(process.env.NODE_ENV === 'test' ? ['@nuxt/test-utils/module'] : [])
+    // ...(process.env.NUXT_NITRO_PRESET !== 'node-server' ? ['@nuxthub/core'] : [])
   ],
   // Add Vite SSR configuration to fix the "Cannot read properties of undefined (reading 'body')" error
   vite: {
@@ -26,19 +26,6 @@ export default defineNuxtConfig({
       external: ['to-px']
     }
   },
-  ...(process.env.NUXT_NITRO_PRESET !== 'node-server'
-    ? {
-        hub: {
-          workers: true,
-          kv: true,
-          bindings: {
-            hyperdrive: {
-              HYPERDRIVE: process.env.NUXT_CF_HYPERDRIVE_ID as string
-            }
-          }
-        }
-      }
-    : {}),
   pinia: {
     storesDirs: ['./app/stores/**']
   },
@@ -46,10 +33,7 @@ export default defineNuxtConfig({
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
     locales,
-    defaultLocale: 'en',
-    bundle: {
-      optimizeTranslationDirective: false
-    }
+    defaultLocale: 'en'
   },
   sitemap: {
     exclude: [
@@ -126,22 +110,11 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: process.env.NUXT_NITRO_PRESET,
+    experimental: {
+      tasks: true
+    },
     rollupConfig: {
       external: process.env.NUXT_NITRO_PRESET != 'node-server' ? ['pg-native'] : undefined
-    }
-  },
-  routeRules: {
-    '/intervention-manager': {
-      redirect: {
-        to: '/intervention-manager/dashboard',
-        statusCode: 301 // Permanent redirect
-      }
-    },
-    '/ar/intervention-manager': {
-      redirect: {
-        to: '/ar/intervention-manager/dashboard',
-        statusCode: 301 // Permanent redirect
-      }
     }
   }
 })

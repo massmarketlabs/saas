@@ -1,8 +1,8 @@
 import * as nuxtLocales from '@nuxt/ui/locale'
 
 export const locales = [
-  nuxtLocales.en,
-  nuxtLocales.ar
+  { ...nuxtLocales.en, language: 'en-US' },
+  { ...nuxtLocales.ar, language: 'ar' }
 ]
 
 export const adminExcludes = locales

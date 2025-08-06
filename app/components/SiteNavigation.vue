@@ -1,58 +1,18 @@
 <script setup lang="ts">
-const { mode } = defineProps<{
-  mode: 'desktop' | 'mobile'
-}>()
+import type { LocalePathFunction } from '#i18n'
+import { getMenuInterventionManager } from '~/layouts/menu-intervention-manager'
 
-const { t } = useI18n()
-const localePath = useLocalePath()
-
-const navigation = [
-  { label: t('global.nav.features'), to: localePath('/#features') },
-  { label: t('global.nav.pricing'), to: localePath('/pricing') },
-  { label: t('global.nav.docs'), to: 'https://docs.nuxsaas.com/', external: true }
-]
+const props = defineProps<{ t: TranFunction, localePath: LocalePathFunction }>()
+const menuItems = getMenuInterventionManager(props.t, props.localePath)
 </script>
 
 <template>
-  <div>
-    <!-- Desktop Navigation -->
-    <div
-      v-if="mode === 'desktop'"
-      class="flex items-center gap-8"
-    >
-      <template
-        v-for="item in navigation"
-        :key="item.label"
-      >
-        <NuxtLink
-          v-if="!item.external"
-          :to="item.to"
-          class="text-sm font-medium text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-400"
-        >
-          {{ item.label }}
-        </NuxtLink>
-        <a
-          v-else
-          :href="item.to"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-sm font-medium text-gray-700 hover:text-primary-500 dark:text-gray-300 dark:hover:text-primary-400"
-        >
-          {{ item.label }}
-        </a>
-      </template>
-    </div>
-
-    <!-- Mobile Navigation -->
-    <div v-if="mode === 'mobile'">
-      <UDropdownMenu :items="navigation">
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-menu"
-          aria-label="menu"
-        />
-      </UDropdownMenu>
-    </div>
+  <div class="flex items-center gap-2">
+    <UNavigationMenu
+      orientation="horizontal"
+      :items="menuItems"
+      variant="link"
+    />
+    <UserNavigation />
   </div>
 </template>

@@ -1,10 +1,16 @@
 import type { CalendarDate } from '@internationalized/date'
 import type { TableColumn } from '@nuxt/ui'
 import type { CellContext, RowData } from '@tanstack/vue-table'
+import type { User } from 'better-auth'
 
 export type { FormSubmitEvent, NavigationMenuItem, TableData } from '@nuxt/ui'
 export type { Row } from '@tanstack/vue-table'
-export type { UserWithRole } from 'better-auth/plugins'
+export type UserWithRole = User & {
+  banned: boolean | null | undefined
+  role?: string | null | undefined
+  banReason?: string | null | undefined
+  banExpires?: Date | null | undefined
+}
 export { z } from 'zod/v4'
 export type { output as zodOutput } from 'zod/v4'
 export { locales as zodLocales } from 'zod/v4'

@@ -1,3 +1,4 @@
+// app/plugins/auth.server.ts
 export default defineNuxtPlugin({
   name: 'better-auth-fetch-plugin',
   enforce: 'pre',
