@@ -80,7 +80,7 @@ const programStats = computed(() => ({
           </div>
           <template v-if="data?.is_active">
             <div class="flex flex-wrap gap-2">
-              <UBadge class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium">
+              <UBadge class="inline-flex text-center items-center px-3 py-1 rounded-full text-xs font-medium">
                 Active Program
               </UBadge>
             </div>
@@ -88,7 +88,7 @@ const programStats = computed(() => ({
           <template v-else>
             <UBadge
               color="error"
-              class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+              class="inline-flex text-center items-center px-3 py-1 rounded-full text-xs font-medium"
             >
               Inactive Program
             </UBadge>
@@ -189,134 +189,108 @@ const programStats = computed(() => ({
         <!-- Left Column: Program Enrollment -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Program Enrollment Section -->
-          <UCard class="shadow-sm">
-            <template #header>
-              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-2">
-                  <Icon
-                    name="i-lucide-users"
-                    class="w-5 h-5 text-primary"
-                  />
-                  <span class="font-bold text-xl">Program Enrollment</span>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <UModal
-                    title="Enroll New Student"
-                    description="Add a new student to this program"
-                  >
-                    <UButton
-                      size="sm"
-                      icon="i-lucide-user-plus"
-                      :label="t('global.page.create')"
-                      color="primary"
-                    />
-                    <template #body>
-                      <Placeholder class="h-64" />
-                    </template>
-                  </UModal>
+          <CardExpandable
+            header-icon="i-lucide-users"
+            title="Program Enrollment"
+            :items="data?.program_enrollment ?? []"
+            empty-state-icon="i-lucide-users"
+            empty-state-title="No enrollments yet"
+            empty-state-description="Get started by enrolling your first beneficiary in this program."
+          >
+            <template #header-actions>
+              <div class="flex flex-wrap gap-2">
+                <UModal
+                  title="Enroll New Student"
+                  description="Add a new student to this program"
+                >
                   <UButton
                     size="sm"
-                    variant="outline"
-                    icon="i-lucide-download"
-                    label="Export"
+                    icon="i-lucide-user-plus"
+                    :label="t('global.page.create')"
+                    color="primary"
                   />
-                </div>
+                  <template #body>
+                    <Placeholder class="h-64" />
+                  </template>
+                </UModal>
+                <UButton
+                  size="sm"
+                  variant="outline"
+                  icon="i-lucide-download"
+                  label="Export"
+                />
               </div>
             </template>
 
-            <div
-              v-if="!data?.program_enrollment || data.program_enrollment.length === 0"
-              class="text-center py-12"
-            >
-              <Icon
-                class="w-12 h-12 text-primary mx-auto mb-4"
-                name="i-lucide-users"
-              />
-              <h3 class="text-lg font-medium mb-2">
-                No enrollments yet
-              </h3>
-              <p class="text-gray-500 mb-4">
-                Get started by enrolling your first beneficiary in this program.
-              </p>
+            <template #empty-action>
               <UButton
                 icon="i-lucide-user-plus"
                 label="Enroll Beneficiary"
               />
-            </div>
-
-            <div
-              v-else
-              class="space-y-3"
-            >
-              <div
-                v-for="enrollment in data.program_enrollment"
-                :key="enrollment.id"
-                class="bg-accented rounded-lg p-4"
-              >
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Icon
-                          class="w-5 h-5 text-blue-600"
-                          name="i-lucide-user"
-                        />
-                      </div>
-                      <div>
+            </template>
+            <template #item="enrollment">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Icon
+                        class="w-5 h-5 text-blue-600"
+                        name="i-lucide-user"
+                      />
+                    </div>
+                    <div>
+                      <p class="font-medium">
+                        Name: {{ enrollment.item.user.name }}
+                      </p>
+                      <template
+                        v-if="enrollment.item.user.dob"
+                      >
                         <p class="font-medium">
-                          Name: {{ enrollment.user.name }}
+                          Age: <IntervalToNowWithYearsMonths :start="enrollment.item.user.dob" />
                         </p>
-                        <template
-                          v-if="enrollment.user.dob"
+                      </template>
+                      <div class="flex gap-2">
+                        <p
+                          v-if="enrollment.item.created_at"
+                          class="text-sm text-gray-500"
                         >
-                          <p class="font-medium">
-                            Age: <IntervalToNowWithYearsMonths :start="enrollment.user.dob" />
-                          </p>
-                        </template>
-                        <div class="flex gap-2">
-                          <p
-                            v-if="enrollment.created_at"
-                            class="text-sm text-gray-500"
-                          >
-                            Enrolled: {{ new Date(enrollment.created_at).toLocaleDateString() }}
-                          </p>
-                          <p class="text-sm text-gray-500">
-                            <IntervalToNowWithYearsMonths :start="enrollment.created_at" />
-                          </p>
-                        </div>
+                          Enrolled: {{ new Date(enrollment.item.created_at).toLocaleDateString() }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          <IntervalToNowWithYearsMonths :start="enrollment.item.created_at" />
+                        </p>
                       </div>
                     </div>
                   </div>
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="[
-                        enrollment.status === 'active' ? 'bg-success-100 text-success-800' : 'bg-gray-100 text-gray-800'
-                      ]"
-                    >
-                      {{ enrollment.status }}
-                    </span>
-                    <UDropdownMenu
-                      :items="[
-                        [{ label: 'View Details', icon: 'i-lucide-eye' }],
-                        [{ label: 'Edit', icon: 'i-lucide-edit' }],
-                        [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error' }]
-                      ]"
-                    >
-                      <UButton
-                        icon="i-lucide-more-horizontal"
-                        size="sm"
-                        class="text-white-500"
-                        variant="ghost"
-                        square
-                      />
-                    </UDropdownMenu>
-                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    :class="[
+                      enrollment.item.status === 'active' ? 'bg-success-100 text-success-800' : 'bg-gray-100 text-gray-800'
+                    ]"
+                  >
+                    {{ enrollment.item.status }}
+                  </span>
+                  <UDropdownMenu
+                    :items="[
+                      [{ label: 'View Details', icon: 'i-lucide-eye' }],
+                      [{ label: 'Edit', icon: 'i-lucide-edit' }],
+                      [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error' }]
+                    ]"
+                  >
+                    <UButton
+                      icon="i-lucide-more-horizontal"
+                      size="sm"
+                      class="text-white-500"
+                      variant="ghost"
+                      square
+                    />
+                  </UDropdownMenu>
                 </div>
               </div>
-            </div>
-          </UCard>
-
+            </template>
+          </CardExpandable>
           <!-- Most Frequent Absences Statistics -->
           <UCard class="shadow-sm">
             <template #header>
@@ -355,177 +329,78 @@ const programStats = computed(() => ({
 
         <!-- Right Column: Terms and Interventions -->
         <div class="space-y-6">
-          <!-- Terms Section -->
-          <!-- <UCard class="shadow-sm">
-            <template #header>
-              <div class="flex flex-col gap-3">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <Icon
-                      class="w-5 h-5 text-primary"
-                      name="i-lucide-calendar"
-                    />
-                    <span class="font-bold text-xl">Terms</span>
-                  </div>
-                  <UDropdownMenu
-                    :items="[
-                      [{ label: 'Create Term', icon: 'i-lucide-plus' }],
-                      [{ label: 'Import Terms', icon: 'i-lucide-upload' }]
-                    ]"
-                  >
-                    <UButton
-                      size="sm"
-                      icon="i-lucide-plus"
-                      :label="t('global.page.create')"
-                      color="primary"
-                    />
-                  </UDropdownMenu>
-                </div>
-              </div>
+          <!-- Interventions Section -->
+          <CardExpandable
+            :items="data?.interventions ?? []"
+            title="Interventions"
+            header-icon="i-lucide-zap"
+            empty-state-icon="i-lucide-zap"
+            empty-state-title="No interventions available"
+          >
+            <template #header-actions>
+              <UModal
+                title="Add an Intervention"
+                description="Create a new intervention for this program"
+              >
+                <UButton
+                  size="sm"
+                  icon="i-lucide-plus"
+                  :label="t('global.page.create')"
+                  color="primary"
+                />
+                <template #body>
+                  <Placeholder class="h-48" />
+                </template>
+              </UModal>
             </template>
 
-            <div
-              v-if="!data?.terms || data.terms.length === 0"
-              class="text-center py-8"
-            >
-              <Icon
-                name="i-lucide-calendar"
-                class="w-8 h-8 text-primary mx-auto mb-3"
+            <template #empty-action>
+              <UButton
+                icon="i-lucide-user-plus"
+                label="Create an Intervention"
               />
-              <p class="text-gray-500 text-sm">
-                No terms configured
-              </p>
-            </div>
-
-            <div
-              v-else
-              class="space-y-3"
-            >
-              <div
-                v-for="term in data.terms"
-                :key="term.id"
-                class="bg-accented rounded-lg p-3"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex-1">
-                    <p class="font-medium">
-                      {{ term.name }}
-                    </p>
-                    <p class="text-sm text-gray-500">
-                      {{ new Date(term.start_date).toLocaleDateString() }} -
-                      {{ new Date(term.end_date).toLocaleDateString() }}
-                    </p>
-                  </div>
-                  <UDropdownMenu
-                    :items="[
-                      [{ label: 'Edit', icon: 'i-lucide-edit' }],
-                      [{ label: 'Delete', icon: 'i-lucide-trash-2', color: 'error' }]
-                    ]"
-                  >
-                    <UButton
-                      icon="i-lucide-more-horizontal"
-                      size="xs"
-                      variant="ghost"
-                      class="text-white-500"
-                      square
-                    />
-                  </UDropdownMenu>
-                </div>
-              </div>
-            </div>
-          </UCard> -->
-
-          <!-- Interventions Section -->
-          <UCard class="shadow-sm">
-            <template #header>
+            </template>
+            <template #item="interventionItem">
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <Icon
-                    name="i-lucide-zap"
-                    class="w-5 h-5 text-primary"
-                  />
-                  <span class="font-bold text-xl">Interventions</span>
+                <div class="text-left flex-1 justify-start p-0 h-auto">
+                  <p class="font-medium">
+                    {{ interventionItem.item.name }}
+                  </p>
+                  <p class="font-medium text-gray-500 text-sm">
+                    {{ interventionItem.item.term.name }}
+                  </p>
                 </div>
-                <UModal
-                  title="Add an Intervention"
-                  description="Create a new intervention for this program"
+                <UDropdownMenu
+                  :items="[
+                    [
+                      { label: 'View',
+                        icon: 'i-lucide-eye',
+                        onSelect: async () => await navigateTo(`/admin/programs/${interventionItem.item.program_id}/intervention/${interventionItem.item.id}`) }
+                    ],
+                    [
+                      { label: 'Edit',
+                        icon: 'i-lucide-edit'
+                      }
+                    ],
+                    [
+                      { label: 'Delete',
+                        icon: 'i-lucide-trash-2',
+                        color: 'error'
+                      }
+                    ]
+                  ]"
                 >
                   <UButton
-                    size="sm"
-                    icon="i-lucide-plus"
-                    :label="t('global.page.create')"
-                    color="primary"
+                    icon="i-lucide-more-horizontal"
+                    size="xs"
+                    variant="ghost"
+                    square
+                    class="text-white-500"
                   />
-                  <template #body>
-                    <Placeholder class="h-48" />
-                  </template>
-                </UModal>
+                </UDropdownMenu>
               </div>
             </template>
-
-            <div
-              v-if="!data?.interventions || data.interventions.length === 0"
-              class="text-center py-8"
-            >
-              <Icon
-                name="i-lucide-zap"
-                class="w-8 h-8 text-primary mx-auto mb-3"
-              />
-              <p class="text-gray-500 text-sm">
-                No interventions available
-              </p>
-            </div>
-
-            <div
-              v-else
-              class="space-y-2"
-            >
-              <div
-                v-for="interventionItem in data?.interventions"
-                :key="interventionItem.id"
-                class="group bg-accented rounded-lg p-3"
-              >
-                <div class="flex items-center justify-between">
-                  <div class="text-left flex-1 justify-start p-0 h-auto">
-                    <p class="font-medium">
-                      {{ interventionItem.name }}
-                    </p>
-                    <p class="font-medium text-gray-500 text-sm">
-                      {{ interventionItem.term.name }}
-                    </p>
-                  </div>
-                  <UDropdownMenu
-                    :items="[
-                      [
-                        { label: 'View',
-                          icon: 'i-lucide-eye',
-                          onSelect: async () => await navigateTo(`/admin/programs/${interventionItem.program_id}/intervention/${interventionItem.name}`) }
-                      ],
-                      [
-                        { label: 'Edit',
-                          icon: 'i-lucide-edit'
-                        }
-                      ],
-                      [
-                        { label: 'Delete',
-                          icon: 'i-lucide-trash-2',
-                          color: 'error'
-                        }
-                      ]
-                    ]"
-                  >
-                    <UButton
-                      icon="i-lucide-more-horizontal"
-                      size="xs"
-                      variant="ghost"
-                      square
-                      class="text-white-500"
-                    />
-                  </UDropdownMenu>
-                </div>
-              </div>
-            </div>
-          </UCard>
+          </CardExpandable>
         </div>
       </div>
     </div>
