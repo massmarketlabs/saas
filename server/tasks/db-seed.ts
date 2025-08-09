@@ -11,7 +11,7 @@ export default defineTask({
     try {
       const db = await useDB()
 
-      const resp = await seed(db, schema, { count: 100 })
+      const resp = await seed(db, schema, { count: 10 })
         .refine(f => ({
           auditLog: {
             columns: {
@@ -20,6 +20,7 @@ export default defineTask({
             }
           },
           user: {
+            count: 100,
             columns: {
               id: f.uuid(),
               name: f.fullName({ isUnique: true }),
@@ -45,8 +46,13 @@ export default defineTask({
 
             }
           },
+          intervention: {
+            columns: {
+              description: f.loremIpsum({ sentencesCount: 5 })
+            }
+          },
           terms: {
-            count: 20
+            count: 2
           }
 
         }))

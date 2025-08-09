@@ -3,30 +3,30 @@ import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core'
 import { and, eq, gte, ilike, inArray, lte } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
-export const filterSchema = z.array(
-  z.union([
-    z.object({
-      col: z.string(),
-      op: z.literal('between'),
-      v: z.tuple([z.string(), z.string()])
-    }),
-    z.object({
-      col: z.string(),
-      op: z.literal('in'),
-      v: z.array(z.string()).min(1)
-    }),
-    z.object({
-      col: z.string(),
-      op: z.literal('like'),
-      v: z.string()
-    }),
-    z.object({
-      col: z.string(),
-      op: z.literal('eq'),
-      v: z.string()
-    })
-  ])
-)
+const filterItemSchema = z.union([
+  z.object({
+    col: z.string(),
+    op: z.literal('between'),
+    v: z.tuple([z.string(), z.string()])
+  }),
+  z.object({
+    col: z.string(),
+    op: z.literal('in'),
+    v: z.array(z.string()).min(1)
+  }),
+  z.object({
+    col: z.string(),
+    op: z.literal('like'),
+    v: z.string()
+  }),
+  z.object({
+    col: z.string(),
+    op: z.literal('eq'),
+    v: z.string()
+  })
+] as const)
+
+export const filterSchema = z.array(filterItemSchema)
 
 export function processFilters(
   filters: z.infer<typeof filterSchema>,

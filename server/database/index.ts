@@ -28,11 +28,6 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
           .findFirst({
             where: (program, { eq }) => eq(program.id, id),
             with: {
-              program_enrollment: {
-                with: {
-                  user: true
-                }
-              },
               interventions: {
                 with: {
                   term: true,
@@ -73,6 +68,24 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
     interventions: {
       insert: async (payload: RequestCreateIntervention) => {
         return await db.insert(schema.interventions).values(payload).returning()
+      },
+      getById: async (interventionId: string) => {
+        return await db
+          .query
+          .interventions
+          .findFirst({
+            where: (intervention, { eq }) => eq(intervention.id, interventionId),
+            with: {
+              program: true,
+              term: true,
+              evaluations: true,
+              intervention_enrollment: {
+                with: {
+                  user: true
+                }
+              }
+            }
+          })
       }
     }
   }

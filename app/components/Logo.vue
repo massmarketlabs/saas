@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import LogoUrl from '/logo.png'
+import LogoUrl from '/images/logo.png'
 </script>
 
 <template>

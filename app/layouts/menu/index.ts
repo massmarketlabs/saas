@@ -54,6 +54,11 @@ export const getMenus = (
             to: localePath(`/admin/organization/user`)
           },
           {
+            label: t('menu.terms'),
+            icon: 'i-lucide-leaf',
+            to: localePath(`/admin/organization/terms`)
+          },
+          {
             label: t('menu.settings'),
             icon: 'i-lucide-cog',
             to: localePath(`/admin/organization/settings`)

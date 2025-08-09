@@ -5,19 +5,17 @@
       "search": "Search",
       "dashboard": "Dashboard",
       "users": "Users",
-      "subscriptions": "Subscriptions",
       "maintenance": "Maintenance",
       "dbStats": "Database Status",
       "home": "Home",
       "auditLog": "Audit Log",
-      "donors": "Donors",
       "programs": "Program",
       "beneficiary": "Beneficiary",
       "interventions": "Interventions",
       "evaluation": "Evaluation",
       "organization": "Organization",
       "settings": "Settings",
-      "finance": "Finance"
+      "terms": "Terms"
     }
   },
   "ar": {
@@ -26,19 +24,17 @@
       "search": "بحث",
       "dashboard": "لوحة التحكم",
       "users": "المستخدمون",
-      "subscriptions": "الاشتراكات",
       "maintenance": "الصيانة",
       "dbStats": "حالة قاعدة البيانات",
       "home": "الصفحة الرئيسية",
       "auditLog": "سجل التدقيق",
-      "donors": "المتبرعون",
       "programs": "البرامج",
       "beneficiary": "المستفيد",
       "interventions": "التدخلات",
       "evaluation": "تقييم",
       "organization": "المنظمة",
       "settings": "إعدادات",
-      "finance": "تمويل"
+      "terms": "الفصول الدراسية"
     }
   }
 }

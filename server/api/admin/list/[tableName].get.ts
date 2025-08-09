@@ -38,7 +38,7 @@ const querySchema = z.object({
         if (!Array.isArray(parsed))
           return []
 
-        return parsed.reduce<z.infer<typeof filterSchema>>((validFilters, item) => {
+        return parsed.reduce((validFilters, item) => {
           const result = filterSchema.element.safeParse(item)
           if (result.success) {
             validFilters.push(result.data)
