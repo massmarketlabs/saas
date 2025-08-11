@@ -46,7 +46,7 @@ export default defineTask({
 
             }
           },
-          intervention: {
+          interventions: {
             columns: {
               description: f.loremIpsum({ sentencesCount: 5 })
             }

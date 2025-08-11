@@ -1,13 +1,11 @@
+<!-- app/components/CardExpandable/index.vue -->
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
 // Types
 interface CardExpandableProps<T = Record<string, any>> {
-  // Required props
   title: string
   items: T[]
-
-  // Optional customization props
   headerIcon?: string
   emptyStateIcon?: string
   emptyStateTitle?: string
@@ -22,7 +20,6 @@ interface CardExpandableSlots<T = Record<string, any>> {
   'item': (props: { item: T, index: number }) => any
 }
 
-// Define generic props with defaults
 const props = withDefaults(defineProps<CardExpandableProps>(), {
   headerIcon: 'i-lucide-list',
   emptyStateIcon: 'i-lucide-inbox',
@@ -32,19 +29,26 @@ const props = withDefaults(defineProps<CardExpandableProps>(), {
   itemKeyPath: 'id'
 })
 
-// Define slots for better type checking
 defineSlots<CardExpandableSlots>()
 
 // Reactive state
 const isExpanded = ref<boolean>(false)
 
-// Computed properties
-const displayedItems = computed(() => {
-  if (!props.items || props.items.length <= props.itemsPerPage) {
-    return props.items
-  }
+// Computed properties with better null safety
+const safeItems = computed(() => {
+  return Array.isArray(props.items) ? props.items : []
+})
 
-  return isExpanded.value ? props.items : props.items.slice(0, props.itemsPerPage)
+const displayedItems = computed(() => {
+  const items = safeItems.value
+  if (items.length <= props.itemsPerPage) {
+    return items
+  }
+  return isExpanded.value ? items : items.slice(0, props.itemsPerPage)
+})
+
+const hasMoreItems = computed(() => {
+  return safeItems.value.length > props.itemsPerPage
 })
 
 // Methods
@@ -53,20 +57,25 @@ const toggleExpanded = (): void => {
 }
 
 const getItemKey = (item: Record<string, any>, index: number): string | number => {
-  // Try to get key from item using the specified path
-  const keys = props.itemKeyPath.split('.')
-  let value: any = item
+  if (!item)
+    return index
 
-  for (const key of keys) {
-    if (value && typeof value === 'object' && key in value) {
-      value = value[key]
-    } else {
-      // Fallback to index if key path doesn't exist
-      return index
+  try {
+    const keys = props.itemKeyPath.split('.')
+    let value: any = item
+
+    for (const key of keys) {
+      if (value && typeof value === 'object' && key in value) {
+        value = value[key]
+      } else {
+        return index
+      }
     }
-  }
 
-  return value || index
+    return value || index
+  } catch {
+    return index
+  }
 }
 </script>
 
@@ -87,11 +96,12 @@ const getItemKey = (item: Record<string, any>, index: number): string | number =
       </div>
     </template>
 
-    <!-- Empty state -->
+    <!-- Content -->
     <div
-      v-if="!items || items.length === 0"
+      v-if="safeItems.length === 0"
       class="text-center py-12"
     >
+      <!-- Empty state -->
       <Icon
         class="w-12 h-12 text-primary mx-auto mb-4"
         :name="emptyStateIcon"
@@ -105,11 +115,11 @@ const getItemKey = (item: Record<string, any>, index: number): string | number =
       <slot name="empty-action" />
     </div>
 
-    <!-- Items list -->
     <div
       v-else
       class="space-y-3"
     >
+      <!-- Items list -->
       <div
         v-for="(item, index) in displayedItems"
         :key="getItemKey(item, index)"
@@ -125,13 +135,13 @@ const getItemKey = (item: Record<string, any>, index: number): string | number =
 
     <!-- Footer with show more/less button -->
     <template
-      v-if="items && items.length > itemsPerPage"
+      v-if="hasMoreItems"
       #footer
     >
       <div class="flex justify-center">
         <UButton
           :icon="isExpanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-          :label="isExpanded ? 'Show Less' : `Show ${items.length - itemsPerPage} More`"
+          :label="isExpanded ? 'Show Less' : `Show ${safeItems.length - itemsPerPage} More`"
           variant="ghost"
           size="sm"
           @click="toggleExpanded"

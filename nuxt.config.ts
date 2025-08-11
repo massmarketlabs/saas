@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import type { NuxtPage } from 'nuxt/schema'
-import { adminExcludes } from './app/utils/locales'
+import { adminExcludes, locales } from './app/utils/locales'
 import { generateRuntimeConfig } from './server/utils/runtimeConfig'
 
 export default defineNuxtConfig({
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   i18n: {
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
-    locales: ['en', 'ar'],
+    locales,
     defaultLocale: 'en'
   },
   sitemap: {

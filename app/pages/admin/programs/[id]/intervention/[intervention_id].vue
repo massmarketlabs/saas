@@ -10,12 +10,41 @@ definePageMeta({
 const localePath = useLocalePath()
 const { t } = useI18n()
 const route = useRoute()
-const requestFetch = useRequestFetch()
+// const requestFetch = useRequestFetch()
 
 const { id: programId, intervention_id } = route.params
-const { data } = useAsyncData(`intervention-${intervention_id}`, async () => await requestFetch(`/api/admin/intervention/${intervention_id}`))
-const instructors = computed(() => data.value?.intervention_enrollment.filter(el => el.user.role === 'instructor'))
-const beneficiaries = computed(() => data.value?.intervention_enrollment.filter(el => el.user.role === 'beneficiary'))
+// const { data } = await useAsyncData(`intervention-${intervention_id}`, () => requestFetch(`/api/admin/intervention/${intervention_id}`))
+const { data } = await useFetch(`/api/admin/intervention/${intervention_id}`)
+
+// Ensure consistent data structure for SSR/Client
+const instructors = computed(() => {
+  if (!data.value?.intervention_enrollment)
+    return []
+  return data.value.intervention_enrollment.filter(el => el.user?.role === 'instructor')
+})
+
+const beneficiaries = computed(() => {
+  if (!data.value?.intervention_enrollment)
+    return []
+  return data.value.intervention_enrollment.filter(el => el.user?.role === 'beneficiary')
+})
+
+// Date formatting utility to ensure consistency
+const formatDate = (dateString: string | null | undefined) => {
+  if (!dateString)
+    return ''
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(new Date(dateString))
+  } catch (error) {
+    console.error(error)
+    console.warn('Invalid date:', dateString)
+    return ''
+  }
+}
 
 useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
 </script>
@@ -38,14 +67,14 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 class="text-2xl font-bold dark:text-white">
-              {{ data?.name }}
+              {{ data?.name || 'Loading...' }}
             </h1>
             <p class="text-gray-500 mt-1">
-              {{ data?.description }}
+              {{ data?.description || '' }}
             </p>
             <div class="flex items-center gap-4 mt-2">
               <span class="text-sm text-gray-600">
-                Program: <strong>{{ data?.program.name }}</strong>
+                Program: <strong>{{ data?.program?.name || 'N/A' }}</strong>
               </span>
               <span
                 v-if="data?.term"
@@ -53,9 +82,9 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
               >
                 Term:
                 <strong>
-                  {{ data?.term.name }}
-                  {{ new Date(data?.term?.start_date).toLocaleDateString() }} -
-                  {{ new Date(data?.term?.end_date).toLocaleDateString() }}
+                  {{ data.term.name }}
+                  {{ formatDate(data.term.start_date) }} -
+                  {{ formatDate(data.term.end_date) }}
                 </strong>
               </span>
             </div>
@@ -86,7 +115,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                 Total Beneficiaries
               </p>
               <p class="text-xl font-semibold text-gray-500">
-                {{ beneficiaries?.length }}
+                {{ beneficiaries.length }}
               </p>
             </div>
           </div>
@@ -108,7 +137,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                 Active
               </p>
               <p class="text-xl font-semibold text-gray-500">
-                {{ beneficiaries?.length }}
+                {{ beneficiaries.length }}
               </p>
             </div>
           </div>
@@ -129,8 +158,8 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
               <p class="text-xs font-medium">
                 Instructors
               </p>
-              <p class="text-xl font-semibold text-gray-500">
-                {{ instructors?.length }}
+              <p class="text-xl font-semibrel text-gray-500">
+                {{ instructors.length }}
               </p>
             </div>
           </div>
@@ -143,7 +172,8 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
         <div class="lg:col-span-2 space-y-6">
           <!-- Beneficiaries List -->
           <CardExpandable
-            :items="beneficiaries ?? []"
+            :key="`beneficiaries-${beneficiaries.length}`"
+            :items="beneficiaries"
             title="Beneficiaries"
             header-icon="i-lucide-users"
             empty-state-icon="i-lucide-users"
@@ -174,7 +204,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                 />
               </div>
             </template>
-            <template #item="beneficiary">
+            <template #item="{ item: beneficiary }">
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex-1">
                   <div class="flex items-center gap-3">
@@ -186,10 +216,10 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                     </div>
                     <div>
                       <p class="font-medium">
-                        {{ beneficiary.item?.user?.name }}
+                        {{ beneficiary?.user?.name || 'Unknown' }}
                       </p>
                       <p class="text-sm text-gray-500">
-                        Enrolled: {{ new Date(beneficiary.item?.created_at).toLocaleDateString() }}
+                        Enrolled: {{ formatDate(beneficiary?.created_at) }}
                       </p>
                     </div>
                   </div>
@@ -222,8 +252,9 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
         <div class="space-y-6">
           <!-- Instructors -->
           <CardExpandable
+            :key="`instructors-${instructors.length}`"
             header-icon="i-lucide-graduation-cap"
-            :items="instructors ?? []"
+            :items="instructors"
             title="Instructors"
             empty-state-icon="i-lucide-graduation-cap"
             empty-state-title="No instructors assigned"
@@ -246,7 +277,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
               </UModal>
             </template>
 
-            <template #item="item">
+            <template #item="{ item: instructor }">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -257,10 +288,10 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                   </div>
                   <div>
                     <p class="font-medium">
-                      {{ item.item.user.name }}
+                      {{ instructor?.user?.name || 'Unknown' }}
                     </p>
                     <p class="text-sm text-gray-500">
-                      {{ item.item.user.role }}
+                      {{ instructor?.user?.role || 'N/A' }}
                     </p>
                   </div>
                 </div>
