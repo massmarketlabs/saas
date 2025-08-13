@@ -20,7 +20,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     // Get db connection
-    const db = await useDB()
+    const db = await useDB(event)
     // Insert into database
     const result = await dbQueries(db).program.insert(body.data)
 

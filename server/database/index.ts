@@ -1,8 +1,10 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { z } from 'zod/v4'
+import type { paginatedSchema } from './utils'
 import { eq } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import * as schema from '../database/schema'
+import { handlePaginatedRequest } from './utils'
 
 // program.insert
 export const insertProgramSchema = createInsertSchema(schema.programs)
@@ -86,6 +88,16 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               }
             }
           })
+      }
+    },
+    user: {
+      list: async (query: z.infer<typeof paginatedSchema>) => {
+        const resp = await handlePaginatedRequest(
+          db,
+          query,
+          schema.user
+        )
+        return resp
       }
     }
   }

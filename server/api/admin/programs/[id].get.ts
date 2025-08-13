@@ -5,7 +5,7 @@ const ERR_MISSING_ID = 'ID param is required'
 export default defineEventHandler(async (event) => {
   const __user = requireAuth(event)
 
-  const db = await useDB()
+  const db = await useDB(event)
   const id = getRouterParam(event, 'id')
 
   if (!id) {

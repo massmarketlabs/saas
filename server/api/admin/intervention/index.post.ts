@@ -9,6 +9,6 @@ export default defineEventHandler(async (event) => {
   }
   const payload = { ...body.data, created_by: user.user.id }
 
-  const db = await useDB()
+  const db = await useDB(event)
   return await dbQueries(db).interventions.insert(payload)
 })

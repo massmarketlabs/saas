@@ -182,20 +182,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
           >
             <template #header-actions>
               <div class="flex flex-wrap gap-2">
-                <UModal
-                  title="Add Beneficiary"
-                  description="Add a new beneficiary to this intervention"
-                >
-                  <UButton
-                    size="sm"
-                    icon="i-lucide-user-plus"
-                    :label="t('global.page.create')"
-                    color="primary"
-                  />
-                  <template #body>
-                    <Placeholder class="h-64" />
-                  </template>
-                </UModal>
+                <ModalAddBeneficiary />
                 <UButton
                   size="sm"
                   variant="outline"
