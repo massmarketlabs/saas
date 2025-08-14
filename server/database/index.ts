@@ -4,7 +4,7 @@ import type { paginatedSchema } from './utils'
 import { eq } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import * as schema from '../database/schema'
-import { handlePaginatedRequest } from './utils'
+import { DrizzleCrudRepository } from './crud-repository'
 
 // program.insert
 export const insertProgramSchema = createInsertSchema(schema.programs)
@@ -21,7 +21,8 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
   return {
     program: {
       insert: async (payload: RequestInsertProgram) => {
-        return await db.insert(schema.programs).values(payload).returning()
+        const repo = new DrizzleCrudRepository(db, schema.programs)
+        return await repo.create(payload)
       },
       getById: async (id: string) => {
         return await db
@@ -92,11 +93,8 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
     },
     user: {
       list: async (query: z.infer<typeof paginatedSchema>) => {
-        const resp = await handlePaginatedRequest(
-          db,
-          query,
-          schema.user
-        )
+        const repo = new DrizzleCrudRepository(db, schema.user)
+        const resp = await repo.list(query)
         return resp
       }
     }

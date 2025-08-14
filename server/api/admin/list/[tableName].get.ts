@@ -1,6 +1,7 @@
-import type { PgTable } from 'drizzle-orm/pg-core'
+import type { AnyPgTable } from 'drizzle-orm/pg-core'
+import { DrizzleCrudRepository } from '~~/server/database/crud-repository'
 import * as schema from '~~/server/database/schema'
-import { handlePaginatedRequest, paginatedSchema } from '~~/server/database/utils'
+import { paginatedSchema } from '~~/server/database/utils'
 import { isValidTable } from '~~/server/utils/db'
 
 export default eventHandler(async (event) => {
@@ -24,12 +25,9 @@ export default eventHandler(async (event) => {
   }
 
   const query = await getValidatedQuery(event, paginatedSchema.parse)
-  const table = schema[tableName]
+  const table = schema[tableName] as AnyPgTable
   const db = await useDB(event)
-  const resp = await handlePaginatedRequest(
-    db,
-    query,
-    table as PgTable
-  )
+  const repo = new DrizzleCrudRepository(db, table)
+  const resp = await repo.list(query)
   return resp
 })

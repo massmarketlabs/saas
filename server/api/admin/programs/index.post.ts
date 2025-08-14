@@ -27,7 +27,7 @@ export default defineEventHandler(async (event: H3Event) => {
     await logAuditEvent({
       userId: user.session.userId,
       category: 'organization',
-      action: `Program ${result[0].name} created`,
+      action: `Program ${result.data.name} created`,
       status: 'success',
       ipAddress: getRequestIP(event),
       userAgent: event.headers.get('user-agent') ?? undefined

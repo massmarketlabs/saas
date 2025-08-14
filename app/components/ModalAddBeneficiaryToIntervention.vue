@@ -19,10 +19,10 @@ const { data } = await useFetch('/api/admin/user/list')
       #body
     >
       <div
-        v-for="user in data?.data"
+        v-for="user in data.data"
         :key="user.id"
       >
-        {{ user }}
+        {{ user.id }}
       </div>
       <!-- <Placeholder class="h-64" /> -->
     </template>

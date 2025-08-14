@@ -182,7 +182,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
           >
             <template #header-actions>
               <div class="flex flex-wrap gap-2">
-                <ModalAddBeneficiary />
+                <ModalAddBeneficiaryToIntervention />
                 <UButton
                   size="sm"
                   variant="outline"

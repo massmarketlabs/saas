@@ -1,8 +1,6 @@
 import type { SQL } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
-import type { PgColumn, PgSelect, PgTable } from 'drizzle-orm/pg-core'
-import type * as schema from './schema'
-import { and, asc, desc, eq, getTableColumns, gte, ilike, inArray, lte, sql } from 'drizzle-orm'
+import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core'
+import { and, eq, gte, ilike, inArray, lte } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
 // utils
@@ -135,56 +133,6 @@ export const withPagination = (qb: PgSelect, limit: number, page: number) => {
 // Sorting
 export const withSorts = (qb: PgSelect, sorts: SQL[]) => {
   return qb.orderBy(...sorts)
-}
-
-export const handlePaginatedRequest = async (
-  db: NodePgDatabase<typeof schema>,
-  query: z.infer<typeof paginatedSchema>,
-  table: PgTable
-) =>
-{
-  const columns = getTableColumns(table)
-  const listQuery = db.select().from(table).$dynamic()
-  const totalQuery = db.select({ count: sql<number>`cast(count(*) as int)` }).from(table).$dynamic()
-
-  if (query) {
-    // Handle filters
-    if (query.filter) {
-      const filters = processFilters(query.filter, columns)
-      withFilters(listQuery, filters)
-      withFilters(totalQuery, filters)
-    }
-    // Handle sorting
-    if (query.sort?.length) {
-      const sorts: SQL[] = []
-      for (const [field, direction] of query.sort) {
-        if (field in columns) {
-          const columnKey = field as keyof typeof columns
-          const orderFunc = direction === 'desc' ? desc : asc
-          sorts.push(orderFunc(columns[columnKey]))
-        }
-      }
-      withSorts(listQuery, sorts)
-    } else if ('id' in columns) {
-      // Fallback sort to id desc
-      const sorts: SQL[] = [desc(columns.id)]
-      withSorts(listQuery, sorts)
-    }
-  }
-
-  // Handle Pagination
-  const page = query.page
-  const limit = query.limit
-  withPagination(listQuery, limit, page)
-  const count = await totalQuery
-  const result = await listQuery
-
-  return {
-    data: result,
-    total: count[0]?.count || 0,
-    page,
-    limit
-  }
 }
 
 // Grouped Column
