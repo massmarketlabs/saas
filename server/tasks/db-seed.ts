@@ -25,7 +25,8 @@ export default defineTask({
               id: f.uuid(),
               name: f.fullName({ isUnique: true }),
               role: f.valuesFromArray({ values: ['admin', 'instructor', 'beneficiary'] }),
-              dob: f.datetime()
+              dob: f.datetime(),
+              image: f.default({ defaultValue: null })
             }
           },
           programs: {
