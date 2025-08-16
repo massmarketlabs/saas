@@ -3,7 +3,7 @@ import { dbQueries } from '~~/server/database'
 const ERR_MISSING_ID = 'ID param is required'
 
 export default defineEventHandler(async (event) => {
-  const __user = requireAuth(event)
+  const __user = await requireAuth(event)
 
   const db = await useDB(event)
   const id = getRouterParam(event, 'id')
