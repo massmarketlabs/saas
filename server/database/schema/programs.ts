@@ -1,3 +1,4 @@
+// server/database/schema/programs.ts
 import { relations } from 'drizzle-orm'
 import { boolean, date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 import { user } from './auth'

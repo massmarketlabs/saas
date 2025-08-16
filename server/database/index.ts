@@ -1,8 +1,8 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
-import type { z } from 'zod/v4'
 import type { paginatedSchema } from './utils'
 import { and, eq } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
+import { z } from 'zod/v4'
 import * as schema from '../database/schema'
 import { DrizzleCrudRepository } from './crud-repository'
 
@@ -15,7 +15,7 @@ type RequestCreateProgram = z.infer<typeof insertProgramSchema>
 export const requestCreateInterventionSchema = createInsertSchema(schema.interventions)
 type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
 
-export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment)
+export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment, { intervention_id: z.string(), user_id: z.string() }) // TODO: ensure that no leaking uuid that don't use v4
 type RequestCreateInterventionEnrollment = z.infer<typeof insertInterventionEnrollment>
 
 // Database Queries
@@ -85,6 +85,7 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               term: true,
               evaluations: true,
               intervention_enrollment: {
+                orderBy: (enrollment, { desc }) => desc(enrollment.updated_at),
                 with: {
                   user: true
                 }
@@ -103,7 +104,7 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               eq(schema.intervention_enrollment.user_id, user_id)
             )
           )
-          .limit(0)
+          .limit(1)
 
         const repo = new DrizzleCrudRepository(db, schema.intervention_enrollment)
         const enrollment = enrollments[0]

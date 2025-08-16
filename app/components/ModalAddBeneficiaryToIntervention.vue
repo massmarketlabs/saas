@@ -76,19 +76,17 @@ const handleUpdateEnlistedBeneficiary = async (enroll: boolean | string, user_id
   if (typeof enroll === 'string') {
     return
   }
-  console.log({ enroll, user_id, intervention_id })
-
+  const t = toast.add({ title: 'Updating...', description: 'Making changes to data, please wait...' })
   const resp = await $fetch('/api/admin/intervention/enroll', { method: 'post', body: {
     user_id,
     intervention_id
   } })
 
   if (!resp.success) {
-    toast.add({ color: 'error', title: resp.message })
+    toast.update(t.id, { color: 'error', title: resp.message, description: '' })
     return
   }
-  toast.add({ color: 'success', title: resp.message })
-  emits('enrollmentChange')
+  toast.update(t.id, { color: 'success', title: resp.message, description: '' })
 }
 </script>
 
@@ -97,6 +95,7 @@ const handleUpdateEnlistedBeneficiary = async (enroll: boolean | string, user_id
     v-model:open="isOpen"
     title="Add Beneficiary"
     description="Add a new beneficiary to this intervention"
+    @after:leave="emits('enrollmentChange')"
   >
     <UButton
       size="sm"
@@ -126,14 +125,14 @@ const handleUpdateEnlistedBeneficiary = async (enroll: boolean | string, user_id
           class="space-y-2"
         >
           <div
-            v-for="user in allUsers"
+            v-for="(user) in allUsers"
             :key="user.id"
           >
             <UCheckbox
               color="primary"
               variant="card"
               :default-value="props.enlistedBeneficiaries.includes(user.id)"
-              :label="user.name"
+              :label="`${user.name}`"
               @update:model-value="(val) => handleUpdateEnlistedBeneficiary(val, user.id)"
             />
           </div>

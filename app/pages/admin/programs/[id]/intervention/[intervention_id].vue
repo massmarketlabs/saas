@@ -11,7 +11,7 @@ const localePath = useLocalePath()
 const { t } = useI18n()
 const route = useRoute()
 const { id: programId, intervention_id } = route.params
-const { data, refresh } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`)
+const { data, refresh, pending } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`, { key: `intervention-${intervention_id}` })
 
 // Ensure consistent data structure for SSR/Client
 const instructors = computed(() => {
@@ -26,7 +26,7 @@ const beneficiaries = computed(() => {
   return data.value.intervention_enrollment.filter(el => el.user?.role === 'beneficiary')
 })
 
-const beneficiaryIds = computed(() => beneficiaries.value.reduce((acc, curr) => {
+const activeBeneficiaryIds = computed(() => beneficiaries.value.reduce((acc, curr) => {
   if (!curr.deleted_at) {
     acc.push(curr.user_id)
   }
@@ -141,7 +141,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                 Active
               </p>
               <p class="text-xl font-semibold text-gray-500">
-                {{ beneficiaries.length }}
+                {{ activeBeneficiaryIds.length }}
               </p>
             </div>
           </div>
@@ -187,14 +187,15 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
             <template #header-actions>
               <div class="flex flex-wrap gap-2">
                 <ModalAddBeneficiaryToIntervention
-                  :enlisted-beneficiaries="beneficiaryIds"
-                  @enrollment-change="refresh"
+                  :enlisted-beneficiaries="activeBeneficiaryIds"
+                  @enrollment-change="async () => await refresh()"
                 />
                 <UButton
                   size="sm"
                   variant="outline"
                   icon="i-lucide-download"
                   label="Export"
+                  :loading="pending"
                 />
               </div>
             </template>
@@ -217,11 +218,11 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                           v-if="beneficiary?.deleted_at"
                           color="error"
                         >
-                          Deleted
+                          Archived
                         </UBadge>
                       </div>
                       <p class="text-sm text-gray-500">
-                        Enrolled: {{ formatDate(beneficiary?.created_at) }}
+                        Created: {{ formatDate(beneficiary?.created_at) }}
                       </p>
                     </div>
                   </div>
