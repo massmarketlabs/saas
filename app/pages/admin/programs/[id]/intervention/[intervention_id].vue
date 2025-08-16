@@ -10,11 +10,8 @@ definePageMeta({
 const localePath = useLocalePath()
 const { t } = useI18n()
 const route = useRoute()
-// const requestFetch = useRequestFetch()
-
 const { id: programId, intervention_id } = route.params
-// const { data } = await useAsyncData(`intervention-${intervention_id}`, () => requestFetch(`/api/admin/intervention/${intervention_id}`))
-const { data } = await useFetch(`/api/admin/intervention/${intervention_id}`)
+const { data, refresh } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`)
 
 // Ensure consistent data structure for SSR/Client
 const instructors = computed(() => {
@@ -28,6 +25,13 @@ const beneficiaries = computed(() => {
     return []
   return data.value.intervention_enrollment.filter(el => el.user?.role === 'beneficiary')
 })
+
+const beneficiaryIds = computed(() => beneficiaries.value.reduce((acc, curr) => {
+  if (!curr.deleted_at) {
+    acc.push(curr.user_id)
+  }
+  return acc
+}, [] as string[]))
 
 // Date formatting utility to ensure consistency
 const formatDate = (dateString: string | null | undefined) => {
@@ -182,7 +186,10 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
           >
             <template #header-actions>
               <div class="flex flex-wrap gap-2">
-                <ModalAddBeneficiaryToIntervention />
+                <ModalAddBeneficiaryToIntervention
+                  :enlisted-beneficiaries="beneficiaryIds"
+                  @enrollment-change="refresh"
+                />
                 <UButton
                   size="sm"
                   variant="outline"
@@ -202,9 +209,17 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                       />
                     </div>
                     <div>
-                      <p class="font-medium">
-                        {{ beneficiary?.user?.name || 'Unknown' }}
-                      </p>
+                      <div class="flex gap-2">
+                        <p class="font-medium">
+                          {{ beneficiary?.user?.name || 'Unknown' }}
+                        </p>
+                        <UBadge
+                          v-if="beneficiary?.deleted_at"
+                          color="error"
+                        >
+                          Deleted
+                        </UBadge>
+                      </div>
                       <p class="text-sm text-gray-500">
                         Enrolled: {{ formatDate(beneficiary?.created_at) }}
                       </p>
