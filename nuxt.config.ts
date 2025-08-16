@@ -110,6 +110,8 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    // debug: true,
+    // logLevel: 5,
     preset: process.env.NUXT_NITRO_PRESET,
     experimental: {
       tasks: true

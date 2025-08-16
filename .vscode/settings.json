@@ -42,5 +42,5 @@
   "workbench.editorAssociations": {
     "*.svg": "default"
   },
-  "vitest.nodeExecutable": "~/.nvm/versions/node/v22.15.0/bin/node"
+  "vitest.nodeExecutable": "~/.nvm/versions/node/v22.17.1/bin/node"
 }
