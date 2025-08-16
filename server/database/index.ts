@@ -1,7 +1,7 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { z } from 'zod/v4'
 import type { paginatedSchema } from './utils'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
 import * as schema from '../database/schema'
 import { DrizzleCrudRepository } from './crud-repository'
@@ -9,18 +9,20 @@ import { DrizzleCrudRepository } from './crud-repository'
 // program.insert
 export const insertProgramSchema = createInsertSchema(schema.programs)
 
-type RequestInsertProgram = z.infer<typeof insertProgramSchema>
+type RequestCreateProgram = z.infer<typeof insertProgramSchema>
 
 // interventions.insert
-type RequestCreateIntervention = typeof schema.interventions.$inferInsert
+export const requestCreateInterventionSchema = createInsertSchema(schema.interventions)
+type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
 
-export const requestCreateInterventionSchema = createInsertSchema(schema.interventions).omit({ created_by: true })
+export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment)
+type RequestCreateInterventionEnrollment = z.infer<typeof insertInterventionEnrollment>
 
 // Database Queries
 export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
   return {
     program: {
-      insert: async (payload: RequestInsertProgram) => {
+      insert: async (payload: RequestCreateProgram) => {
         const repo = new DrizzleCrudRepository(db, schema.programs)
         return await repo.create(payload)
       },
@@ -44,7 +46,7 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
             }
           })
       },
-      patch: async (id: string, updates: Partial<RequestInsertProgram>) => {
+      patch: async (id: string, updates: Partial<RequestCreateProgram>) => {
         // Validate that there are actually updates to apply
         if (Object.keys(updates).length === 0) {
           throw new Error('No updates provided')
@@ -89,6 +91,49 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               }
             }
           })
+      },
+      toggleEnrollment: async (payload: RequestCreateInterventionEnrollment) => {
+        const { intervention_id, user_id } = payload
+        const enrollments = await db
+          .select()
+          .from(schema.intervention_enrollment)
+          .where(
+            and(
+              eq(schema.intervention_enrollment.intervention_id, intervention_id),
+              eq(schema.intervention_enrollment.user_id, user_id)
+            )
+          )
+          .limit(0)
+
+        const repo = new DrizzleCrudRepository(db, schema.intervention_enrollment)
+        const enrollment = enrollments[0]
+        if (!enrollment) {
+          await repo.create({
+            intervention_id,
+            user_id
+          })
+
+          return {
+            success: true,
+            message: 'Created new enrollment'
+          }
+        }
+
+        const isDeleted = enrollment.deleted_at
+
+        if (isDeleted) {
+          await repo.updateById(enrollment.id, { ...enrollment, deleted_at: null })
+          return {
+            success: true,
+            message: 'Enrollment in intervention reactivated'
+          }
+        }
+
+        await repo.updateById(enrollment.id, { ...enrollment, deleted_at: new Date().toUTCString() })
+        return {
+          success: true,
+          message: 'Enrollment in intervention marked as deleted'
+        }
       }
     },
     user: {
