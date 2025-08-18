@@ -2,6 +2,9 @@
 
 <script setup lang="ts">
 import { Placeholder } from '#components'
+import { csvFormat } from 'd3-dsv'
+
+type Enrollment = NonNullable<typeof data.value>['intervention_enrollment'][0]
 
 definePageMeta({
   layout: false
@@ -10,8 +13,12 @@ definePageMeta({
 const localePath = useLocalePath()
 const { t } = useI18n()
 const route = useRoute()
+const toast = useToast()
 const { id: programId, intervention_id } = route.params
 const { data, refresh, pending } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`, { key: `intervention-${intervention_id}` })
+const toDeleteEnrollment = ref<null | Enrollment>(null)
+const isDeletePending = ref(false)
+const confirmationModalToDeleteEnrollment = computed(() => !!toDeleteEnrollment.value)
 
 // Ensure consistent data structure for SSR/Client
 const instructors = computed(() => {
@@ -20,13 +27,13 @@ const instructors = computed(() => {
   return data.value.intervention_enrollment.filter(el => el.user?.role === 'instructor')
 })
 
-const beneficiaries = computed(() => {
+const enrollments = computed(() => {
   if (!data.value?.intervention_enrollment)
     return []
   return data.value.intervention_enrollment.filter(el => el.user?.role === 'beneficiary')
 })
 
-const activeBeneficiaryIds = computed(() => beneficiaries.value.reduce((acc, curr) => {
+const activeBeneficiaryIds = computed(() => enrollments.value.reduce((acc, curr) => {
   if (!curr.deleted_at) {
     acc.push(curr.user_id)
   }
@@ -51,6 +58,56 @@ const formatDate = (dateString: string | null | undefined) => {
 }
 
 useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
+
+const handleSetConfirmationModal = (enrollment: Enrollment) => {
+  toDeleteEnrollment.value = enrollment
+}
+
+const handleSubmitDelete = async () => {
+  try {
+    isDeletePending.value = true
+    if (!toDeleteEnrollment.value) {
+      return
+    }
+    const resp = await $fetch('/api/admin/intervention/enroll', {
+      method: 'DELETE',
+      body: {
+        id: toDeleteEnrollment.value.id
+      }
+    })
+    toast.add({ color: 'success', title: `Deleted ${resp.deletedCount} beneficiaries from enrollment` })
+    await refresh()
+    toDeleteEnrollment.value = null
+  } catch (error) {
+    console.error(error)
+    toast.add({ color: 'error', title: 'Encountering an unexpected error.', description: String(error) })
+  } finally {
+    isDeletePending.value = false
+  }
+}
+
+const handleDownloadEnrollmentCSV = () => {
+  const sheet = enrollments.value.map(x => (
+    {
+      id: x.id,
+      intervention_id: x.intervention_id,
+      intervention: data.value?.name,
+      user_id: x.user_id,
+      user: x.user.name,
+      created_at: x.created_at,
+      updated_at: x.updated_at,
+      deleted_at: x.deleted_at
+    }
+  ))
+  const rows = csvFormat(sheet)
+  const blob = new Blob([rows], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `${new Date().toUTCString()} - ${String(data.value?.name)} - Enrollments.csv`
+  document.body.appendChild(link) // Append temporarily to allow click
+  link.click()
+  document.body.removeChild(link) // Remove after click
+}
 </script>
 
 <template>
@@ -119,7 +176,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                 Total Beneficiaries
               </p>
               <p class="text-xl font-semibold text-gray-500">
-                {{ beneficiaries.length }}
+                {{ enrollments.length }}
               </p>
             </div>
           </div>
@@ -176,8 +233,8 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
         <div class="lg:col-span-2 space-y-6">
           <!-- Beneficiaries List -->
           <CardExpandable
-            :key="`beneficiaries-${beneficiaries.length}`"
-            :items="beneficiaries"
+            :key="`beneficiaries-${enrollments.length}`"
+            :items="enrollments"
             title="Beneficiaries"
             header-icon="i-lucide-users"
             empty-state-icon="i-lucide-users"
@@ -196,6 +253,7 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                   icon="i-lucide-download"
                   label="Export"
                   :loading="pending"
+                  @click="handleDownloadEnrollmentCSV"
                 />
               </div>
             </template>
@@ -231,9 +289,9 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                   <div class="text-right">
                     <UDropdownMenu
                       :items="[
-                        [{ label: 'View Profile', icon: 'i-lucide-eye' }],
+                        [{ label: 'View Profile', icon: 'i-lucide-eye', onSelect: async () => await navigateTo(`/admin/profile/${beneficiary.id}`) }],
                         [{ label: 'Edit', icon: 'i-lucide-edit' }],
-                        [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error' }]
+                        [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => handleSetConfirmationModal(beneficiary as Enrollment) }]
                       ]"
                     >
                       <UButton
@@ -270,8 +328,8 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
               >
                 <UButton
                   size="sm"
-                  icon="i-lucide-plus"
-                  :label="t('global.page.create')"
+                  icon="i-lucide-user-plus"
+                  :label="t('global.page.add')"
                   color="primary"
                 />
                 <template #body>
@@ -312,6 +370,37 @@ useHead({ title: `Intervention | ${data.value?.name ?? ''}` })
                     square
                   />
                 </UDropdownMenu>
+                <UModal
+                  v-model:open="confirmationModalToDeleteEnrollment"
+                  title="Are you sure?"
+                  description="This action is permanent, any and all data attached to this enrollment will be deleted"
+                  @update:open="(val) => {
+                    if (!val) {
+                      toDeleteEnrollment = null
+                    }
+                  }"
+                >
+                  <template #body>
+                    <span><strong>Name:</strong> {{ toDeleteEnrollment?.user.name }}</span>
+                  </template>
+                  <template #footer>
+                    <div class="flex gap-2 justify-items-end">
+                      <UButton
+                        variant="outline"
+                        @click="toDeleteEnrollment = null"
+                      >
+                        Close
+                      </UButton>
+                      <UButton
+                        color="error"
+                        :loading="isDeletePending"
+                        @click="handleSubmitDelete"
+                      >
+                        Delete
+                      </UButton>
+                    </div>
+                  </template>
+                </UModal>
               </div>
             </template>
           </CardExpandable>

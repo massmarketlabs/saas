@@ -1,4 +1,6 @@
+import type { User } from 'better-auth'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type { EventAuditParams } from '../utils/auditLogger'
 import type { paginatedSchema } from './utils'
 import { and, eq } from 'drizzle-orm'
 import { createInsertSchema } from 'drizzle-zod'
@@ -17,6 +19,9 @@ type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
 
 export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment, { intervention_id: z.string(), user_id: z.string() }) // TODO: ensure that no leaking uuid that don't use v4
 type RequestCreateInterventionEnrollment = z.infer<typeof insertInterventionEnrollment>
+
+export const deleteInterventionEnrollment = z.object({ id: z.string() })
+type RequestDeleteEnrollment = z.infer<typeof deleteInterventionEnrollment>
 
 // Database Queries
 export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
@@ -55,9 +60,7 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
         const result = await db
           .update(schema.programs)
           .set({
-            ...updates,
-            updated_at: new Date().toISOString()
-            // updated_at: new Date() // assuming you have an updated_at timestamp field
+            ...updates
           })
           .where(eq(schema.programs.id, id))
           .returning()
@@ -135,6 +138,21 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
           success: true,
           message: 'Enrollment in intervention marked as deleted'
         }
+      },
+      deleteEnrollment: async (payload: RequestDeleteEnrollment, user: User, auditParams: EventAuditParams) => {
+        const repo = new DrizzleCrudRepository(db, schema.intervention_enrollment)
+        const resp = await repo.deleteById(payload.id)
+        await logAuditEvent({
+          userId: user.id,
+          ipAddress: auditParams.ipAddress,
+          userAgent: auditParams.userAgent,
+          targetId: payload.id,
+          category: 'enrollment',
+          action: `DELETE: Intervention Enrollment`,
+          targetType: 'intervention_enrollment',
+          status: 'success'
+        })
+        return resp
       }
     },
     user: {

@@ -100,7 +100,7 @@ const handleUpdateEnlistedBeneficiary = async (enroll: boolean | string, user_id
     <UButton
       size="sm"
       icon="i-lucide-user-plus"
-      :label="t('global.page.create')"
+      :label="t('global.page.add')"
       color="primary"
     />
 

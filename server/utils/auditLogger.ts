@@ -1,9 +1,10 @@
+import type { H3Event } from 'h3'
 import { auditLog } from '../database/schema/auditLog'
 import { getDB } from './db'
 
 export async function logAuditEvent(data: {
   userId?: string
-  category: 'auth' | 'email' | 'payment' | 'organization'
+  category: 'auth' | 'email' | 'payment' | 'organization' | 'enrollment'
   action: string
   targetType?: string
   targetId?: string
@@ -27,5 +28,14 @@ export async function logAuditEvent(data: {
     })
   } catch (error) {
     console.error('Failed to log audit event:', error)
+  }
+}
+export type EventAuditParams = ReturnType<typeof extractAuditParams>
+
+export function extractAuditParams(event: H3Event) {
+  return {
+    userAgent: event.headers.get('user-agent') || undefined,
+    ipAddress: event.headers.get('x-forwarded-for')
+      || event.headers.get('remoteAddress') || undefined
   }
 }

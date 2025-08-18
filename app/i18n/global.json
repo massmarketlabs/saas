@@ -16,6 +16,8 @@
       "page": {
         "actions": "Actions",
         "create": "Create",
+        "add": "Add",
+        "view": "View",
         "edit": "Edit",
         "delete": "Delete",
         "cancel": "Cancel",
@@ -49,6 +51,8 @@
         "actions": "الإجراءات",
         "create": "إنشاء",
         "edit": "تعديل",
+        "add": "إضافة عنصر",
+        "view": "عرض العنصر",
         "delete": "حذف",
         "cancel": "إلغاء",
         "name": "الاسم",
