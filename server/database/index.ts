@@ -10,12 +10,11 @@ import { DrizzleCrudRepository } from './crud-repository'
 
 // program.insert
 export const insertProgramSchema = createInsertSchema(schema.programs)
-
-type RequestCreateProgram = z.infer<typeof insertProgramSchema>
+export type RequestCreateProgram = z.infer<typeof insertProgramSchema>
 
 // interventions.insert
 export const requestCreateInterventionSchema = createInsertSchema(schema.interventions)
-type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
+export type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
 
 export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment, { intervention_id: z.string(), user_id: z.string() }) // TODO: ensure that no leaking uuid that don't use v4
 type RequestCreateInterventionEnrollment = z.infer<typeof insertInterventionEnrollment>
@@ -95,6 +94,14 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               }
             }
           })
+      },
+      patch: async (payload: Partial<RequestCreateIntervention>) => {
+        if (!payload.id) {
+          return null
+        }
+
+        const repo = new DrizzleCrudRepository(db, schema.interventions)
+        return await repo.updateById(payload.id, payload)
       },
       toggleEnrollment: async (payload: RequestCreateInterventionEnrollment) => {
         const { intervention_id, user_id } = payload

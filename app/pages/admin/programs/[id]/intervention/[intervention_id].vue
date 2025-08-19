@@ -127,9 +127,15 @@ const handleDownloadEnrollmentCSV = () => {
       <UCard class="border-l-2 border-l-primary">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold dark:text-white">
-              {{ data?.name || 'Loading...' }}
-            </h1>
+            <div class="flex gap-2">
+              <h1 class="text-2xl font-bold dark:text-white">
+                {{ data?.name || 'Loading...' }}
+              </h1>
+              <ModalEditIntervention
+                :intervention="data"
+                @intervention-changed="refresh"
+              />
+            </div>
             <p class="text-gray-500 mt-1">
               {{ data?.description || '' }}
             </p>
@@ -219,7 +225,7 @@ const handleDownloadEnrollmentCSV = () => {
               <p class="text-xs font-medium">
                 Instructors
               </p>
-              <p class="text-xl font-semibrel text-gray-500">
+              <p class="text-xl font-semibold text-gray-500">
                 {{ instructors.length }}
               </p>
             </div>

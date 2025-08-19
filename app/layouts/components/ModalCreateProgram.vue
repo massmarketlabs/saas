@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { RequestInsertProgram } from '~~/server/database'
+import type { RequestCreateProgram } from '~~/server/database'
 import { insertProgramSchema } from '~~/server/database'
 
 const form = useTemplateRef('form')
 const isOpen = ref(false)
 const isLoading = ref(false)
-const state = reactive<Partial<RequestInsertProgram>>({})
+const state = reactive<Partial<RequestCreateProgram>>({})
 // const programStore = useProgramStore()
 const { refresh } = await useProgramList()
 const toast = useToast()
 
-const onSubmit = async (event: FormSubmitEvent<RequestInsertProgram>) => {
+const onSubmit = async (event: FormSubmitEvent<RequestCreateProgram>) => {
   try {
     isLoading.value = true
     const resp = await $fetch('/api/admin/programs', { method: 'POST', body: event.data })
