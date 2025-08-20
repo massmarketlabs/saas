@@ -150,12 +150,6 @@ useHead({ title: `Programs | ${data.value?.name}` })
                     ],
                     [
                       {
-                        label: 'Edit',
-                        icon: 'i-lucide-edit'
-                      }
-                    ],
-                    [
-                      {
                         label: 'Delete',
                         icon: 'i-lucide-trash-2',
                         color: 'error'

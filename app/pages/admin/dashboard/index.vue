@@ -1,38 +1,50 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
+import ICountUp from 'vue-countup-v3'
+
 definePageMeta({
   layout: false
 })
 
 const { t } = useI18n()
 
+const { data } = await useFetch('/api/admin/reports')
+
 const stats = ref([
   {
     name: 'activeUsers',
-    value: '2,834',
-    change: '+12.5%',
-    isIncrease: true,
+    value: data.value?.user.total,
+    change: data.value?.user.percentageChange,
+    isIncrease: data.value?.user.trend === 'increase',
+    lastYear: data.value?.user.lastYear,
+    currentYear: data.value?.user.currentYear,
     icon: 'users'
   },
   {
-    name: 'totalRevenue',
-    value: '$45,289',
-    change: '+8.2%',
-    isIncrease: true,
-    icon: 'dollar-sign'
-  },
-  {
-    name: 'activeProjects',
-    value: '156',
-    change: '-3.1%',
-    isIncrease: false,
+    name: 'activePrograms',
+    value: data.value?.program.total,
+    change: data.value?.program.percentageChange,
+    isIncrease: data.value?.program.trend === 'increase',
+    lastYear: data.value?.program.lastYear,
+    currentYear: data.value?.program.currentYear,
     icon: 'folder'
   },
   {
+    name: 'totalInterventions',
+    value: data.value?.intervention.total,
+    change: data.value?.intervention.percentageChange,
+    isIncrease: data.value?.intervention.trend === 'increase',
+    lastYear: data.value?.intervention.lastYear,
+    currentYear: data.value?.intervention.currentYear,
+    icon: 'school'
+  },
+  {
     name: 'customerSatisfaction',
-    value: '94.8%',
-    change: '+2.3%',
+    value: 94.8,
+    decimalPlaces: 1,
+    suffix: '%',
+    change: '+2.3',
     isIncrease: true,
     icon: 'smile'
   }
@@ -76,30 +88,58 @@ const stats = ref([
           :key="stat.name"
           class="relative overflow-hidden"
         >
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm text-gray-500 dark:text-gray-400">
-                {{ t(`dashboard.stats.${stat.name}`) }}
+          <UTooltip
+            :disabled="!stat.lastYear || !stat.currentYear"
+            class="h-full"
+            :ui="{ content: 'h-full' }"
+          >
+            <template #content>
+              <div class="space-y-3">
+                <p>
+                  <strong>Last Year</strong>
+                  {{ stat.lastYear }}
+                </p>
+                <p>
+                  <strong>Current Year</strong>
+                  {{ stat.currentYear }}
+                </p>
+                <p>
+                  <strong>Total</strong>
+                  {{ stat.value }}
+                </p>
               </div>
-              <div class="mt-1 text-2xl font-semibold">
-                {{ stat.value }}
+            </template>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ t(`dashboard.stats.${stat.name}`) }}
+                </div>
+                <ICountUp
+                  class="mt-1 text-2xl font-semibold"
+                  :end-val="stat.value || '0'"
+                  :decimal-places="stat.decimalPlaces"
+                >
+                  <template #suffix>
+                    {{ stat.suffix }}
+                  </template>
+                </ICountUp>
+                <div
+                  class="mt-2 flex items-center text-sm"
+                  :class="stat.isIncrease ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                >
+                  <Icon
+                    :name="stat.isIncrease ? 'lucide:trending-up' : 'lucide:trending-down'"
+                    class="mr-1 h-4 w-4"
+                  />
+                  {{ stat.change }}%
+                </div>
               </div>
-              <div
-                class="mt-2 flex items-center text-sm"
-                :class="stat.isIncrease ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-              >
-                <Icon
-                  :name="stat.isIncrease ? 'lucide:trending-up' : 'lucide:trending-down'"
-                  class="mr-1 h-4 w-4"
-                />
-                {{ stat.change }}
-              </div>
+              <Icon
+                :name="`lucide:${stat.icon}`"
+                class="h-8 w-8 text-gray-400 dark:text-gray-600"
+              />
             </div>
-            <Icon
-              :name="`lucide:${stat.icon}`"
-              class="h-8 w-8 text-gray-400 dark:text-gray-600"
-            />
-          </div>
+          </UTooltip>
         </UCard>
       </div>
 

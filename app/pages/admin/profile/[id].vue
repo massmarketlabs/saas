@@ -269,7 +269,7 @@ const addNote = () => {
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          <h1 class="text-3xl font-bold  mb-2">
             Student Profile
           </h1>
           <p class="text-gray-600">
@@ -281,14 +281,14 @@ const addNote = () => {
           <!-- Left Column -->
           <div class="lg:col-span-1 space-y-6">
             <!-- Profile General Information -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center gap-3">
                   <UIcon
                     name="i-heroicons-user-circle"
                     class="text-blue-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold ">
                     Profile Information
                   </h2>
                 </div>
@@ -313,7 +313,7 @@ const addNote = () => {
                       @click="updateAvatar"
                     />
                   </div>
-                  <h3 class="text-xl font-semibold text-gray-900 mt-3">
+                  <h3 class="text-xl font-semibold  mt-3">
                     {{ profileData.name }}
                   </h3>
                   <UBadge
@@ -329,15 +329,15 @@ const addNote = () => {
                 <div class="space-y-4">
                   <div class="flex justify-between items-center py-2 border-b border-gray-100">
                     <span class="text-sm font-medium text-gray-600">Gender</span>
-                    <span class="text-sm text-gray-900">{{ profileData.gender }}</span>
+                    <span class="text-sm ">{{ profileData.gender }}</span>
                   </div>
                   <div class="flex justify-between items-center py-2 border-b border-gray-100">
                     <span class="text-sm font-medium text-gray-600">Birthday</span>
-                    <span class="text-sm text-gray-900">{{ formatDate(profileData.birthday) }}</span>
+                    <span class="text-sm ">{{ formatDate(profileData.birthday) }}</span>
                   </div>
                   <div class="flex justify-between items-center py-2">
                     <span class="text-sm font-medium text-gray-600">Student ID</span>
-                    <span class="text-sm text-gray-900">{{ profileData.studentId }}</span>
+                    <span class="text-sm ">{{ profileData.studentId }}</span>
                   </div>
                 </div>
 
@@ -357,14 +357,14 @@ const addNote = () => {
             </UCard>
 
             <!-- Emergency Contact Information -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center gap-3">
                   <UIcon
                     name="i-heroicons-phone"
                     class="text-red-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold ">
                     Emergency Contact
                   </h2>
                 </div>
@@ -374,10 +374,10 @@ const addNote = () => {
                 <div
                   v-for="contact in emergencyContacts"
                   :key="contact.id"
-                  class="p-4 bg-gray-50 rounded-lg"
+                  class="p-4 rounded-lg"
                 >
                   <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-medium text-gray-900">
+                    <h4 class="font-medium ">
                       {{ contact.name }}
                     </h4>
                     <UBadge
@@ -409,14 +409,14 @@ const addNote = () => {
             </UCard>
 
             <!-- Siblings -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center gap-3">
                   <UIcon
                     name="i-heroicons-users"
                     class="text-green-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold ">
                     Siblings
                   </h2>
                 </div>
@@ -426,7 +426,7 @@ const addNote = () => {
                 <div
                   v-for="sibling in siblings"
                   :key="sibling.id"
-                  class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  class="flex items-center gap-3 p-3 rounded-lg"
                 >
                   <UAvatar
                     :src="sibling.avatar"
@@ -434,7 +434,7 @@ const addNote = () => {
                     size="sm"
                   />
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900 text-sm">
+                    <p class="font-medium  text-sm">
                       {{ sibling.name }}
                     </p>
                     <p class="text-xs text-gray-600">
@@ -456,7 +456,7 @@ const addNote = () => {
           <!-- Right Column -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Student Notes -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
@@ -464,7 +464,7 @@ const addNote = () => {
                       name="i-heroicons-document-text"
                       class="text-purple-600 text-xl"
                     />
-                    <h2 class="text-lg font-semibold text-gray-900">
+                    <h2 class="text-lg font-semibold ">
                       Student Notes
                     </h2>
                   </div>
@@ -487,10 +487,10 @@ const addNote = () => {
                 <div
                   v-for="note in studentNotes"
                   :key="note.id"
-                  class="p-4 bg-gray-50 rounded-lg"
+                  class="p-4 rounded-lg"
                 >
                   <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-medium text-gray-900">
+                    <h4 class="font-medium ">
                       {{ note.title }}
                     </h4>
                     <span class="text-xs text-gray-500">{{ formatDate(note.date) }}</span>
@@ -513,14 +513,14 @@ const addNote = () => {
             </UCard>
 
             <!-- Latest Evaluations -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center gap-3">
                   <UIcon
                     name="i-heroicons-chart-bar"
                     class="text-orange-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold ">
                     Latest Evaluations
                   </h2>
                 </div>
@@ -530,11 +530,11 @@ const addNote = () => {
                 <div
                   v-for="evaluation in latestEvaluations"
                   :key="evaluation.id"
-                  class="p-4 bg-gray-50 rounded-lg"
+                  class="p-4 rounded-lg"
                 >
                   <div class="flex justify-between items-start mb-3">
                     <div>
-                      <h4 class="font-medium text-gray-900">
+                      <h4 class="font-medium ">
                         {{ evaluation.subject }}
                       </h4>
                       <p class="text-sm text-gray-600">
@@ -561,14 +561,14 @@ const addNote = () => {
             </UCard>
 
             <!-- Enrollment Tabs -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center gap-3">
                   <UIcon
                     name="i-heroicons-academic-cap"
                     class="text-indigo-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold text-gray-900">
+                  <h2 class="text-lg font-semibold ">
                     Enrollments
                   </h2>
                 </div>
@@ -583,11 +583,11 @@ const addNote = () => {
                     <div
                       v-for="enrollment in item.data"
                       :key="enrollment.id"
-                      class="p-4 bg-gray-50 rounded-lg"
+                      class="p-4 rounded-lg"
                     >
                       <div class="flex justify-between items-start mb-2">
                         <div>
-                          <h4 class="font-medium text-gray-900">
+                          <h4 class="font-medium ">
                             {{ enrollment.course }}
                           </h4>
                           <p class="text-sm text-gray-600">
@@ -624,11 +624,11 @@ const addNote = () => {
                     <div
                       v-for="enrollment in item.data"
                       :key="enrollment.id"
-                      class="p-4 bg-gray-50 rounded-lg"
+                      class="p-4 rounded-lg"
                     >
                       <div class="flex justify-between items-start mb-2">
                         <div>
-                          <h4 class="font-medium text-gray-900">
+                          <h4 class="font-medium ">
                             {{ enrollment.course }}
                           </h4>
                           <p class="text-sm text-gray-600">
@@ -671,7 +671,7 @@ const addNote = () => {
             </UCard>
 
             <!-- Attendance History -->
-            <UCard class="bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden">
+            <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
@@ -679,7 +679,7 @@ const addNote = () => {
                       name="i-heroicons-calendar-days"
                       class="text-teal-600 text-xl"
                     />
-                    <h2 class="text-lg font-semibold text-gray-900">
+                    <h2 class="text-lg font-semibold ">
                       Attendance History
                     </h2>
                   </div>
@@ -708,7 +708,7 @@ const addNote = () => {
 
               <div class="space-y-4">
                 <!-- Attendance Summary -->
-                <div class="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div class="grid grid-cols-3 gap-4 p-4 rounded-lg">
                   <div class="text-center">
                     <div class="text-2xl font-bold text-green-600">
                       {{ attendanceStats.attendanceRate }}%
@@ -737,17 +737,17 @@ const addNote = () => {
 
                 <!-- Recent Attendance -->
                 <div class="space-y-2">
-                  <h4 class="font-medium text-gray-900">
+                  <h4 class="font-medium ">
                     Recent Attendance
                   </h4>
                   <div class="space-y-2">
                     <div
                       v-for="record in attendanceHistory"
                       :key="record.id"
-                      class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                      class="flex justify-between items-center p-3 rounded-lg"
                     >
                       <div>
-                        <p class="font-medium text-gray-900">
+                        <p class="font-medium ">
                           {{ formatDate(record.date) }}
                         </p>
                         <p class="text-sm text-gray-600">

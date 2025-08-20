@@ -3,8 +3,8 @@
     "dashboard": {
       "stats": {
         "activeUsers": "Active Users",
-        "totalRevenue": "Total Revenue",
-        "activeProjects": "Active Projects",
+        "totalInterventions": "Total Interventions",
+        "activePrograms": "Active Programs",
         "customerSatisfaction": "Customer Satisfaction"
       },
       "revenueChart": {
@@ -19,8 +19,8 @@
     "dashboard": {
       "stats": {
         "activeUsers": "المستخدمون النشطون",
-        "totalRevenue": "إجمالي الإيرادات",
-        "activeProjects": "المشاريع النشطة",
+        "totalInterventions": "إجمالي عدد التدخلات",
+        "activePrograms": "البرامج النشطة",
         "customerSatisfaction": "رضا العملاء"
       },
       "revenueChart": {

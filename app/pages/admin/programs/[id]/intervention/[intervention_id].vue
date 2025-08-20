@@ -133,6 +133,7 @@ const handleDownloadEnrollmentCSV = () => {
               </h1>
               <ModalEditIntervention
                 :intervention="data"
+                :pending="pending"
                 @intervention-changed="refresh"
               />
             </div>

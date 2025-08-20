@@ -3,11 +3,10 @@ import type { InternalApi } from 'nitropack'
 import type { RequestCreateIntervention } from '~~/server/database'
 import { requestCreateInterventionSchema } from '~~/server/database'
 
-const props = defineProps<{ intervention: InternalApi['/api/admin/intervention/:id']['get'] }>()
+const props = defineProps<{ intervention: InternalApi['/api/admin/intervention/:id']['get'], pending: boolean }>()
 const emit = defineEmits(['interventionChanged'])
 const requestFetch = useRequestFetch()
 const form = useTemplateRef('edit-intervention-form')
-// const { data: programs, pending: programsPending } = await useFetch('/api/admin/programs')
 const { data: terms, pending: termsPending } = await useFetch('/api/admin/terms')
 
 const state = reactive<Partial<RequestCreateIntervention>>({
@@ -21,13 +20,14 @@ const state = reactive<Partial<RequestCreateIntervention>>({
 const toast = useToast()
 
 async function onSubmit(event: FormSubmitEvent<RequestCreateIntervention>) {
-  console.log({ event })
-  console.log(event.data)
   await requestFetch('/api/admin/intervention', {
     method: 'patch',
     body: event.data,
     onRequestError: ({ error }) => {
       toast.add({ title: error.message })
+    },
+    onResponseError: ({ error }) => {
+      toast.add({ title: error?.message })
     },
     onResponse: ({ response }) => {
       if (response?.ok) {
@@ -48,6 +48,7 @@ async function onSubmit(event: FormSubmitEvent<RequestCreateIntervention>) {
       variant="outline"
       size="sm"
       icon="i-heroicons-pencil-square"
+      :loading="props.pending"
     />
     <template #body>
       <UForm
@@ -76,17 +77,6 @@ async function onSubmit(event: FormSubmitEvent<RequestCreateIntervention>) {
             :rows="8"
           />
         </UFormField>
-        <!-- <UFormField
-          label="Program"
-          name="program_id"
-        >
-          <USelect
-            v-model="state.program_id"
-            :loading="programsPending"
-            class="w-full"
-            :items="programs?.map(x => ({ value: x.id, label: x.name }))"
-          />
-        </UFormField> -->
         <UFormField
           label="Term"
           name="term_id"
