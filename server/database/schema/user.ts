@@ -1,6 +1,7 @@
+import { relations } from 'drizzle-orm'
 import { boolean, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
-import { user } from './auth'
 
+import { user } from './auth'
 import { audit_fields } from './shared'
 
 // ========================
@@ -11,6 +12,7 @@ export const emergency_contacts = pgTable('emergency_contacts', {
   user_id: text('user_id').references(() => user.id).notNull(),
   name: text('name').notNull(),
   phone: text('phone').notNull(),
+  email: text('email'),
   relationship: text('relationship').notNull(),
   is_primary: boolean('is_primary').default(false), // Optional: to mark primary contact
 
@@ -47,3 +49,31 @@ export const approval_request = pgTable('approval_request', {
   approved: timestamp('approved', { mode: 'string', withTimezone: true }),
   ...audit_fields
 })
+
+// ========================
+// Relations
+// ========================
+
+// ========================
+// Relations emergency contacts
+// ========================
+
+export const relations_emergency_contacts = relations(emergency_contacts, ({ one }) => ({
+  user: one(user, {
+    fields: [emergency_contacts.user_id],
+    references: [user.id]
+  })
+}))
+
+export const relations_relationships = relations(relationships, ({ one }) => ({
+  user: one(user, {
+    fields: [relationships.user_id],
+    references: [user.id],
+    relationName: 'user_user_id'
+  }),
+  related_user: one(user, {
+    fields: [relationships.related_user_id],
+    references: [user.id],
+    relationName: 'related_user_user_id'
+  })
+}))

@@ -1,7 +1,6 @@
 <i18n src="../../i18n.json"></i18n>
 
 <script setup lang="ts">
-import { Placeholder } from '#components'
 import { csvFormat } from 'd3-dsv'
 
 type Enrollment = NonNullable<typeof data.value>['intervention_enrollment'][0]
@@ -15,7 +14,7 @@ const { t } = useI18n()
 const route = useRoute()
 const toast = useToast()
 const { id: programId, intervention_id } = route.params
-const { data, refresh, pending } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`, { key: `intervention-${intervention_id}` })
+const { data, refresh, pending } = await useFetch(`/api/admin/intervention/${intervention_id as ':id'}`, { key: `intervention-${intervention_id}`, cache: 'no-cache' })
 const toDeleteEnrollment = ref<null | Enrollment>(null)
 const isDeletePending = ref(false)
 const confirmationModalToDeleteEnrollment = computed(() => !!toDeleteEnrollment.value)
@@ -40,6 +39,12 @@ const activeBeneficiaryIds = computed(() => enrollments.value.reduce((acc, curr)
   return acc
 }, [] as string[]))
 
+const activeInstructorIds = computed(() => instructors.value.reduce((acc, curr) => {
+  if (!curr.deleted_at) {
+    acc.push(curr.user_id)
+  }
+  return acc
+}, [] as string[]))
 // Date formatting utility to ensure consistency
 const formatDate = (dateString: string | null | undefined) => {
   if (!dateString)
@@ -122,7 +127,7 @@ const handleDownloadEnrollmentCSV = () => {
       />
     </template>
 
-    <div class="space-y-6">
+    <div class="space-y-6 max-w-7xl mx-auto">
       <!-- Intervention Header Card -->
       <UCard class="border-l-2 border-l-primary">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -134,7 +139,7 @@ const handleDownloadEnrollmentCSV = () => {
               <ModalEditIntervention
                 :intervention="data"
                 :pending="pending"
-                @intervention-changed="refresh"
+                @intervention-changed="async () => await refresh()"
               />
             </div>
             <p class="text-gray-500 mt-1">
@@ -296,7 +301,7 @@ const handleDownloadEnrollmentCSV = () => {
                   <div class="text-right">
                     <UDropdownMenu
                       :items="[
-                        [{ label: 'View Profile', icon: 'i-lucide-eye', onSelect: async () => await navigateTo(`/admin/profile/${beneficiary.id}`) }],
+                        [{ label: 'View Profile', icon: 'i-lucide-eye', onSelect: async () => await navigateTo(`/admin/organization/user/${beneficiary.user_id}`) }],
                         [{ label: 'Edit', icon: 'i-lucide-edit' }],
                         [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => handleSetConfirmationModal(beneficiary as Enrollment) }]
                       ]"
@@ -329,20 +334,10 @@ const handleDownloadEnrollmentCSV = () => {
             empty-state-description=""
           >
             <template #header-actions>
-              <UModal
-                title="Assign Instructor"
-                description="Assign a new instructor to this intervention"
-              >
-                <UButton
-                  size="sm"
-                  icon="i-lucide-user-plus"
-                  :label="t('global.page.add')"
-                  color="primary"
-                />
-                <template #body>
-                  <Placeholder class="h-48" />
-                </template>
-              </UModal>
+              <ModalAddInstructorToIntervention
+                :enlisted-instructors="activeInstructorIds"
+                @instructor-enrollment-change="async () => await refresh()"
+              />
             </template>
 
             <template #item="{ item: instructor }">
@@ -354,19 +349,21 @@ const handleDownloadEnrollmentCSV = () => {
                       name="i-lucide-user"
                     />
                   </div>
-                  <div>
+                  <div class="flex gap-2">
                     <p class="font-medium">
                       {{ instructor?.user?.name || 'Unknown' }}
                     </p>
-                    <p class="text-sm text-gray-500">
-                      {{ instructor?.user?.role || 'N/A' }}
-                    </p>
+                    <UBadge
+                      v-if="instructor?.deleted_at"
+                      color="error"
+                    >
+                      Archived
+                    </UBadge>
                   </div>
                 </div>
                 <UDropdownMenu
                   :items="[
-                    [{ label: 'View Profile', icon: 'i-lucide-eye' }],
-                    [{ label: 'Contact', icon: 'i-lucide-mail' }],
+                    [{ label: 'View Profile', icon: 'i-lucide-eye', onSelect: () => navigateTo(`/admin/organization/user/${instructor.user_id}`) }],
                     [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error' }]
                   ]"
                 >

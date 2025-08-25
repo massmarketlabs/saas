@@ -185,6 +185,10 @@ const createBetterAuth = () => betterAuth({
       dob: {
         type: 'date',
         returned: true
+      },
+      gender: {
+        type: 'string',
+        returned: true
       }
     }
   }

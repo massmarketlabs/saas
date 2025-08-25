@@ -1,6 +1,7 @@
 <!-- eslint-disable no-alert -->
 <script lang="ts" setup>
 import { ref } from 'vue'
+import ModalCreateProfileEmergencyContact from '~/components/ModalCreateProfileEmergencyContact.vue'
 
 definePageMeta({
   layout: false
@@ -8,75 +9,66 @@ definePageMeta({
 
 const router = useRouter()
 const route = useRoute()
+
+const id = route.params.id as string
+const { data, refresh } = await useFetch(`/api/admin/user/${id as ':id'}`, { key: `profile-${id as ':id'}` })
+
+useHead({
+  title: `Profile | ${data.value?.name}`
+})
+
 // Profile Data
 const profileData = ref({
-  name: 'Emma Thompson',
-  gender: 'Female',
-  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b830?w=150&h=150&fit=crop&crop=face',
-  birthday: '2008-03-15',
-  status: 'Active',
-  studentId: 'ST2024001'
+  studentId: data.value?.id,
+  name: data.value?.name,
+  gender: data.value?.gender,
+  avatar: data.value?.image,
+  birthday: data.value?.dob,
+  status: data.value?.banned ? 'Banned' : 'Active',
+  role: data.value?.role
 })
 
 // Emergency Contacts
-const emergencyContacts = ref([
-  {
-    id: 1,
-    name: 'Sarah Thompson',
-    relationship: 'Mother',
-    phone: '(555) 123-4567',
-    email: 'sarah.thompson@email.com'
-  },
-  {
-    id: 2,
-    name: 'Michael Thompson',
-    relationship: 'Father',
-    phone: '(555) 987-6543',
-    email: 'michael.thompson@email.com'
-  }
-])
+const emergencyContacts = computed(() => {
+  if (!data.value || data.value.emergency_contacts.length === 0)
+    return []
+  return data.value?.emergency_contacts.map(e => ({
+    id: e.id,
+    name: e.name,
+    relationship: e.relationship,
+    phone: e.phone,
+    email: e.email,
+    is_primary: e.is_primary
+  }))
+})
 
 // Siblings
-const siblings = ref([
-  {
-    id: 1,
-    name: 'Jake Thompson',
-    relationship: 'Brother',
-    grade: '10',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-  },
-  {
-    id: 2,
-    name: 'Lily Thompson',
-    relationship: 'Sister',
-    grade: '6',
-    status: 'Active',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+const siblings = computed(() => {
+  if (!data.value || !data.value?.relationship_user) {
+    return []
   }
-])
+
+  return data.value.relationship_user.map(user => ({
+    id: user.id,
+    name: user.related_user.name,
+    relationship: user.relationship_type,
+    avatar: user.related_user.image,
+    status: 'Active',
+    grade: '10'
+  }))
+})
 
 // Student Notes
-const studentNotes = ref([
-  {
-    id: 1,
-    title: 'Exceptional Performance in Science Fair',
-    content: 'Emma showed outstanding creativity and scientific thinking in her volcano project. Recommended for advanced science track.',
-    author: 'Mrs. Johnson',
-    date: '2024-02-15',
-    priority: 'High'
-  },
-  {
-    id: 2,
-    title: 'Needs Support in Mathematics',
-    content: 'Student is struggling with algebraic concepts. Recommend additional tutoring sessions.',
-    author: 'Mr. Davis',
-    date: '2024-02-10',
-    priority: 'Medium'
-  }
-])
+const studentNotes = computed(() => data.value?.beneficiary_notes.map(note => ({
+  id: note.id,
+  title: note.title,
+  content: note.description,
+  author: note.created_by.name,
+  author_id: note.created_by.id,
+  date: note.created_at,
+  priority: note.priority
+})))
 
-// Latest Evaluations
 const latestEvaluations = ref([
   {
     id: 1,
@@ -118,6 +110,12 @@ const activeTab = computed({
     })
   }
 })
+const interventions = computed(() => {
+  if (!data.value)
+    return []
+  const interventions = data.value.intervention_enrollment.map(x => x.intervention)
+  return interventions
+})
 
 const enrollmentTabs = ref([
   {
@@ -125,38 +123,16 @@ const enrollmentTabs = ref([
     value: 'current' as const,
     slot: 'current' as const,
     label: 'Current Enrollments',
-    data: [
-      {
-        id: 1,
-        course: 'Advanced Mathematics',
-        instructor: 'Mr. Davis',
-        period: '2nd Period',
-        room: 'Room 201',
-        startDate: '2024-01-15',
-        credits: 4,
-        status: 'Active'
-      },
-      {
-        id: 2,
-        course: 'Biology',
-        instructor: 'Mrs. Johnson',
-        period: '4th Period',
-        room: 'Lab 103',
-        startDate: '2024-01-15',
-        credits: 3,
-        status: 'Active'
-      },
-      {
-        id: 3,
-        course: 'English Literature',
-        instructor: 'Ms. Williams',
-        period: '1st Period',
-        room: 'Room 105',
-        startDate: '2024-01-15',
-        credits: 3,
-        status: 'Active'
-      }
-    ]
+    data: interventions.value.map(intervention => ({
+      id: intervention.id,
+      course: intervention.name,
+      startDate: intervention.start_date,
+      status: intervention.status === 'active' ? 'Active' : 'Inactive',
+      instructor: 'Mr. Batata',
+      period: '2nd Period',
+      room: 'Room 201',
+      credits: 4
+    }))
   },
   {
     key: 'previous' as const,
@@ -257,10 +233,6 @@ const updateAvatar = () => {
 const editProfile = () => {
   window.alert('Profile editing functionality would be implemented here')
 }
-
-const addNote = () => {
-  window.alert('Add note functionality would be implemented here')
-}
 </script>
 
 <template>
@@ -272,7 +244,7 @@ const addNote = () => {
           <h1 class="text-3xl font-bold  mb-2">
             Student Profile
           </h1>
-          <p class="text-gray-600">
+          <p class="text-gray-500">
             Manage student information and track academic progress
           </p>
         </div>
@@ -299,7 +271,7 @@ const addNote = () => {
                 <div class="flex flex-col items-center">
                   <div class="relative">
                     <UAvatar
-                      :src="profileData.avatar"
+                      :src="profileData.avatar ?? ''"
                       :alt="profileData.name"
                       size="3xl"
                       class="ring-4 ring-blue-100"
@@ -328,15 +300,22 @@ const addNote = () => {
                 <!-- Profile Details -->
                 <div class="space-y-4">
                   <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                    <span class="text-sm font-medium text-gray-600">Gender</span>
+                    <span class="text-sm font-medium text-gray-500">Gender</span>
                     <span class="text-sm ">{{ profileData.gender }}</span>
                   </div>
                   <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                    <span class="text-sm font-medium text-gray-600">Birthday</span>
-                    <span class="text-sm ">{{ formatDate(profileData.birthday) }}</span>
+                    <span class="text-sm font-medium text-gray-500">Role</span>
+                    <span class="text-sm ">{{ profileData.role }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-sm font-medium text-gray-500">Birthday</span>
+                    <span
+                      v-if="profileData.birthday"
+                      class="text-sm"
+                    >{{ formatDate(profileData.birthday) }}</span>
                   </div>
                   <div class="flex justify-between items-center py-2">
-                    <span class="text-sm font-medium text-gray-600">Student ID</span>
+                    <span class="text-sm font-medium text-gray-500">Student ID</span>
                     <span class="text-sm ">{{ profileData.studentId }}</span>
                   </div>
                 </div>
@@ -359,22 +338,46 @@ const addNote = () => {
             <!-- Emergency Contact Information -->
             <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
               <template #header>
-                <div class="flex items-center gap-3">
-                  <UIcon
-                    name="i-heroicons-phone"
-                    class="text-red-600 text-xl"
+                <div class="flex justify-between">
+                  <div class="flex items-center gap-3">
+                    <UIcon
+                      name="i-heroicons-phone"
+                      class="text-red-600 text-xl"
+                    />
+                    <h2 class="text-lg font-semibold ">
+                      Emergency Contact
+                    </h2>
+                  </div>
+                  <ModalCreateProfileEmergencyContact
+                    :beneficiary-id="id"
+                    @emergency-contact-added="refresh"
                   />
-                  <h2 class="text-lg font-semibold ">
-                    Emergency Contact
-                  </h2>
                 </div>
               </template>
-
-              <div class="space-y-4">
+              <div
+                v-if="!emergencyContacts || emergencyContacts.length === 0"
+              >
+                <div class="text-center">
+                  <Icon
+                    name="i-heroicons-phone"
+                    class="text-red-600 text-xl rounded-full"
+                  />
+                </div>
+                <p class="text-center text-xl font-bold text-gray-500">
+                  No Emergency Contacts
+                </p>
+                <p class="text-center text-sm text-gray-500">
+                  Start by adding an emergency contact
+                </p>
+              </div>
+              <div
+                v-else
+                class="space-y-4"
+              >
                 <div
                   v-for="contact in emergencyContacts"
                   :key="contact.id"
-                  class="p-4 rounded-lg"
+                  class="p-4 rounded-lg bg-accented"
                 >
                   <div class="flex justify-between items-start mb-2">
                     <h4 class="font-medium ">
@@ -383,12 +386,12 @@ const addNote = () => {
                     <UBadge
                       color="primary"
                       variant="subtle"
-                      size="xs"
+                      size="md"
                     >
                       {{ contact.relationship }}
                     </UBadge>
                   </div>
-                  <div class="space-y-1 text-sm text-gray-600">
+                  <div class="space-y-1 text-sm text-gray-500">
                     <div class="flex items-center gap-2">
                       <UIcon
                         name="i-heroicons-phone"
@@ -403,6 +406,13 @@ const addNote = () => {
                       />
                       <span>{{ contact.email }}</span>
                     </div>
+                    <UBadge
+                      v-if="contact.is_primary"
+
+                      size="md"
+                    >
+                      Primary Contact
+                    </UBadge>
                   </div>
                 </div>
               </div>
@@ -417,7 +427,7 @@ const addNote = () => {
                     class="text-green-600 text-xl"
                   />
                   <h2 class="text-lg font-semibold ">
-                    Siblings
+                    Family Members
                   </h2>
                 </div>
               </template>
@@ -426,10 +436,10 @@ const addNote = () => {
                 <div
                   v-for="sibling in siblings"
                   :key="sibling.id"
-                  class="flex items-center gap-3 p-3 rounded-lg"
+                  class="flex items-center gap-3 p-3 rounded-lg bg-accented"
                 >
                   <UAvatar
-                    :src="sibling.avatar"
+                    :src="sibling.avatar || undefined"
                     :alt="sibling.name"
                     size="sm"
                   />
@@ -437,7 +447,7 @@ const addNote = () => {
                     <p class="font-medium  text-sm">
                       {{ sibling.name }}
                     </p>
-                    <p class="text-xs text-gray-600">
+                    <p class="text-xs text-gray-500">
                       {{ sibling.relationship }} • Grade {{ sibling.grade }}
                     </p>
                   </div>
@@ -465,29 +475,39 @@ const addNote = () => {
                       class="text-purple-600 text-xl"
                     />
                     <h2 class="text-lg font-semibold ">
-                      Student Notes
+                      Notes
                     </h2>
                   </div>
-                  <UButton
-                    color="neutral"
-                    variant="outline"
-                    size="sm"
-                    @click="addNote"
-                  >
-                    <UIcon
-                      name="i-heroicons-plus"
-                      class="mr-2"
-                    />
-                    Add Note
-                  </UButton>
+                  <ModalCreateProfileNote
+                    :beneficiary-id="id"
+                    @note-added="refresh"
+                  />
                 </div>
               </template>
-
-              <div class="space-y-4">
+              <div
+                v-if="!studentNotes || studentNotes.length === 0"
+              >
+                <div class="text-center">
+                  <Icon
+                    name="i-heroicons-document-text"
+                    class="text-purple-600 text-xl rounded-full"
+                  />
+                </div>
+                <p class="text-center text-xl font-bold text-gray-500">
+                  No Notes Found
+                </p>
+                <p class="text-center text-sm text-gray-500">
+                  Start by adding a note
+                </p>
+              </div>
+              <div
+                v-else
+                class="space-y-4"
+              >
                 <div
                   v-for="note in studentNotes"
                   :key="note.id"
-                  class="p-4 rounded-lg"
+                  class="p-4 rounded-lg bg-accented"
                 >
                   <div class="flex justify-between items-start mb-2">
                     <h4 class="font-medium ">
@@ -495,11 +515,13 @@ const addNote = () => {
                     </h4>
                     <span class="text-xs text-gray-500">{{ formatDate(note.date) }}</span>
                   </div>
-                  <p class="text-sm text-gray-700 mb-2">
+                  <p class="text-sm text-gray-500 mb-2">
                     {{ note.content }}
                   </p>
                   <div class="flex justify-between items-center">
-                    <span class="text-xs text-gray-500">By {{ note.author }}</span>
+                    <NuxtLink :to="`/admin/organization/user/${note.author_id}`">
+                      <span class="text-xs text-gray-500">By {{ note.author }}</span>
+                    </NuxtLink>
                     <UBadge
                       :color="note.priority === 'High' ? 'error' : note.priority === 'Medium' ? 'warning' : 'success'"
                       variant="subtle"
@@ -530,14 +552,14 @@ const addNote = () => {
                 <div
                   v-for="evaluation in latestEvaluations"
                   :key="evaluation.id"
-                  class="p-4 rounded-lg"
+                  class="p-4 rounded-lg bg-accented"
                 >
                   <div class="flex justify-between items-start mb-3">
                     <div>
                       <h4 class="font-medium ">
                         {{ evaluation.subject }}
                       </h4>
-                      <p class="text-sm text-gray-600">
+                      <p class="text-sm text-gray-500">
                         {{ evaluation.type }}
                       </p>
                     </div>
@@ -553,7 +575,7 @@ const addNote = () => {
                       </p>
                     </div>
                   </div>
-                  <p class="text-sm text-gray-700">
+                  <p class="text-sm text-gray-500">
                     {{ evaluation.comments }}
                   </p>
                 </div>
@@ -583,14 +605,14 @@ const addNote = () => {
                     <div
                       v-for="enrollment in item.data"
                       :key="enrollment.id"
-                      class="p-4 rounded-lg"
+                      class="p-4 rounded-lg bg-accented"
                     >
                       <div class="flex justify-between items-start mb-2">
                         <div>
                           <h4 class="font-medium ">
                             {{ enrollment.course }}
                           </h4>
-                          <p class="text-sm text-gray-600">
+                          <p class="text-sm text-gray-500">
                             {{ enrollment.instructor }}
                           </p>
                         </div>
@@ -601,7 +623,7 @@ const addNote = () => {
                           {{ enrollment.status }}
                         </UBadge>
                       </div>
-                      <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                      <div class="grid grid-cols-2 gap-4 text-sm text-gray-500">
                         <div>
                           <span class="font-medium">Period:</span> {{ enrollment.period }}
                         </div>
@@ -609,7 +631,7 @@ const addNote = () => {
                           <span class="font-medium">Room:</span> {{ enrollment.room }}
                         </div>
                         <div>
-                          <span class="font-medium">Start Date:</span> {{ formatDate(enrollment.startDate) }}
+                          <span class="font-medium">Start Date:</span> {{ formatDate(String(enrollment.startDate)) }}
                         </div>
                         <div>
                           <span class="font-medium">Credits:</span> {{ enrollment.credits }}
@@ -624,14 +646,14 @@ const addNote = () => {
                     <div
                       v-for="enrollment in item.data"
                       :key="enrollment.id"
-                      class="p-4 rounded-lg"
+                      class="p-4 rounded-lg bg-accented"
                     >
                       <div class="flex justify-between items-start mb-2">
                         <div>
                           <h4 class="font-medium ">
                             {{ enrollment.course }}
                           </h4>
-                          <p class="text-sm text-gray-600">
+                          <p class="text-sm text-gray-500">
                             {{ enrollment.instructor }}
                           </p>
                         </div>
@@ -650,7 +672,7 @@ const addNote = () => {
                           </div>
                         </div>
                       </div>
-                      <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                      <div class="grid grid-cols-2 gap-4 text-sm text-gray-500">
                         <div>
                           <span class="font-medium">Period:</span> {{ enrollment.period }}
                         </div>
@@ -713,7 +735,7 @@ const addNote = () => {
                     <div class="text-2xl font-bold text-green-600">
                       {{ attendanceStats.attendanceRate }}%
                     </div>
-                    <div class="text-xs text-gray-600">
+                    <div class="text-xs text-gray-500">
                       Attendance Rate
                     </div>
                   </div>
@@ -721,7 +743,7 @@ const addNote = () => {
                     <div class="text-2xl font-bold text-blue-600">
                       {{ attendanceStats.totalDays }}
                     </div>
-                    <div class="text-xs text-gray-600">
+                    <div class="text-xs text-gray-500">
                       Total Days
                     </div>
                   </div>
@@ -729,7 +751,7 @@ const addNote = () => {
                     <div class="text-2xl font-bold text-purple-600">
                       {{ attendanceStats.streak }}
                     </div>
-                    <div class="text-xs text-gray-600">
+                    <div class="text-xs text-gray-500">
                       Current Streak
                     </div>
                   </div>
@@ -744,13 +766,13 @@ const addNote = () => {
                     <div
                       v-for="record in attendanceHistory"
                       :key="record.id"
-                      class="flex justify-between items-center p-3 rounded-lg"
+                      class="flex justify-between items-center p-3 rounded-lg bg-accented"
                     >
                       <div>
                         <p class="font-medium ">
                           {{ formatDate(record.date) }}
                         </p>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm text-gray-500">
                           {{ record.course }}
                         </p>
                       </div>

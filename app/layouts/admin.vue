@@ -2,7 +2,6 @@
 <i18n src="./menu/i18n.json"></i18n>
 
 <script setup lang="ts">
-import ModalCreateProgram from './components/ModalCreateProgram.vue'
 import SearchPalette from './components/SearchPalette.vue'
 import { getMenus } from './menu'
 
@@ -103,13 +102,7 @@ if (import.meta.client) {
           :collapsed="isCollapsed"
           orientation="vertical"
           class="data-[orientation=vertical]:w-full flex-1 overflow-y-auto"
-        >
-          <template #add>
-            <ClientOnly>
-              <ModalCreateProgram />
-            </ClientOnly>
-          </template>
-        </UNavigationMenu>
+        />
         <div class="flex flex-col pl-1 pr-2">
           <USeparator />
           <UTooltip
@@ -179,11 +172,7 @@ if (import.meta.client) {
                   orientation="vertical"
                   :items="menus"
                   class="data-[orientation=vertical]:w-full"
-                >
-                  <template #add>
-                    <ModalCreateProgram />
-                  </template>
-                </UNavigationMenu>
+                />
               </div>
             </template>
           </UDrawer>

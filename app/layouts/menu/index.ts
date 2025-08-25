@@ -7,16 +7,13 @@ function programListToMenu(
   localePath: LocalePathFunction,
   programsList: Program[] | undefined
 ): NavigationMenuItem[] {
-  if (!programsList) {
-    return [{ slot: 'add' }]
-  }
+  if (!programsList)
+    return []
 
   const menu = programsList.map((x) => {
     const navigationItem: NavigationMenuItem = { label: x.name, to: localePath(`/admin/programs/${x.id}`) }
     return navigationItem
   })
-  const addSlot: NavigationMenuItem = { slot: 'add' as const }
-  menu.push(addSlot)
 
   return menu
 }

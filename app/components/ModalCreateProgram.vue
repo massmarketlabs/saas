@@ -6,7 +6,6 @@ const form = useTemplateRef('form')
 const isOpen = ref(false)
 const isLoading = ref(false)
 const state = reactive<Partial<RequestCreateProgram>>({})
-// const programStore = useProgramStore()
 const { refresh } = await useProgramList()
 const toast = useToast()
 

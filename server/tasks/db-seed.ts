@@ -50,6 +50,12 @@ export default defineTask({
               id: f.valuesFromArray({
                 isUnique: true,
                 values: Array.from({ length: 1000 }, () => uuidV4())
+              }),
+              name: f.fullName(),
+              email: f.email(),
+              phone: f.phoneNumber(),
+              relationship: f.valuesFromArray({
+                values: ['mother', 'father', 'sibling', 'friend', 'uncle', 'aunt']
               })
             }
           },
@@ -71,7 +77,8 @@ export default defineTask({
               name: f.fullName({ isUnique: true }),
               role: f.valuesFromArray({ values: ['admin', 'instructor', 'beneficiary'] }),
               dob: f.datetime(),
-              image: f.default({ defaultValue: null })
+              image: f.default({ defaultValue: null }),
+              gender: f.valuesFromArray({ values: ['male', 'female', 'other'] })
             }
           },
           programs: {
@@ -119,6 +126,14 @@ export default defineTask({
                 isUnique: true,
                 values: Array.from({ length: 1000 }, () => uuidV4())
               })
+            }
+          },
+          user_notes: {
+            count: 100,
+            columns: {
+              title: f.loremIpsum({ sentencesCount: 2 }),
+              description: f.loremIpsum({ sentencesCount: 5 }),
+              priority: f.valuesFromArray({ values: ['high', 'medium', 'low'] })
             }
           }
 

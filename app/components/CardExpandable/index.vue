@@ -1,9 +1,9 @@
 <!-- app/components/CardExpandable/index.vue -->
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 import { computed, ref } from 'vue'
 
 // Types
-interface CardExpandableProps<T = Record<string, any>> {
+interface CardExpandableProps<T> {
   title: string
   items: T[]
   headerIcon?: string
@@ -14,13 +14,13 @@ interface CardExpandableProps<T = Record<string, any>> {
   itemKeyPath?: string
 }
 
-interface CardExpandableSlots<T = Record<string, any>> {
+interface CardExpandableSlots<T> {
   'header-actions': () => any
   'empty-action': () => any
   'item': (props: { item: T, index: number }) => any
 }
 
-const props = withDefaults(defineProps<CardExpandableProps>(), {
+const props = withDefaults(defineProps<CardExpandableProps<T>>(), {
   headerIcon: 'i-lucide-list',
   emptyStateIcon: 'i-lucide-inbox',
   emptyStateTitle: 'No items yet',
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<CardExpandableProps>(), {
   itemKeyPath: 'id'
 })
 
-defineSlots<CardExpandableSlots>()
+defineSlots<CardExpandableSlots<T>>()
 
 // Reactive state
 const isExpanded = ref<boolean>(false)
@@ -56,7 +56,7 @@ const toggleExpanded = (): void => {
   isExpanded.value = !isExpanded.value
 }
 
-const getItemKey = (item: Record<string, any>, index: number): string | number => {
+const getItemKey = (item: T, index: number): string | number => {
   if (!item)
     return index
 

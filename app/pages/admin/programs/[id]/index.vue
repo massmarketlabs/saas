@@ -10,8 +10,9 @@ const { t } = useI18n()
 const route = useRoute()
 const id = route.params.id
 
-const requestFetch = useRequestFetch()
-const { data } = await useAsyncData(`program-${id}`, async () => await requestFetch(`/api/admin/programs/${id}`))
+const { data } = await useFetch(`/api/admin/programs/${id}`, { key: `program-${id}` })
+
+const { data: enrollments } = await useFetch(`/api/admin/programs/${id as ':id'}/enrollment`, { key: `program-enrollments-${id}` })
 
 useHead({ title: `Programs | ${data.value?.name}` })
 </script>
@@ -28,7 +29,7 @@ useHead({ title: `Programs | ${data.value?.name}` })
       />
     </template>
 
-    <div class="space-y-6">
+    <div class="space-y-6 max-w-7xl mx-auto">
       <!-- Program Header Card -->
       <UCard class="border-l-2 border-l-primary">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -91,16 +92,56 @@ useHead({ title: `Programs | ${data.value?.name}` })
         <!-- Left Column: Program Enrollment -->
         <div class="lg:col-span-2 space-y-6">
           <CardExpandable
-            :items="[]"
+            :items="enrollments ?? []"
             title="Active Enrollments"
-          />
+            icon="i-lucide-users"
+            header-icon="i-lucide-users"
+            empty-state-icon="i-lucide-users"
+            empty-state-title="No enrollments yet"
+            empty-state-description="Select an intervention to add beneficiaries"
+          >
+            <template #item="{ item }">
+              <div class="flex justify-between">
+                <div class="flex gap-2 items-center">
+                  <UAvatar
+                    size="sm"
+                    :src="item.image ?? ''"
+                    :alt="item.name"
+                  />
+
+                  <span>
+                    {{ item.name }}
+                  </span>
+                </div>
+
+                <UDropdownMenu
+                  :items="[
+                    { type: 'label', label: 'Actions' },
+                    { type: 'separator' },
+                    { type: 'link', label: 'View Profile', onSelect: async () => await navigateTo(`/admin/organization/user/${item.id}`) }
+                  ]"
+                >
+                  <UButton
+                    icon="i-lucide-ellipsis"
+                    class="text-gray-500"
+                    variant="ghost"
+                    square
+                    size="xs"
+                  />
+                </UDropdownMenu>
+              </div>
+            </template>
+          </CardExpandable>
         </div>
 
         <!-- Right Column: Terms and Interventions -->
-        <div class="space-y-6">
+        <div
+          v-if="data"
+          class="space-y-6"
+        >
           <!-- Interventions Section -->
           <CardExpandable
-            :items="data?.interventions ?? []"
+            :items="data.interventions"
             title="Interventions"
             header-icon="i-lucide-zap"
             empty-state-icon="i-lucide-zap"
@@ -145,7 +186,7 @@ useHead({ title: `Programs | ${data.value?.name}` })
                       {
                         label: 'View',
                         icon: 'i-lucide-eye',
-                        onSelect: async () => await navigateTo(`/admin/programs/${interventionItem.item.program_id}/intervention/${interventionItem.item.id}`)
+                        onSelect: async () => await navigateTo(localePath(`/admin/programs/${interventionItem.item.program_id}/intervention/${interventionItem.item.id}`))
                       }
                     ],
                     [
@@ -158,11 +199,11 @@ useHead({ title: `Programs | ${data.value?.name}` })
                   ]"
                 >
                   <UButton
-                    icon="i-lucide-more-horizontal"
+                    icon="i-lucide-ellipsis"
                     size="xs"
                     variant="ghost"
                     square
-                    class="text-white-500"
+                    class="text-gray-500"
                   />
                 </UDropdownMenu>
               </div>

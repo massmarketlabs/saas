@@ -55,7 +55,7 @@ const getActionItems = (row: Row<UserWithRole>) => {
     {
       label: t('global.page.view'),
       icon: 'i-lucide-eye',
-      onSelect: async () => await navigateTo(`/admin/profile/${user.id}`)
+      onSelect: async () => await navigateTo(`/admin/organization/user/${user.id}`)
     },
     {
       label: user.banned ? t('user.actions.unban') : t('user.actions.ban'),

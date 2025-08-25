@@ -30,9 +30,8 @@ const profileMenuItems: DropdownMenuItem[] = [
         class="flex items-center gap-2"
       >
         <UAvatar
-          v-if="user?.image"
-          :src="user.image"
-          :alt="user.name"
+          :src="user?.image ?? ''"
+          :alt="user?.name"
           size="sm"
         />
         <span>

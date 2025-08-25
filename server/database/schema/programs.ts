@@ -5,6 +5,7 @@ import { user } from './auth'
 
 import { program_status_enum } from './enums'
 import { audit_fields } from './shared'
+import { emergency_contacts, relationships } from './user'
 
 // ========================
 // Programs
@@ -66,6 +67,17 @@ export const evaluation = pgTable('evaluation', {
   ...audit_fields
 })
 
+export const user_notes = pgTable('user_notes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  priority: text('priority').notNull(),
+  created_by: text('created_by').references(() => user.id).notNull(),
+  beneficiary_id: text('beneficiary_id').references(() => user.id).notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id),
+  ...audit_fields
+})
+
 // ========================
 // Relations
 // ========================
@@ -109,6 +121,23 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
 }))
 
 // ========================
+// User Relations
+// ========================
+export const relations_user = relations(user, ({ many }) => ({
+  intervention_enrollment: many(intervention_enrollment),
+  created_interventions: many(interventions),
+  emergency_contacts: many(emergency_contacts),
+  beneficiary_notes: many(user_notes, { relationName: 'beneficiary_notes' }),
+  created_notes: many(user_notes, { relationName: 'created_notes' }),
+  relationship_user: many(relationships, { relationName: 'user_user_id' }),
+  relationship_related_user: many(relationships, { relationName: 'related_user_user_id' })
+  // instructed_meetings: many(meeting_schedule),
+  // attendance_records: many(attendance),
+  // marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
+  // attendance_reminders: many(attendance_reminders)
+}))
+
+// ========================
 // Intervention Enrollment Relations
 // ========================
 export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one }) => ({
@@ -133,15 +162,20 @@ export const relations_evaluation = relations(evaluation, ({ one }) => ({
   })
 }))
 
-// ========================
-// User Relations
-// ========================
-export const relations_user = relations(user, ({ many }) => ({
-  // program_enrollment: many(program_enrollment),
-  intervention_enrollment: many(intervention_enrollment),
-  created_interventions: many(interventions)
-  // instructed_meetings: many(meeting_schedule),
-  // attendance_records: many(attendance),
-  // marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
-  // attendance_reminders: many(attendance_reminders)
+export const relations_user_notes = relations(user_notes, ({ one }) => ({
+  intervention: one(interventions, {
+    fields: [user_notes.intervention_id],
+    references: [interventions.id],
+    relationName: 'created_notes'
+
+  }),
+  created_by: one(user, {
+    fields: [user_notes.created_by],
+    references: [user.id]
+  }),
+  beneficiary: one(user, {
+    fields: [user_notes.beneficiary_id],
+    references: [user.id],
+    relationName: 'beneficiary_notes'
+  })
 }))
