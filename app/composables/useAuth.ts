@@ -85,7 +85,7 @@ export function useAuth() {
             clearNuxtState([
               'auth:session',
               'auth:user',
-              'auth:sessionFetching' // Consider clearing this too
+              'auth:sessionFetching'
             ])
             if (redirectTo) {
               await navigateTo(redirectTo)

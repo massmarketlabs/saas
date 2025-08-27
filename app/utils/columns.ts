@@ -42,9 +42,10 @@ export const yesNoColumn = <T>(cell: ColumnCell<T>, t: TranFunction) => {
   return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () => value ? t('yes') : t('no'))
 }
 
-export const avatarColumn = <T>(cell: ColumnCell<T>) => {
+export const avatarColumn = <T>(cell: ColumnCell<T & { name?: string }>) => {
   const value = cell.getValue() as string
-  return h(UAvatar, { src: value })
+  const name = cell.row.original?.name
+  return h(UAvatar, { src: value, alt: name })
 }
 
 export const isEnabledColumn = <T>(cell: ColumnCell<T>, t: TranFunction) => {

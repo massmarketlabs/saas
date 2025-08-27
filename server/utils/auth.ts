@@ -52,6 +52,7 @@ const createBetterAuth = () => betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    disableSignUp: true, // NOTE: removing this will allow for sign up,
     sendResetPassword: async ({ user, url }) => {
       const response = await resendInstance.emails.send({
         from: `${runtimeConfig.public.appName} <${runtimeConfig.public.appNotifyEmail}>`,

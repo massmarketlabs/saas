@@ -20,7 +20,14 @@
       "form": {
         "email": "Email",
         "password": "Password",
-        "role": "Role"
+        "role": "Role",
+        "dob": "Date of Birth",
+        "gender": {
+          "label": "Gender",
+          "male": "Male",
+          "female": "Female",
+          "other": "Other"
+        }
       },
       "validation": {
         "nameMin": "Name must be at least {n} characters",
@@ -71,7 +78,14 @@
       "form": {
         "email": "البريد الإلكتروني",
         "password": "كلمة المرور",
-        "role": "الدور"
+        "role": "الدور",
+        "dob": "تاريخ الميلاد",
+        "gender": {
+          "label": "جنس",
+          "male": "ذكر",
+          "female": "أنثى",
+          "other": "آخر"
+        }
       },
       "validation": {
         "nameMin": "يجب أن يكون الاسم {n} أحرف على الأقل",

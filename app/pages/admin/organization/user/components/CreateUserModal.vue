@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type { CalendarDate } from '@internationalized/date'
+import { getLocalTimeZone } from '@internationalized/date'
+import { z } from 'zod/v4'
+
 const { t } = defineProps<{
   t: TranFunction
 }>()
@@ -9,34 +13,62 @@ const emit = defineEmits<{
 }>()
 
 const open = defineModel('open', { default: false })
+
+const toast = useToast()
 const { client } = useAuth()
 
 const schema = z.object({
   name: z.string().min(4, t('user.validation.nameMin', { n: 4 })),
   email: z.email(t('user.validation.emailInvalid')),
   password: z.string().min(8, t('user.validation.passwordMin', { n: 8 })),
-  role: z.enum(['beneficiary', 'instructor', 'admin'])
+  role: z.enum(['beneficiary', 'instructor', 'admin']),
+  dob: z.custom<CalendarDate | null>().refine(x => x?.toDate('utc') instanceof Date, 'Invalid date'),
+  gender: z.enum(['female', 'male', 'other'])
 })
-type Schema = zodOutput<typeof schema>
 
-const state = reactive({
+type Schema = z.output<typeof schema>
+
+const state = shallowReactive({
   name: '',
   email: '',
   password: '',
-  role: 'beneficiary' as const
+  role: 'beneficiary' as const,
+  dob: null,
+  gender: 'other' as const
 })
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
-  const res = await client.admin.createUser({
+  const d = data.dob?.toDate(getLocalTimeZone()).toISOString()
+
+  const payload = {
     name: data.name,
     email: data.email,
     password: data.password,
-    role: data.role
-  })
-  if (res) {
-    open.value = false
-    emit('created')
+    role: data.role,
+    data: {
+      dob: d,
+      gender: data.gender
+
+    }
   }
+
+  const res = await client.admin.createUser(payload)
+
+  if (res.error) {
+    toast.add({
+      color: 'error',
+      title: res.error?.message,
+      description: res.error?.code
+    })
+    return
+  }
+
+  open.value = false
+  emit('created')
+  toast.add({
+    color: 'success',
+    title: `${res.data.user.name} created.`
+  })
 }
 
 const onCancel = () => {
@@ -100,6 +132,31 @@ const onCancel = () => {
               { label: t('user.roles.beneficiary'), value: 'beneficiary' },
               { label: t('user.roles.instructor'), value: 'instructor' },
               { label: t('user.roles.admin'), value: 'admin' }
+            ]"
+          />
+        </UFormField>
+
+        <UFormField
+          :label="t('user.form.dob')"
+          name="dob"
+        >
+          <DatePicker
+            v-model="state.dob"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField
+          :label="t('user.form.gender.label')"
+          name="gender"
+        >
+          <USelect
+            v-model="state.gender"
+            class="w-full"
+            :items="[
+              { label: t('user.form.gender.male'), value: 'male' },
+              { label: t('user.form.gender.female'), value: 'female' },
+              { label: t('user.form.gender.other'), value: 'other' }
             ]"
           />
         </UFormField>

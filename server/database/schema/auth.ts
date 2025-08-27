@@ -23,7 +23,7 @@ export const user = pgTable('user', {
   banned: boolean('banned'),
   banReason: text('ban_reason'),
   banExpires: timestamp('ban_expires'),
-  dob: timestamp('dob'),
+  dob: timestamp('dob', { mode: 'string' }),
   gender: text('gender')
 })
 
