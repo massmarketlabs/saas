@@ -3,7 +3,8 @@ import { adminAc, defaultStatements } from 'better-auth/plugins/admin/access'
 
 export const statement = {
   ...defaultStatements,
-  assignment: ['create', 'read', 'update', 'delete']
+  assignment: ['create', 'read', 'update', 'delete'],
+  administration: ['full']
 } as const
 
 export const ac = createAccessControl(statement)
@@ -13,7 +14,8 @@ export const beneficiary = ac.newRole({
 })
 
 export const admin = ac.newRole({
-  ...adminAc.statements
+  ...adminAc.statements,
+  administration: ['full']
 })
 
 export const instructor = ac.newRole({

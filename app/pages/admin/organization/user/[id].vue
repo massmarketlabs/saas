@@ -1,7 +1,6 @@
 <!-- eslint-disable no-alert -->
 <script lang="ts" setup>
 import { ref } from 'vue'
-import ModalCreateProfileEmergencyContact from '~/components/ModalCreateProfileEmergencyContact.vue'
 
 definePageMeta({
   layout: false
@@ -18,7 +17,7 @@ useHead({
 })
 
 // Profile Data
-const profileData = ref({
+const profileData = computed(() => ({
   studentId: data.value?.id,
   name: data.value?.name,
   gender: data.value?.gender,
@@ -26,7 +25,7 @@ const profileData = ref({
   birthday: data.value?.dob,
   status: data.value?.banned ? 'Banned' : 'Active',
   role: data.value?.role
-})
+}))
 
 // Emergency Contacts
 const emergencyContacts = computed(() => {
@@ -229,10 +228,6 @@ const getGradeColor = (grade: string) => {
 const updateAvatar = () => {
   window.alert('Avatar update functionality would be implemented here')
 }
-
-const editProfile = () => {
-  window.alert('Profile editing functionality would be implemented here')
-}
 </script>
 
 <template>
@@ -303,7 +298,7 @@ const editProfile = () => {
                   <span class="text-sm ">{{ profileData.gender }}</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Role</span>
+                  <span class="text-sm font-medium text-gray-500">Role(s)</span>
                   <span class="text-sm ">{{ profileData.role }}</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
@@ -318,19 +313,10 @@ const editProfile = () => {
                   <span class="text-sm ">{{ profileData.studentId }}</span>
                 </div>
               </div>
-
-              <UButton
-                color="primary"
-                variant="outline"
-                block
-                @click="editProfile"
-              >
-                <UIcon
-                  name="i-heroicons-pencil-square"
-                  class="mr-2"
-                />
-                Edit Profile
-              </UButton>
+              <ModalEditProfile
+                :profile="data"
+                @update-profile="refresh"
+              />
             </div>
           </UCard>
 

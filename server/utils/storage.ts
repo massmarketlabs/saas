@@ -3,10 +3,9 @@ import { runtimeConfig } from './runtimeConfig'
 
 export const s3Client = new S3Client({
   region: 'auto',
-  endpoint: runtimeConfig.r2_endpoint,
+  endpoint: runtimeConfig.s3_endpoint,
   credentials: {
-    accessKeyId: runtimeConfig.r2_access_key_id,
-    secretAccessKey: runtimeConfig.r2_secret_access_key
-
+    accessKeyId: runtimeConfig.s3_access_key_id,
+    secretAccessKey: runtimeConfig.s3_secret_key
   }
 })

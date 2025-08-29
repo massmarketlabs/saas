@@ -39,6 +39,7 @@ export function useAuth() {
 
   const session = useState<InferSessionFromClient<ClientOptions> | null>('auth:session', () => null)
   const user = useState<UserWithRole | null>('auth:user', () => null)
+  const isAdmin = useState('auth:isAdmin', () => false)
   // const subscriptions = useState<Subscription[]>('auth:subscriptions', () => [])
   const sessionFetching = import.meta.server ? ref(false) : useState('auth:sessionFetching', () => false)
 
@@ -58,6 +59,11 @@ export function useAuth() {
       } else {
         session.value = sessionReq.data.value?.session || null
         user.value = sessionReq.data.value?.user ? { ...sessionReq.data.value.user, role: sessionReq.data.value.user.role ?? undefined } : null
+
+        const adminStatus = await client.admin.hasPermission({ userId: user.value?.id, permission: { administration: ['full'] } })
+        if (adminStatus.data?.success) {
+          isAdmin.value = true
+        }
       }
 
       // if (user.value) {
@@ -119,6 +125,7 @@ export function useAuth() {
   return {
     session,
     user,
+    isAdmin,
     // subscription: client.subscription,
     // subscriptions,
     loggedIn: computed(() => !!session.value),

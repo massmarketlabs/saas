@@ -1,13 +1,13 @@
 <!-- components/DatePicker.vue -->
 <script setup lang="ts">
-import type { CalendarDate } from '@internationalized/date'
-import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
+import type { ZonedDateTime } from '@internationalized/date'
+import { DateFormatter } from '@internationalized/date'
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'medium'
 })
 
-const modelValue = defineModel<CalendarDate | null>({
+const modelValue = defineModel<ZonedDateTime | null>({
   default: null
 })
 </script>
@@ -15,11 +15,11 @@ const modelValue = defineModel<CalendarDate | null>({
 <template>
   <UPopover>
     <UButton
+      variant="outline"
       color="neutral"
-      variant="subtle"
       icon="i-lucide-calendar"
     >
-      {{ modelValue ? df.format(modelValue.toDate(getLocalTimeZone())) : 'Select a date' }}
+      {{ modelValue ? df.format(modelValue.toDate()) : 'Select a date' }}
     </UButton>
     <template #content>
       <UCalendar

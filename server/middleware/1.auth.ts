@@ -1,12 +1,21 @@
-import type { UserWithRole } from 'better-auth/plugins'
-import { requireAuth } from '~~/server/utils/auth'
-
 export default defineEventHandler(async (event) => {
   const path = event.path
 
   if (path?.startsWith('/api/admin')) {
-    const session = await requireAuth(event)
-    if (!session.user || (session.user as UserWithRole).role !== 'admin') {
+    const __session = await requireAuth(event)
+    const auth = useServerAuth()
+
+    // console.log('1.auth.ts', session.user.id)
+
+    const hasPermission = await auth.api.userHasPermission({
+      headers: event.headers,
+      body: {
+        role: 'admin',
+        permissions: { administration: ['full'] }
+      }
+    })
+
+    if (!hasPermission.success || hasPermission.error) {
       throw createError({
         statusCode: 403,
         statusMessage: 'Forbidden',

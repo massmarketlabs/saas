@@ -3,7 +3,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const localePath = useLocalePath()
 const { t } = useI18n()
-const { user, loggedIn, signOut, sessionFetching } = useAuth()
+const { user, loggedIn, signOut, sessionFetching, isAdmin } = useAuth()
 
 const profileMenuItems: DropdownMenuItem[] = [
   {
@@ -17,6 +17,8 @@ const profileMenuItems: DropdownMenuItem[] = [
     onSelect: async () => await signOut({ redirectTo: localePath('/signin') })
   }
 ]
+
+console.log({ isAdmin: isAdmin.value })
 </script>
 
 <template>
@@ -44,7 +46,7 @@ const profileMenuItems: DropdownMenuItem[] = [
       </UButton>
     </UDropdownMenu>
     <UButton
-      v-if="user?.role === 'admin'"
+      v-if="isAdmin"
       variant="outline"
       color="neutral"
       class="flex items-center gap-2"

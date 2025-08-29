@@ -34,14 +34,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   const {
     loggedIn,
-    user
-    // fetchSession
+    client
   } = useAuth()
-  // console.log('middleware')
   const redirectOptions = useRuntimeConfig().public.auth
   const { only, redirectUserTo, redirectGuestTo } = defu(to.meta?.auth, redirectOptions)
-
-  // await fetchSession()
 
   const localePath = useLocalePath()
 
@@ -70,13 +66,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const routeBaseName = useRouteBaseName()
   const routeName = routeBaseName(to)
-  // console.log({ routeName })
+  // Admin Pages - Check if user has admin role and required permissions
+  if (String(routeName)?.startsWith('admin')) {
+    // If specific permissions are required, check them using checkRolePermission
+    const hasPermission = await client.admin.hasPermission({
+      permissions: { administration: ['full'] }
+    })
 
-  // Admin Pages
-  if (routeName?.startsWith('admin') && user.value?.role != 'admin') {
-    return navigateTo(localePath('/403'))
-  }
-  if (routeName == 'admin') {
-    return navigateTo(localePath('/admin/dashboard'))
+    if (!hasPermission.data?.success) {
+      return navigateTo(localePath('/403'))
+    }
   }
 })
