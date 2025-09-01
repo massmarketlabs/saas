@@ -17,8 +17,6 @@ const profileMenuItems: DropdownMenuItem[] = [
     onSelect: async () => await signOut({ redirectTo: localePath('/signin') })
   }
 ]
-
-console.log({ isAdmin: isAdmin.value })
 </script>
 
 <template>

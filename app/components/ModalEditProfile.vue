@@ -6,12 +6,29 @@ import { z } from 'zod/v4'
 
 const props = defineProps<{ profile: InternalApi['/api/admin/user/:id']['get'] | undefined }>()
 const emit = defineEmits(['updateProfile'])
-const form = useTemplateRef('update-profile')
 const toast = useToast()
+
+const newImageKey = ref(props.profile?.image ? props.profile.image : '')
+const form = useTemplateRef('update-profile')
+
 const schema = z.object({
   dob: z.custom<ZonedDateTime | null>().refine(x => x?.toDate(), 'Invalid date'),
+  image: z.file().optional().nullable(),
+  name: z.string(),
   gender: z.enum(['female', 'male', 'other']),
   role: z.array(z.enum(['admin', 'instructor', 'beneficiary']))
+})
+
+const { data: imageFile } = await useFetch(props.profile?.image ?? '', {
+  immediate: !!props.profile?.image,
+  method: 'get',
+  responseType: 'blob',
+  server: false,
+  transform: (b: Blob) => {
+    if (!b)
+      return null
+    return new File([b], 'avatar.jpeg', { type: b.type })
+  }
 })
 
 const roles = [{ label: 'Admin', value: 'admin' }, { label: 'Instructor', value: 'instructor' }, { label: 'Beneficiary', value: 'beneficiary' }]
@@ -28,6 +45,8 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
   await client.admin.updateUser({
     userId: props.profile.id,
     data: {
+      image: newImageKey.value === '' ? null : newImageKey.value,
+      name: data.data.name,
       dob,
       gender: data.data.gender,
       role: data.data.role.join(',')
@@ -35,7 +54,7 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
     fetchOptions: {
       onResponse: ({ response }) => {
         if (response.ok) {
-          toast.add({ color: 'success', title: 'Updated' })
+          toast.add({ color: 'success', title: 'Profile Updated' })
           emit('updateProfile')
         }
       },
@@ -48,9 +67,61 @@ const onSubmit = async (data: FormSubmitEvent<Schema>) => {
 }
 
 const state = shallowReactive<Partial<Schema>>({
+  image: null,
+  name: props.profile?.name,
   gender: props.profile?.gender as 'male' | 'female' | 'other' ?? 'unknown',
   dob: props.profile?.dob ? parseAbsoluteToLocal(new Date(props.profile?.dob).toISOString()) : null,
   role: props.profile?.role?.split(',') as []
+})
+
+const handleFileChange = async (payload: unknown) => {
+  const file = payload as File
+
+  if (!file) {
+    state.image = null
+    newImageKey.value = ''
+    return
+  }
+
+  try {
+    // Create FormData for file upload
+    const formData = new FormData()
+    formData.append('file', file)
+
+    // Upload file to S3 endpoint
+    const response = await useFetch('/api/admin/storage', {
+      method: 'POST',
+      body: formData
+    })
+
+    if (response.error.value || !response.data.value?.key) {
+      throw new Error(`Upload failed: ${response.error.value?.message}`)
+    }
+    newImageKey.value = response.data.value?.key
+
+    toast.add({
+      color: 'success',
+      title: 'Image uploaded successfully'
+    })
+  }
+  catch (error) {
+    console.error('Upload error:', error)
+
+    // Show error toast
+    toast.add({
+      color: 'error',
+      title: 'Failed to upload image',
+      description: error instanceof Error ? error.message : 'Unknown error'
+    })
+
+    // Reset the file input on error
+    state.image = null
+  }
+}
+
+watch(imageFile, () => {
+  if (imageFile)
+    state.image = imageFile.value
 })
 </script>
 
@@ -76,6 +147,30 @@ const state = shallowReactive<Partial<Schema>>({
         class="space-y-4"
         @submit="onSubmit"
       >
+        <UFormField
+          label="Image"
+          name="image"
+        >
+          <UFileUpload
+            v-model="state.image"
+            accept="image/*"
+            file-delete
+            icon="i-heroicons-camera"
+            size="lg"
+            color="primary"
+            class="w-24 h-24 rounded-full mx-auto"
+            @update:model-value="handleFileChange"
+          />
+        </UFormField>
+        <UFormField
+          label="Name"
+          name="name"
+        >
+          <UInput
+            v-model="state.name"
+            class="w-full"
+          />
+        </UFormField>
         <UFormField
           label="Date of Birth"
           name="dob"
@@ -115,7 +210,6 @@ const state = shallowReactive<Partial<Schema>>({
     <template #footer>
       <UButton
         label="Submit"
-
         @click="form?.submit"
       />
     </template>

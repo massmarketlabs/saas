@@ -105,7 +105,7 @@ const activeTab = computed({
     router.push({
       // path: '/components/tabs',
       query: { enrollments: tab }
-      // hash: '#control-active-item'
+      // hash: '#control-active-item'u
     })
   }
 })
@@ -224,10 +224,6 @@ const getGradeColor = (grade: string) => {
     return 'text-orange-600'
   return 'text-red-600'
 }
-
-const updateAvatar = () => {
-  window.alert('Avatar update functionality would be implemented here')
-}
 </script>
 
 <template>
@@ -263,22 +259,11 @@ const updateAvatar = () => {
             <div class="space-y-6">
               <!-- Avatar Section -->
               <div class="flex flex-col items-center">
-                <div class="relative">
-                  <UAvatar
-                    :src="profileData.avatar ?? ''"
-                    :alt="profileData.name"
-                    size="3xl"
-                    class="ring-4 ring-blue-100"
-                  />
-                  <UButton
-                    icon="i-heroicons-camera"
-                    size="sm"
-                    color="primary"
-                    variant="solid"
-                    class="absolute bottom-0 right-0 rounded-full"
-                    @click="updateAvatar"
-                  />
-                </div>
+                <UAvatar
+                  :src="profileData.avatar ?? ''"
+                  :alt="profileData.name"
+                  size="3xl"
+                />
                 <h3 class="text-xl font-semibold  mt-3">
                   {{ profileData.name }}
                 </h3>

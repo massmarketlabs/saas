@@ -1,3 +1,5 @@
+import { GetObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { dbQueries } from '~~/server/database'
 
 export default defineEventHandler(async (event) => {
@@ -12,6 +14,20 @@ export default defineEventHandler(async (event) => {
   if (!resp) {
     throw createError({ status: 404, message: `User ${id} not found.` })
   }
+  if (!resp.image) {
+    return resp
+  }
 
-  return resp
+  const S3_BUCKET_NAME = 'avatars'
+
+  const getObjectCommand = new GetObjectCommand({
+    Bucket: S3_BUCKET_NAME,
+    Key: resp.image
+  })
+
+  const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, {
+    expiresIn: 3600
+  })
+
+  return { ...resp, image: presignedUrl }
 })

@@ -118,6 +118,15 @@ const createBetterAuth = () => betterAuth({
     },
     updateAccountOnSignIn: true
   },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          return { data: { ...user, image: null } }
+        }
+      }
+    }
+  },
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       const ipAddress = ctx.getHeader('x-forwarded-for')
