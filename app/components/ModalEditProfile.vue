@@ -19,8 +19,8 @@ const schema = z.object({
   role: z.array(z.enum(['admin', 'instructor', 'beneficiary']))
 })
 
-const { data: imageFile } = await useFetch(props.profile?.image ?? '', {
-  immediate: !!props.profile?.image,
+const { data: imageFile } = await useFetch(props.profile?.imageUrl ?? '', {
+  immediate: !!props.profile?.imageUrl,
   method: 'get',
   responseType: 'blob',
   server: false,

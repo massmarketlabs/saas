@@ -21,7 +21,7 @@ const profileData = computed(() => ({
   studentId: data.value?.id,
   name: data.value?.name,
   gender: data.value?.gender,
-  avatar: data.value?.image,
+  avatar: data.value?.imageUrl,
   birthday: data.value?.dob,
   status: data.value?.banned ? 'Banned' : 'Active',
   role: data.value?.role

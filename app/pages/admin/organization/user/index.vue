@@ -1,6 +1,7 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
+import type { SelectItem } from '@nuxt/ui'
 import BanUserModal from './components/BanUserModal.vue'
 import CreateUserModal from './components/CreateUserModal.vue'
 
@@ -40,9 +41,45 @@ const filters: AdminTableFilter[] = reactive([
   }
 ])
 
+const fetchRoleCount = async (filter: FilterCondition[]) => {
+  const statusCount = await $fetch<ColumnCount[]>('/api/admin/count/user/role', {
+    query: {
+      filter: JSON.stringify(filter)
+    }
+  })
+  const roleFilter = filters[1] as FilterCheckbox
+  roleFilter.items.forEach((item) => {
+    const status = statusCount.find(status => status.column === item.id)
+    item.count = status ? status.count : 0
+  })
+}
+
+const fetchData: FetchDataFn<UserWithRole & { roles?: string[] }> = async ({ page, limit, sort, filter }) => {
+  await fetchRoleCount(filter)
+  const result = await $fetch<PageData<UserWithRole>>('/api/admin/user/list', {
+    query: {
+      page,
+      limit,
+      sort: JSON.stringify(sort.map((item) => {
+        return [item.field, item.order]
+      })),
+      filter: JSON.stringify(filter)
+    }
+  })
+
+  const transformed = result.data.map(d => ({
+    ...d,
+    roles: d.role?.split(',')
+  }))
+  return {
+    data: transformed,
+    total: result.total
+  }
+}
+
 const { refresh } = useAdminTable()
 
-const getActionItems = (row: Row<UserWithRole>) => {
+const getActionItems = (row: Row<UserWithRole & { roles?: string[] }>) => {
   const user = row.original
   return [
     {
@@ -93,17 +130,29 @@ const getActionItems = (row: Row<UserWithRole>) => {
   ]
 }
 
-const getRoleDropdownItems = (original: UserWithRole) => {
+const getRoleDropdownItems = (original: UserWithRole & { roles?: string[] }): SelectItem[] => {
   const roles = ['beneficiary', 'admin', 'instructor'] as const
   return roles.map((role) => {
     return {
       label: t(`user.roles.${role}`),
-      type: 'checkbox' as const,
-      checked: original.role === role,
-      onUpdateChecked: async () => {
+      value: role,
+      onSelect: async () => {
+        const payload = original.roles
+        if (!payload)
+          return
+        const index = payload.indexOf(role)
+
+        if (index === -1) {
+          payload.push(role)
+        } else {
+          payload.splice(index, 1)
+        }
+
+        console.log({ payload })
+
         const result = await client.admin.setRole({
           userId: original.id,
-          role
+          role: payload.join(',') as typeof roles[number]
         })
         if (result.data?.user) {
           refresh()
@@ -115,7 +164,7 @@ const getRoleDropdownItems = (original: UserWithRole) => {
   })
 }
 
-const columns: AdminTableColumn<UserWithRole>[] = [
+const columns: AdminTableColumn<UserWithRole & { roles?: string[] }>[] = [
   {
     accessorKey: 'id',
     header: 'ID'
@@ -151,37 +200,6 @@ const columns: AdminTableColumn<UserWithRole>[] = [
     cell: ({ row }) => actionColumn(row, getActionItems)
   }
 ]
-
-const fetchRoleCount = async (filter: FilterCondition[]) => {
-  const statusCount = await $fetch<ColumnCount[]>('/api/admin/count/user/role', {
-    query: {
-      filter: JSON.stringify(filter)
-    }
-  })
-  const roleFilter = filters[1] as FilterCheckbox
-  roleFilter.items.forEach((item) => {
-    const status = statusCount.find(status => status.column === item.id)
-    item.count = status ? status.count : 0
-  })
-}
-
-const fetchData: FetchDataFn<UserWithRole> = async ({ page, limit, sort, filter }) => {
-  await fetchRoleCount(filter)
-  const result = await $fetch<PageData<UserWithRole>>('/api/admin/user/list', {
-    query: {
-      page,
-      limit,
-      sort: JSON.stringify(sort.map((item) => {
-        return [item.field, item.order]
-      })),
-      filter: JSON.stringify(filter)
-    }
-  })
-  return {
-    data: result.data,
-    total: result.total
-  }
-}
 </script>
 
 <template>
@@ -203,20 +221,14 @@ const fetchData: FetchDataFn<UserWithRole> = async ({ page, limit, sort, filter 
       :fetch-data="fetchData"
     >
       <template #role-cell="{ row: { original } }">
-        <UDropdownMenu
+        <USelect
+          v-model="original.roles"
+          multiple
           :items="getRoleDropdownItems(original)"
+          size="xs"
+          class="w-full"
           arrow
-        >
-          <UButton
-            :color="original.role === 'admin' ? 'primary' : 'neutral'"
-            variant="outline"
-            size="xs"
-            icon="i-lucide-chevron-down"
-            trailing
-          >
-            {{ t(`user.roles.${original.role}`) }}
-          </UButton>
-        </UDropdownMenu>
+        />
       </template>
       <template #status-cell="{ row: { original } }">
         <UBadge

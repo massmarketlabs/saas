@@ -14,8 +14,9 @@ export default defineEventHandler(async (event) => {
   if (!resp) {
     throw createError({ status: 404, message: `User ${id} not found.` })
   }
+
   if (!resp.image) {
-    return resp
+    return { ...resp, imageUrl: null }
   }
 
   const S3_BUCKET_NAME = 'avatars'
@@ -28,6 +29,6 @@ export default defineEventHandler(async (event) => {
   const presignedUrl = await getSignedUrl(s3Client, getObjectCommand, {
     expiresIn: 3600
   })
-
-  return { ...resp, image: presignedUrl }
+  const rtn = { ...resp, imageUrl: presignedUrl }
+  return rtn
 })
