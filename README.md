@@ -120,8 +120,11 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## TODO
 
-- README
-
-- RBAC
-
-- Commands
+- [ ] Profile page needs:
+  - [ ] Family Members (C/R/U/D)
+  - [ ] Enrollments by active and previous
+  - [ ] Recent Assignments Completed
+  - [ ] Attendance History
+- [ ] Landing Page
+  - [ ] Intervention Selector and navigation
+- [ ] Remove sign up page
