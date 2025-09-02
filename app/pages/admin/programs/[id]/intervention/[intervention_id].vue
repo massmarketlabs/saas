@@ -302,7 +302,6 @@ const handleDownloadEnrollmentCSV = () => {
                     <UDropdownMenu
                       :items="[
                         [{ label: 'View Profile', icon: 'i-lucide-eye', onSelect: async () => await navigateTo(`/admin/organization/user/${beneficiary.user_id}`) }],
-                        [{ label: 'Edit', icon: 'i-lucide-edit' }],
                         [{ label: 'Remove', icon: 'i-lucide-trash-2', color: 'error', onSelect: () => handleSetConfirmationModal(beneficiary as Enrollment) }]
                       ]"
                     >
