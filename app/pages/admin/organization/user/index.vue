@@ -148,8 +148,6 @@ const getRoleDropdownItems = (original: UserWithRole & { roles?: string[] }): Se
           payload.splice(index, 1)
         }
 
-        console.log({ payload })
-
         const result = await client.admin.setRole({
           userId: original.id,
           role: payload.join(',') as typeof roles[number]

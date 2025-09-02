@@ -1,6 +1,8 @@
-<!-- eslint-disable no-alert -->
+<i18n src="./i18n.json"></i18n>
+
 <script lang="ts" setup>
 import { ref } from 'vue'
+import BanUserModal from './components/BanUserModal.vue'
 
 definePageMeta({
   layout: false
@@ -8,9 +10,14 @@ definePageMeta({
 
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
+const { t } = useI18n()
+const { client } = useAuth()
 
 const id = route.params.id as string
 const { data, refresh } = await useFetch(`/api/admin/user/${id as ':id'}`, { key: `profile-${id as ':id'}` })
+
+const isBanModalOpen = ref(false)
 
 useHead({
   title: `Profile | ${data.value?.name}`
@@ -19,11 +26,12 @@ useHead({
 // Profile Data
 const profileData = computed(() => ({
   studentId: data.value?.id,
+  email: data.value?.email,
   name: data.value?.name,
   gender: data.value?.gender,
   avatar: data.value?.imageUrl,
   birthday: data.value?.dob,
-  status: data.value?.banned ? 'Banned' : 'Active',
+  status: data.value?.banned ? 'Banned' : 'Active' as const,
   role: data.value?.role
 }))
 
@@ -267,17 +275,55 @@ const getGradeColor = (grade: string) => {
                 <h3 class="text-xl font-semibold  mt-3">
                   {{ profileData.name }}
                 </h3>
-                <UBadge
-                  :color="profileData.status === 'Active' ? 'success' : 'error'"
-                  variant="subtle"
-                  class="mt-1"
+                <UDropdownMenu
+                  :items="[{
+                    label: profileData.status === 'Active' ? 'Ban' : 'Unban',
+                    icon: 'i-lucide-ban',
+                    color: profileData.status === 'Active' ? 'error' : 'success',
+                    onSelect: async () => {
+                      if (profileData.status === 'Active') {
+                        isBanModalOpen = true
+                        return
+                      }
+
+                      await client.admin.unbanUser({ userId: id }, {
+                        onResponse: async ({ response }) => {
+                          if (response.ok) {
+                            toast.add({ color: 'success', title: 'Ban removed' })
+                            await refresh()
+                          }
+
+                        } })
+                    } }]"
                 >
-                  {{ profileData.status }}
-                </UBadge>
+                  <UBadge
+                    :color="profileData.status === 'Active' ? 'success' : 'error'"
+                    variant="subtle"
+                    class="mt-1"
+                    size="sm"
+                    trailing-icon="i-heroicons-chevron-down"
+                  >
+                    {{ profileData.status }}
+                  </UBadge>
+                </UDropdownMenu>
+                <BanUserModal
+                  v-model:open="isBanModalOpen"
+                  :user-id="id"
+                  :t="t"
+                  @banned="refresh"
+                />
               </div>
 
               <!-- Profile Details -->
               <div class="space-y-4">
+                <div class="flex justify-between items-center py-2">
+                  <span class="text-sm font-medium text-gray-500">ID</span>
+                  <span class="text-sm ">{{ profileData.studentId }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span class="text-sm font-medium text-gray-500">Email</span>
+                  <span class="text-sm ">{{ profileData.email }}</span>
+                </div>
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                   <span class="text-sm font-medium text-gray-500">Gender</span>
                   <span class="text-sm ">{{ profileData.gender }}</span>
@@ -292,10 +338,6 @@ const getGradeColor = (grade: string) => {
                     v-if="profileData.birthday"
                     class="text-sm"
                   >{{ formatDate(profileData.birthday) }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2">
-                  <span class="text-sm font-medium text-gray-500">Student ID</span>
-                  <span class="text-sm ">{{ profileData.studentId }}</span>
                 </div>
               </div>
               <ModalEditProfile
@@ -324,9 +366,7 @@ const getGradeColor = (grade: string) => {
                 />
               </div>
             </template>
-            <div
-              v-if="!emergencyContacts || emergencyContacts.length === 0"
-            >
+            <div v-if="!emergencyContacts || emergencyContacts.length === 0">
               <div class="text-center">
                 <Icon
                   name="i-heroicons-phone"
@@ -378,7 +418,6 @@ const getGradeColor = (grade: string) => {
                   </div>
                   <UBadge
                     v-if="contact.is_primary"
-
                     size="md"
                   >
                     Primary Contact
@@ -454,9 +493,7 @@ const getGradeColor = (grade: string) => {
                 />
               </div>
             </template>
-            <div
-              v-if="!studentNotes || studentNotes.length === 0"
-            >
+            <div v-if="!studentNotes || studentNotes.length === 0">
               <div class="text-center">
                 <Icon
                   name="i-heroicons-document-text"
