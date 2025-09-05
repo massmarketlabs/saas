@@ -1,6 +1,6 @@
 import type { SQL } from 'drizzle-orm'
 import type { PgColumn, PgSelect } from 'drizzle-orm/pg-core'
-import { and, eq, gte, ilike, inArray, lte } from 'drizzle-orm'
+import { and, eq, gte, ilike, inArray, lte, or } from 'drizzle-orm'
 import { z } from 'zod/v4'
 
 // utils
@@ -23,6 +23,11 @@ const filterItemSchema = z.union([
   z.object({
     col: z.string(),
     op: z.literal('eq'),
+    v: z.string()
+  }),
+  z.object({
+    col: z.string(),
+    op: z.literal('comma-separated'),
     v: z.string()
   })
 ] as const)
@@ -58,6 +63,22 @@ export function processFilters(
         sqlFilters.push(
           eq(column, filter.v)
         )
+      } else if (filter.op === 'comma-separated') {
+        // Handle searching for a single value within a comma-separated database field
+        // e.g., searching for 'admin' in a field containing 'admin,instructor,student'
+        const searchValue = filter.v.trim()
+
+        if (searchValue.length > 0) {
+          // Create conditions to match the value in different positions within comma-separated string
+          sqlFilters.push(
+            or(
+              eq(column, searchValue), // exact match (single value)
+              ilike(column, `${searchValue},%`), // starts with value: 'admin,instructor'
+              ilike(column, `%,${searchValue},%`), // middle value: 'student,admin,instructor'
+              ilike(column, `%,${searchValue}`) // ends with value: 'instructor,admin'
+            )!
+          )
+        }
       }
     }
   }

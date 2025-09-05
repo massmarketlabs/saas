@@ -20,7 +20,7 @@ const route = useRoute()
 
 const { intervention_id } = route.params
 
-const roleFilter: FilterCondition = { col: 'role', op: 'eq', v: 'beneficiary' }
+const roleFilter: FilterCondition = { col: 'role', op: 'comma-separated', v: 'beneficiary' }
 
 const filters = computed(() => {
   const baseFilters: FilterCondition[] = [roleFilter]

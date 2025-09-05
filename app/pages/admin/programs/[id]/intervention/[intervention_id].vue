@@ -23,13 +23,13 @@ const confirmationModalToDeleteEnrollment = computed(() => !!toDeleteEnrollment.
 const instructors = computed(() => {
   if (!data.value?.intervention_enrollment)
     return []
-  return data.value.intervention_enrollment.filter(el => el.user?.role === 'instructor')
+  return data.value.intervention_enrollment.filter(el => el.user?.role?.split(',').includes('instructor'))
 })
 
 const enrollments = computed(() => {
   if (!data.value?.intervention_enrollment)
     return []
-  return data.value.intervention_enrollment.filter(el => el.user?.role === 'beneficiary')
+  return data.value.intervention_enrollment.filter(el => el.user?.role?.split(',').includes('beneficiary'))
 })
 
 const activeBeneficiaryIds = computed(() => enrollments.value.reduce((acc, curr) => {

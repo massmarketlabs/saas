@@ -92,6 +92,10 @@ export type FilterCondition = {
   col: string
   op: 'eq'
   v: string
+} | {
+  col: string
+  op: 'comma-separated'
+  v: string
 }
 
 export interface FetchDataParams {
