@@ -39,7 +39,7 @@ export const insertUserEmergencyContact = createInsertSchema(schema.emergency_co
 export type RequestInsertUserEmergencyContact = z.infer<typeof insertUserEmergencyContact>
 
 // user.relationship
-export const insertUserRelationship = createInsertSchema(schema.relationships)
+export const insertUserRelationship = createInsertSchema(schema.relationships).array()
 export type RequestInsertRelationship = z.infer<typeof insertUserRelationship>
 
 // Database Queries
@@ -255,8 +255,41 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
         const repo = new DrizzleCrudRepository(db, schema.emergency_contacts)
         return await repo.create(contact)
       },
-      insertRelationship: async (relationship: RequestInsertRelationship) => {
-        console.log({ relationship })
+      insertRelationship: async (relationships: RequestInsertRelationship) => {
+        const repo = new DrizzleCrudRepository(db, schema.relationships)
+
+        const processedRelationships: RequestInsertRelationship = []
+        const processRelationship = (r: string) => {
+          switch (r) {
+            case 'sibling':
+              return 'sibling'
+            case 'parent':
+              return 'child'
+            case 'child':
+              return 'parent'
+            default:
+              return 'other'
+          }
+        }
+
+        const processOppositeRelationship = (relationship: RequestInsertRelationship[number]): RequestInsertRelationship[number] => {
+          return {
+            ...relationship,
+            user_id: relationship.related_user_id,
+            related_user_id: relationship.user_id,
+            relationship_type: processRelationship(relationship.relationship_type)
+          }
+        }
+
+        for (const relationship of relationships) {
+          processedRelationships.push(
+            relationship,
+            processOppositeRelationship(relationship)
+          )
+        }
+
+        const resp = await repo.createMany(processedRelationships)
+        return resp
       }
     }
   }

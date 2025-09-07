@@ -28,7 +28,7 @@ export default defineTask({
                 isUnique: true,
                 values: Array.from({ length: 1000 }, () => uuidV4())
               }),
-              relationship_type: f.valuesFromArray({ values: ['Mother', 'Father', 'Sibling'] })
+              relationship_type: f.valuesFromArray({ values: ['Parent', 'Child', 'Sibling'] })
             }
           },
           auditLog: {
