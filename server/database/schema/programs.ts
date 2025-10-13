@@ -1,6 +1,6 @@
 // server/database/schema/programs.ts
 import { relations } from 'drizzle-orm'
-import { boolean, date, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { boolean, date, doublePrecision, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
 import { user } from './auth'
 
 import { program_status_enum } from './enums'
@@ -36,12 +36,15 @@ export const interventions = pgTable('interventions', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   description: text('description'),
-  term_id: uuid('term_id').references(() => terms.id).notNull(), // TODO: update this to use intervention_
+  term_id: uuid('term_id').references(() => terms.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
   start_date: date('start_date'),
   end_date: date('end_date'),
   created_by: text('created_by').references(() => user.id).notNull(),
   status: program_status_enum().notNull().default('active'),
+  credits: integer('credits'),
+  room: text('room'),
+  primary_instructor_id: text('primary_instructor_id').references(() => user.id),
   ...audit_fields
 })
 
@@ -52,6 +55,8 @@ export const intervention_enrollment = pgTable('intervention_enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
   intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   user_id: text('user_id').references(() => user.id).notNull(),
+  letter_grade: text('letter_grade'),
+  final_grade: doublePrecision('final_grade'),
   ...audit_fields
 })
 

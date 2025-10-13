@@ -2,7 +2,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import BanUserModal from './components/BanUserModal.vue'
 
 definePageMeta({
   layout: false
@@ -10,43 +9,15 @@ definePageMeta({
 
 const router = useRouter()
 const route = useRoute()
-const toast = useToast()
 const { t } = useI18n()
-const { client } = useAuth()
 
 const id = route.params.id as string
-const { data, refresh } = await useFetch(`/api/admin/user/${id as ':id'}`, { key: `profile-${id as ':id'}` })
-
-const isBanModalOpen = ref(false)
+const { data, refresh } = await useFetch(`/api/admin/user/${id as ':id'}`, {
+  key: `profile-${id as ':id'}`
+})
 
 useHead({
   title: `Profile | ${data.value?.name}`
-})
-
-// Profile Data
-const profileData = computed(() => ({
-  studentId: data.value?.id,
-  email: data.value?.email,
-  name: data.value?.name,
-  gender: data.value?.gender,
-  avatar: data.value?.imageUrl,
-  birthday: data.value?.dob,
-  status: data.value?.banned ? 'Banned' : 'Active' as const,
-  role: data.value?.role
-}))
-
-// Emergency Contacts
-const emergencyContacts = computed(() => {
-  if (!data.value || data.value.emergency_contacts.length === 0)
-    return []
-  return data.value?.emergency_contacts.map(e => ({
-    id: e.id,
-    name: e.name,
-    relationship: e.relationship,
-    phone: e.phone,
-    email: e.email,
-    is_primary: e.is_primary
-  }))
 })
 
 // Siblings
@@ -66,15 +37,17 @@ const siblings = computed(() => {
 })
 
 // Student Notes
-const studentNotes = computed(() => data.value?.beneficiary_notes.map(note => ({
-  id: note.id,
-  title: note.title,
-  content: note.description,
-  author: note.created_by.name,
-  author_id: note.created_by.id,
-  date: note.created_at,
-  priority: note.priority
-})))
+const studentNotes = computed(() =>
+  data.value?.beneficiary_notes.map(note => ({
+    id: note.id,
+    title: note.title,
+    content: note.description,
+    author: note.created_by.name,
+    author_id: note.created_by.id,
+    date: note.created_at,
+    priority: note.priority
+  }))
+)
 
 const latestEvaluations = ref([
   {
@@ -83,7 +56,8 @@ const latestEvaluations = ref([
     type: 'Mid-term Exam',
     grade: 'B+',
     date: '2024-02-20',
-    comments: 'Good improvement in problem-solving skills. Keep up the good work!'
+    comments:
+      'Good improvement in problem-solving skills. Keep up the good work!'
   },
   {
     id: 2,
@@ -91,7 +65,8 @@ const latestEvaluations = ref([
     type: 'Lab Report',
     grade: 'A',
     date: '2024-02-18',
-    comments: 'Excellent observation skills and detailed analysis. Outstanding work!'
+    comments:
+      'Excellent observation skills and detailed analysis. Outstanding work!'
   },
   {
     id: 3,
@@ -99,14 +74,15 @@ const latestEvaluations = ref([
     type: 'Essay Assignment',
     grade: 'A-',
     date: '2024-02-15',
-    comments: 'Creative writing with good structure. Minor grammar improvements needed.'
+    comments:
+      'Creative writing with good structure. Minor grammar improvements needed.'
   }
 ])
 
 // Enrollment Data
 const activeTab = computed({
   get() {
-    return route.query.enrollments as string || 'current'
+    return (route.query.enrollments as string) || 'current'
   },
   set(tab) {
     // Hash is specified here to prevent the page from scrolling to the top
@@ -120,7 +96,9 @@ const activeTab = computed({
 const interventions = computed(() => {
   if (!data.value)
     return []
-  const interventions = data.value.intervention_enrollment.map(x => x.intervention)
+  const interventions = data.value.intervention_enrollment.map(
+    x => x.intervention
+  )
   return interventions
 })
 
@@ -130,44 +108,38 @@ const enrollmentTabs = ref([
     value: 'current' as const,
     slot: 'current' as const,
     label: 'Current Enrollments',
-    data: interventions.value.map(intervention => ({
-      id: intervention.id,
-      course: intervention.name,
-      startDate: intervention.start_date,
-      status: intervention.status === 'active' ? 'Active' : 'Inactive',
-      instructor: 'Mr. Batata',
-      period: '2nd Period',
-      room: 'Room 201',
-      credits: 4
-    }))
+    data: interventions.value
+      .filter(x => x.status === 'active')
+      .map(intervention => ({
+        id: intervention.id,
+        course: intervention.name,
+        startDate: intervention.start_date,
+        status: 'Active',
+        instructor: 'Mr. Batata',
+        period: '2nd Period',
+        room: 'Room 201',
+        credits: 4
+      }))
   },
   {
     key: 'previous' as const,
     value: 'previous' as const,
     slot: 'previous' as const,
     label: 'Previous Enrollments',
-    data: [
-      {
-        id: 4,
-        course: 'Algebra I',
-        instructor: 'Mr. Smith',
-        period: '3rd Period',
-        academicYear: '2023-2024',
+    data: interventions.value
+      .filter(x => x.status !== 'active')
+      .map(intervention => ({
+        id: intervention.id,
+        course: intervention.name,
+        startDate: intervention.start_date,
+        status: 'Active',
+        instructor: 'Mr. Batata',
+        period: '2nd Period',
+        room: 'Room 201',
         credits: 4,
-        finalGrade: 'B+',
-        gpaImpact: '3.3'
-      },
-      {
-        id: 5,
-        course: 'World History',
-        instructor: 'Mrs. Brown',
-        period: '5th Period',
-        academicYear: '2023-2024',
-        credits: 3,
-        finalGrade: 'A',
-        gpaImpact: '4.0'
-      }
-    ]
+        finalGrade: 'A+',
+        academicYear: 2025
+      }))
   }
 ])
 
@@ -239,7 +211,7 @@ const getGradeColor = (grade: string) => {
     <div class="min-h-screen p-6">
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold  mb-2">
+        <h1 class="text-3xl font-bold mb-2">
           Student Profile
         </h1>
         <p class="text-gray-500">
@@ -251,184 +223,18 @@ const getGradeColor = (grade: string) => {
         <!-- Left Column -->
         <div class="lg:col-span-1 space-y-6">
           <!-- Profile General Information -->
-          <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
-            <template #header>
-              <div class="flex items-center gap-3">
-                <UIcon
-                  name="i-heroicons-user-circle"
-                  class="text-blue-600 text-xl"
-                />
-                <h2 class="text-lg font-semibold ">
-                  Profile Information
-                </h2>
-              </div>
-            </template>
-
-            <div class="space-y-6">
-              <!-- Avatar Section -->
-              <div class="flex flex-col items-center">
-                <UAvatar
-                  :src="profileData.avatar ?? ''"
-                  :alt="profileData.name"
-                  size="3xl"
-                />
-                <h3 class="text-xl font-semibold  mt-3">
-                  {{ profileData.name }}
-                </h3>
-                <UDropdownMenu
-                  :items="[{
-                    label: profileData.status === 'Active' ? 'Ban' : 'Unban',
-                    icon: 'i-lucide-ban',
-                    color: profileData.status === 'Active' ? 'error' : 'success',
-                    onSelect: async () => {
-                      if (profileData.status === 'Active') {
-                        isBanModalOpen = true
-                        return
-                      }
-
-                      await client.admin.unbanUser({ userId: id }, {
-                        onResponse: async ({ response }) => {
-                          if (response.ok) {
-                            toast.add({ color: 'success', title: 'Ban removed' })
-                            await refresh()
-                          }
-
-                        }
-                      })
-                    }
-                  }]"
-                >
-                  <UBadge
-                    :color="profileData.status === 'Active' ? 'success' : 'error'"
-                    variant="subtle"
-                    class="mt-1"
-                    size="sm"
-                    trailing-icon="i-heroicons-chevron-down"
-                  >
-                    {{ profileData.status }}
-                  </UBadge>
-                </UDropdownMenu>
-                <BanUserModal
-                  v-model:open="isBanModalOpen"
-                  :user-id="id"
-                  :t="t"
-                  @banned="refresh"
-                />
-              </div>
-
-              <!-- Profile Details -->
-              <div class="space-y-4">
-                <div class="flex justify-between items-center py-2">
-                  <span class="text-sm font-medium text-gray-500">ID</span>
-                  <span class="text-sm ">{{ profileData.studentId }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Email</span>
-                  <span class="text-sm ">{{ profileData.email }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Gender</span>
-                  <span class="text-sm ">{{ profileData.gender }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Role(s)</span>
-                  <span class="text-sm ">{{ profileData.role }}</span>
-                </div>
-                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Birthday</span>
-                  <span
-                    v-if="profileData.birthday"
-                    class="text-sm"
-                  >{{ formatDate(profileData.birthday) }}</span>
-                </div>
-              </div>
-              <ModalEditProfile
-                :profile="data"
-                @update-profile="refresh"
-              />
-            </div>
-          </UCard>
-
+          <UserProfileInformation
+            :id="id"
+            :t="t"
+            :data="data"
+            @update-profile-information="refresh"
+          />
           <!-- Emergency Contact Information -->
-          <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
-            <template #header>
-              <div class="flex justify-between">
-                <div class="flex items-center gap-3">
-                  <UIcon
-                    name="i-heroicons-phone"
-                    class="text-red-600 text-xl"
-                  />
-                  <h2 class="text-lg font-semibold ">
-                    Emergency Contact
-                  </h2>
-                </div>
-                <ModalCreateProfileEmergencyContact
-                  :beneficiary-id="id"
-                  @emergency-contact-added="refresh"
-                />
-              </div>
-            </template>
-            <div v-if="!emergencyContacts || emergencyContacts.length === 0">
-              <div class="text-center">
-                <Icon
-                  name="i-heroicons-phone"
-                  class="text-red-600 text-xl rounded-full"
-                />
-              </div>
-              <p class="text-center text-xl font-bold text-gray-500">
-                No Emergency Contacts
-              </p>
-              <p class="text-center text-sm text-gray-500">
-                Start by adding an emergency contact
-              </p>
-            </div>
-            <div
-              v-else
-              class="space-y-4"
-            >
-              <div
-                v-for="contact in emergencyContacts"
-                :key="contact.id"
-                class="p-4 rounded-lg bg-accented"
-              >
-                <div class="flex justify-between items-start mb-2">
-                  <h4 class="font-medium ">
-                    {{ contact.name }}
-                  </h4>
-                  <UBadge
-                    color="primary"
-                    variant="subtle"
-                    size="md"
-                  >
-                    {{ contact.relationship }}
-                  </UBadge>
-                </div>
-                <div class="space-y-1 text-sm text-gray-500">
-                  <div class="flex items-center gap-2">
-                    <UIcon
-                      name="i-heroicons-phone"
-                      class="text-xs"
-                    />
-                    <span>{{ contact.phone }}</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <UIcon
-                      name="i-heroicons-envelope"
-                      class="text-xs"
-                    />
-                    <span>{{ contact.email }}</span>
-                  </div>
-                  <UBadge
-                    v-if="contact.is_primary"
-                    size="md"
-                  >
-                    Primary Contact
-                  </UBadge>
-                </div>
-              </div>
-            </div>
-          </UCard>
-
+          <UserProfileEmergencyContact
+            :id="id"
+            :data="data"
+            @update-emergency-contacts="refresh"
+          />
           <!-- Siblings -->
           <UCard class="shadow-lg border border-gray-200 rounded-xl overflow-hidden">
             <template #header>
@@ -438,7 +244,7 @@ const getGradeColor = (grade: string) => {
                     name="i-heroicons-users"
                     class="text-green-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold ">
+                  <h2 class="text-lg font-semibold">
                     Family Members
                   </h2>
                 </div>
@@ -480,7 +286,7 @@ const getGradeColor = (grade: string) => {
                   :to="`/admin/organization/user/${sibling.user_id}`"
                   class="flex-1 space-y-1"
                 >
-                  <p class="font-medium  text-sm">
+                  <p class="font-medium text-sm">
                     {{ sibling.name }}
                   </p>
                   <p class="text-xs text-gray-500">
@@ -510,7 +316,7 @@ const getGradeColor = (grade: string) => {
                     name="i-heroicons-document-text"
                     class="text-purple-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold ">
+                  <h2 class="text-lg font-semibold">
                     Notes
                   </h2>
                 </div>
@@ -544,10 +350,12 @@ const getGradeColor = (grade: string) => {
                 class="p-4 rounded-lg bg-accented"
               >
                 <div class="flex justify-between items-start mb-2">
-                  <h4 class="font-medium ">
+                  <h4 class="font-medium">
                     {{ note.title }}
                   </h4>
-                  <span class="text-xs text-gray-500">{{ formatDate(note.date) }}</span>
+                  <span class="text-xs text-gray-500">{{
+                    formatDate(note.date)
+                  }}</span>
                 </div>
                 <p class="text-sm text-gray-500 mb-2">
                   {{ note.content }}
@@ -557,7 +365,12 @@ const getGradeColor = (grade: string) => {
                     <span class="text-xs text-gray-500">By {{ note.author }}</span>
                   </NuxtLink>
                   <UBadge
-                    :color="note.priority === 'High' ? 'error' : note.priority === 'Medium' ? 'warning' : 'success'"
+                    :color="note.priority === 'High'
+                      ? 'error'
+                      : note.priority === 'Medium'
+                        ? 'warning'
+                        : 'success'
+                    "
                     variant="subtle"
                     size="xs"
                   >
@@ -576,7 +389,7 @@ const getGradeColor = (grade: string) => {
                   name="i-heroicons-chart-bar"
                   class="text-orange-600 text-xl"
                 />
-                <h2 class="text-lg font-semibold ">
+                <h2 class="text-lg font-semibold">
                   Latest Evaluations
                 </h2>
               </div>
@@ -590,7 +403,7 @@ const getGradeColor = (grade: string) => {
               >
                 <div class="flex justify-between items-start mb-3">
                   <div>
-                    <h4 class="font-medium ">
+                    <h4 class="font-medium">
                       {{ evaluation.subject }}
                     </h4>
                     <p class="text-sm text-gray-500">
@@ -625,18 +438,11 @@ const getGradeColor = (grade: string) => {
                     name="i-heroicons-academic-cap"
                     class="text-indigo-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold ">
+                  <h2 class="text-lg font-semibold">
                     Enrollments
                   </h2>
                 </div>
-                <UModal>
-                  <UButton
-                    icon="i-lucide-pencil"
-                    size="sm"
-                    label="Modify"
-                    variant="outline"
-                  />
-                </UModal>
+                <ModalManageEnrollments :user-id="id" />
               </div>
             </template>
 
@@ -671,7 +477,7 @@ const getGradeColor = (grade: string) => {
                   >
                     <div class="flex justify-between items-start mb-2">
                       <div>
-                        <h4 class="font-medium ">
+                        <h4 class="font-medium">
                           {{ enrollment.course }}
                         </h4>
                         <p class="text-sm text-gray-500">
@@ -679,7 +485,8 @@ const getGradeColor = (grade: string) => {
                         </p>
                       </div>
                       <UBadge
-                        :color="enrollment.status === 'Active' ? 'success' : 'neutral'"
+                        :color="enrollment.status === 'Active' ? 'success' : 'neutral'
+                        "
                         variant="subtle"
                       >
                         {{ enrollment.status }}
@@ -687,16 +494,20 @@ const getGradeColor = (grade: string) => {
                     </div>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-500">
                       <div>
-                        <span class="font-medium">Period:</span> {{ enrollment.period }}
+                        <span class="font-medium">Period:</span>
+                        {{ enrollment.period }}
                       </div>
                       <div>
-                        <span class="font-medium">Room:</span> {{ enrollment.room }}
+                        <span class="font-medium">Room:</span>
+                        {{ enrollment.room }}
                       </div>
                       <div>
-                        <span class="font-medium">Start Date:</span> {{ formatDate(String(enrollment.startDate)) }}
+                        <span class="font-medium">Start Date:</span>
+                        {{ formatDate(String(enrollment.startDate)) }}
                       </div>
                       <div>
-                        <span class="font-medium">Credits:</span> {{ enrollment.credits }}
+                        <span class="font-medium">Credits:</span>
+                        {{ enrollment.credits }}
                       </div>
                     </div>
                   </div>
@@ -704,7 +515,22 @@ const getGradeColor = (grade: string) => {
               </template>
 
               <template #previous="{ item }">
-                <div class="space-y-4">
+                <div
+                  v-if="item.data.length === 0"
+                  class="text-center my-6 space-y-2"
+                >
+                  <Icon
+                    name="i-heroicons-academic-cap"
+                    class="text-indigo-600 text-xl rounded-full"
+                  />
+                  <p class="text-center text-xl font-bold text-gray-500">
+                    No previous enrollments Found
+                  </p>
+                </div>
+                <div
+                  v-else
+                  class="space-y-4"
+                >
                   <div
                     v-for="enrollment in item.data"
                     :key="enrollment.id"
@@ -712,7 +538,7 @@ const getGradeColor = (grade: string) => {
                   >
                     <div class="flex justify-between items-start mb-2">
                       <div>
-                        <h4 class="font-medium ">
+                        <h4 class="font-medium">
                           {{ enrollment.course }}
                         </h4>
                         <p class="text-sm text-gray-500">
@@ -736,16 +562,16 @@ const getGradeColor = (grade: string) => {
                     </div>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-500">
                       <div>
-                        <span class="font-medium">Period:</span> {{ enrollment.period }}
+                        <span class="font-medium">Period:</span>
+                        {{ enrollment.period }}
                       </div>
                       <div>
-                        <span class="font-medium">Year:</span> {{ enrollment?.academicYear }}
+                        <span class="font-medium">Year:</span>
+                        {{ enrollment?.academicYear }}
                       </div>
                       <div>
-                        <span class="font-medium">Credits Earned:</span> {{ enrollment.credits }}
-                      </div>
-                      <div>
-                        <span class="font-medium">GPA Impact:</span> {{ enrollment?.gpaImpact }}
+                        <span class="font-medium">Credits Earned:</span>
+                        {{ enrollment.credits }}
                       </div>
                     </div>
                   </div>
@@ -763,7 +589,7 @@ const getGradeColor = (grade: string) => {
                     name="i-heroicons-calendar-days"
                     class="text-teal-600 text-xl"
                   />
-                  <h2 class="text-lg font-semibold ">
+                  <h2 class="text-lg font-semibold">
                     Attendance History
                   </h2>
                 </div>
@@ -821,7 +647,7 @@ const getGradeColor = (grade: string) => {
 
               <!-- Recent Attendance -->
               <div class="space-y-2">
-                <h4 class="font-medium ">
+                <h4 class="font-medium">
                   Recent Attendance
                 </h4>
                 <div class="space-y-2">
@@ -831,7 +657,7 @@ const getGradeColor = (grade: string) => {
                     class="flex justify-between items-center p-3 rounded-lg bg-accented"
                   >
                     <div>
-                      <p class="font-medium ">
+                      <p class="font-medium">
                         {{ formatDate(record.date) }}
                       </p>
                       <p class="text-sm text-gray-500">
@@ -840,7 +666,12 @@ const getGradeColor = (grade: string) => {
                     </div>
                     <div class="text-right">
                       <UBadge
-                        :color="record.status === 'Present' ? 'success' : record.status === 'Absent' ? 'error' : 'warning'"
+                        :color="record.status === 'Present'
+                          ? 'success'
+                          : record.status === 'Absent'
+                            ? 'error'
+                            : 'warning'
+                        "
                         variant="subtle"
                       >
                         {{ record.status }}

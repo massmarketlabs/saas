@@ -150,6 +150,26 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
         const repo = new DrizzleCrudRepository(db, schema.interventions)
         return await repo.updateById(payload.id, payload)
       },
+      getByUserId: async (userId: string) => {
+        const interventions = await db.query.interventions.findMany({
+          with: {
+            program: true,
+            term: true,
+            intervention_enrollment: {
+              where: (enrollment, { eq, isNull }) =>
+                and(
+                  eq(enrollment.user_id, userId),
+                  isNull(enrollment.deleted_at)
+                )
+            }
+          }
+        })
+
+        return interventions.map(intervention => ({
+          ...intervention,
+          isEnrolled: intervention.intervention_enrollment.length > 0
+        }))
+      },
       toggleEnrollment: async (payload: RequestCreateInterventionEnrollment) => {
         const { intervention_id, user_id } = payload
         const enrollments = await db
