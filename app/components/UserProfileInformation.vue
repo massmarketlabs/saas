@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { InternalApi } from 'nitropack'
+import BanUserModal from '../pages/admin/organization/user/components/BanUserModal.vue'
 
 const props = defineProps<{
   id: string
