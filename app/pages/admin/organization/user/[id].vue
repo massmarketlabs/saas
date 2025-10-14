@@ -10,7 +10,8 @@ const { t } = useI18n()
 
 const id = route.params.id as string
 const { data, refresh } = await useFetch(`/api/admin/user/${id as ':id'}`, {
-  key: `profile-${id as ':id'}`
+  key: `profile-${id as ':id'}`,
+  method: 'post'
 })
 
 useHead({

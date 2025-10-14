@@ -4,7 +4,7 @@ import type { InternalApi } from 'nitropack'
 import { parseAbsoluteToLocal } from '@internationalized/date'
 import { z } from 'zod/v4'
 
-const props = defineProps<{ profile: InternalApi['/api/admin/user/:id']['get'] | undefined }>()
+const props = defineProps<{ profile?: InternalApi['/api/admin/user/:id']['post'] }>()
 const emit = defineEmits(['updateProfile'])
 const toast = useToast()
 

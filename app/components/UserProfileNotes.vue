@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { InternalApi } from 'nitropack'
 
-const props = defineProps<{ id: string, data?: InternalApi['/api/admin/user/:id']['get'] }>()
+const props = defineProps<{ id: string, data?: InternalApi['/api/admin/user/:id']['post'] }>()
 const emits = defineEmits(['updateProfileNotes'])
 
 const studentNotes = computed(() =>

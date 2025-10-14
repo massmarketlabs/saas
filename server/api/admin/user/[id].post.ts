@@ -3,13 +3,27 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { dbQueries } from '~~/server/database'
 
 export default defineEventHandler(async (event) => {
-  const __auth = requireAuth(event)
+  const session = await requireAuth(event)
   const id = getRouterParam(event, 'id')
   if (!id) {
     throw createError({ statusCode: 400, message: 'ID param is required.' })
   }
   const db = await useDB(event)
   const resp = await dbQueries(db).user.getById(id)
+  const userId = session.user.id
+  const auditParams = extractAuditParams(event)
+
+  await logAuditEvent({
+    targetId: id,
+    userId,
+    action: 'Access granted to view user profile',
+    category: 'users',
+    status: 'success',
+    details: 'View full user profile',
+    userAgent: auditParams?.userAgent,
+    ipAddress: auditParams?.ipAddress,
+    targetType: 'user'
+  })
 
   if (!resp) {
     throw createError({ status: 404, message: `User ${id} not found.` })

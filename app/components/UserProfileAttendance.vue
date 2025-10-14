@@ -39,6 +39,14 @@ const attendanceHistory = ref([
     notes: 'Sick leave - parent notification'
   }
 ])
+
+const getColor = (status: string) => {
+  return status === 'Present'
+    ? 'success'
+    : status === 'Absent'
+      ? 'error'
+      : 'warning'
+}
 </script>
 
 <template>
@@ -119,7 +127,7 @@ const attendanceHistory = ref([
           >
             <div>
               <p class="font-medium">
-                {{ formatDate(record.date) }}
+                {{ formatDate(new Date(record.date)) }}
               </p>
               <p class="text-sm text-gray-500">
                 {{ record.course }}
@@ -127,12 +135,7 @@ const attendanceHistory = ref([
             </div>
             <div class="text-right">
               <UBadge
-                :color="record.status === 'Present'
-                  ? 'success'
-                  : record.status === 'Absent'
-                    ? 'error'
-                    : 'warning'
-                "
+                :color="getColor(record.status)"
                 variant="subtle"
               >
                 {{ record.status }}

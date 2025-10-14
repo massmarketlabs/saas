@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { InternalApi } from 'nitropack'
 
-const { id, data, getGradeColor } = defineProps<{ id: string, getGradeColor: (grade: string) => string, data?: InternalApi['/api/admin/user/:id']['get'] }>()
+const { id, data, getGradeColor } = defineProps<{ id: string, getGradeColor: (grade: string) => string, data?: InternalApi['/api/admin/user/:id']['post'] }>()
 
 const route = useRoute()
 const router = useRouter()

@@ -3,7 +3,7 @@ import type { InternalApi } from 'nitropack'
 
 const props = defineProps<{
   id: string
-  data?: InternalApi['/api/admin/user/:id']['get']
+  data?: InternalApi['/api/admin/user/:id']['post']
 }>()
 
 const emits = defineEmits(['updateEmergencyContacts'])

@@ -4,7 +4,7 @@ import BanUserModal from '../pages/admin/organization/user/components/BanUserMod
 
 const props = defineProps<{
   id: string
-  data: InternalApi['/api/admin/user/:id']['get'] | undefined
+  data?: InternalApi['/api/admin/user/:id']['post']
   t: TranFunction
 }>()
 
