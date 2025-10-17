@@ -111,6 +111,19 @@ export const evaluations = pgTable('evaluations', {
 })
 
 // ========================
+// Attendance
+// ========================
+export const attendance = pgTable('attendance', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  intervention_id: uuid('intervention_id').notNull().references(() => interventions.id),
+  user_id: text('user_id').references(() => user.id).notNull(),
+  scheduled_date: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+  state: text('state').default('untracked').notNull(),
+  note: text('note'),
+  ...audit_fields
+})
+
+// ========================
 // Relations
 // ========================
 

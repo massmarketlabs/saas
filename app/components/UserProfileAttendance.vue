@@ -1,51 +1,14 @@
 <script setup lang="ts">
-// Attendance Data
-const attendanceStats = ref({
-  present: 142,
-  absent: 3,
-  late: 8,
-  totalDays: 153,
-  attendanceRate: 93,
-  streak: 12
-})
+const props = defineProps<{ userId: string }>()
 
-const attendanceHistory = ref([
-  {
-    id: 1,
-    date: '2024-02-20',
-    course: 'Mathematics',
-    status: 'Present',
-    notes: null
-  },
-  {
-    id: 2,
-    date: '2024-02-20',
-    course: 'Biology',
-    status: 'Present',
-    notes: null
-  },
-  {
-    id: 3,
-    date: '2024-02-19',
-    course: 'English',
-    status: 'Late',
-    notes: 'Arrived 10 minutes late'
-  },
-  {
-    id: 4,
-    date: '2024-02-18',
-    course: 'Mathematics',
-    status: 'Absent',
-    notes: 'Sick leave - parent notification'
-  }
-])
+const { data } = await useFetch(`/api/admin/attendance/${props.userId as ':user_id'}`, { method: 'post' })
 
 const getColor = (status: string) => {
-  return status === 'Present'
+  return status === 'present'
     ? 'success'
-    : status === 'Absent'
+    : status === 'absent'
       ? 'error'
-      : 'warning'
+      : status === 'untracked' ? 'info' : 'warning'
 }
 </script>
 
@@ -67,19 +30,25 @@ const getColor = (status: string) => {
             color="success"
             variant="subtle"
           >
-            {{ attendanceStats.present }} Present
+            {{ data?.attendanceStats.present }} Present
           </UBadge>
           <UBadge
             color="error"
             variant="subtle"
           >
-            {{ attendanceStats.absent }} Absent
+            {{ data?.attendanceStats.absent }} Absent
+          </UBadge>
+          <UBadge
+            color="info"
+            variant="subtle"
+          >
+            {{ data?.attendanceStats.untracked }} Untracked
           </UBadge>
           <UBadge
             color="warning"
             variant="subtle"
           >
-            {{ attendanceStats.late }} Late
+            {{ data?.attendanceStats.late }} Late
           </UBadge>
         </div>
       </div>
@@ -90,7 +59,7 @@ const getColor = (status: string) => {
       <div class="grid grid-cols-3 gap-4 p-4 rounded-lg">
         <div class="text-center">
           <div class="text-2xl font-bold text-green-600">
-            {{ attendanceStats.attendanceRate }}%
+            {{ data?.attendanceStats.attendanceRate }}%
           </div>
           <div class="text-xs text-gray-500">
             Attendance Rate
@@ -98,7 +67,7 @@ const getColor = (status: string) => {
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-600">
-            {{ attendanceStats.totalDays }}
+            {{ data?.attendanceStats.totalDays }}
           </div>
           <div class="text-xs text-gray-500">
             Total Days
@@ -106,7 +75,7 @@ const getColor = (status: string) => {
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-purple-600">
-            {{ attendanceStats.streak }}
+            {{ data?.attendanceStats.streak }}
           </div>
           <div class="text-xs text-gray-500">
             Current Streak
@@ -121,30 +90,30 @@ const getColor = (status: string) => {
         </h4>
         <div class="space-y-2">
           <div
-            v-for="record in attendanceHistory"
-            :key="record.id"
+            v-for="record in data?.attendanceHistory"
+            :key="record.attendance.id"
             class="flex justify-between items-center p-3 rounded-lg bg-accented"
           >
             <div>
               <p class="font-medium">
-                {{ formatDate(new Date(record.date)) }}
+                {{ formatDate(new Date(record.attendance.scheduled_date)) }}
               </p>
               <p class="text-sm text-gray-500">
-                {{ record.course }}
+                {{ record.interventions.name }}
               </p>
             </div>
             <div class="text-right">
               <UBadge
-                :color="getColor(record.status)"
+                :color="getColor(record.attendance.state)"
                 variant="subtle"
               >
-                {{ record.status }}
+                {{ record.attendance.state }}
               </UBadge>
               <p
-                v-if="record.notes"
+                v-if="record.attendance.note"
                 class="text-xs text-gray-500 mt-1"
               >
-                {{ record.notes }}
+                {{ record.attendance.note }}
               </p>
             </div>
           </div>

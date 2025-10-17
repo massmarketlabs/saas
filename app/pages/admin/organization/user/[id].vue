@@ -88,7 +88,7 @@ const getGradeColor = (grade: string) => {
             :get-grade-color="getGradeColor"
           />
           <!-- Attendance History -->
-          <UserProfileAttendance />
+          <UserProfileAttendance :user-id="id" />
         </div>
       </div>
     </div>

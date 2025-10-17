@@ -34,7 +34,19 @@ export default defineTask({
           auditLog: {
             columns: {
               id: f.intPrimaryKey(),
-              status: f.valuesFromArray({ values: ['success', 'pending', 'failure'] })
+              status: f.valuesFromArray({ values: ['success', 'pending', 'failure'] }),
+              category: f.valuesFromArray({ values: ['auth', 'organization', 'enrollment', 'email', 'program'] })
+            }
+          },
+          attendance: {
+            count: 1000,
+            columns: {
+              id: f.valuesFromArray({
+                isUnique: true,
+                values: Array.from({ length: 1000 }, () => uuidV4())
+              }),
+              state: f.valuesFromArray({ values: ['untracked', 'present', 'absent', 'late'] }),
+              note: f.loremIpsum({ sentencesCount: 2 })
             }
           },
           assignments: {
