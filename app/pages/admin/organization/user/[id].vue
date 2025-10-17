@@ -77,7 +77,10 @@ const getGradeColor = (grade: string) => {
             @update-profile-notes="refresh"
           />
           <!-- Latest Evaluations -->
-          <UserProfileLatestEvaluations :get-grade-color="getGradeColor" />
+          <UserProfileLatestEvaluations
+            :data="data"
+            :get-grade-color="getGradeColor"
+          />
           <!-- Enrollment Tabs -->
           <UserProfileEnrollment
             :id="id"

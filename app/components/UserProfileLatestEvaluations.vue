@@ -1,35 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{ getGradeColor: (grade: string) => string }>()
+import type { InternalApi } from 'nitropack'
 
-const latestEvaluations = ref([
-  {
-    id: 1,
-    subject: 'Mathematics',
-    type: 'Mid-term Exam',
-    grade: 'B+',
-    date: '2024-02-20',
-    comments:
-      'Good improvement in problem-solving skills. Keep up the good work!'
-  },
-  {
-    id: 2,
-    subject: 'Science',
-    type: 'Lab Report',
-    grade: 'A',
-    date: '2024-02-18',
-    comments:
-      'Excellent observation skills and detailed analysis. Outstanding work!'
-  },
-  {
-    id: 3,
-    subject: 'English',
-    type: 'Essay Assignment',
-    grade: 'A-',
-    date: '2024-02-15',
-    comments:
-      'Creative writing with good structure. Minor grammar improvements needed.'
-  }
-])
+const props = defineProps<{ data?: InternalApi['/api/admin/user/:id']['post'], getGradeColor: (grade: string) => string }>()
 </script>
 
 <template>
@@ -47,34 +19,60 @@ const latestEvaluations = ref([
     </template>
 
     <div class="space-y-4">
+      <div v-if="!data || !data.submissions || data.submissions.length === 0">
+        <div class="text-center">
+          <Icon
+            name="i-heroicons-chart-bar"
+            class="text-orange-600 text-xl rounded-full"
+          />
+        </div>
+        <p class="text-center text-xl font-bold text-gray-500">
+          No Recent Evaluations
+        </p>
+        <p class="text-center text-sm text-gray-500">
+          Go to instructor class manager tool to make changes
+        </p>
+      </div>
       <div
-        v-for="evaluation in latestEvaluations"
-        :key="evaluation.id"
+        v-for="submission in data.submissions"
+        v-else
+        :key="submission.id"
         class="p-4 rounded-lg bg-accented"
       >
         <div class="flex justify-between items-start mb-3">
           <div>
             <h4 class="font-medium">
-              {{ evaluation.subject }}
+              {{ submission.assignment.intervention.name }}
             </h4>
             <p class="text-sm text-gray-500">
-              {{ evaluation.type }}
+              {{ submission.assignment.type }}
             </p>
           </div>
-          <div class="text-right">
+          <div
+            v-if="submission.evaluations?.[0]"
+            class="text-right"
+          >
             <div
               class="text-2xl font-bold"
-              :class="props.getGradeColor(evaluation.grade)"
+              :class="props.getGradeColor(submission.evaluations?.[0]?.letter_grade || 'F')"
             >
-              {{ evaluation.grade }}
+              {{ submission.evaluations?.[0]?.letter_grade }} ({{ submission.evaluations?.[0]?.grade }}%)
             </div>
             <p class="text-xs text-gray-500">
-              {{ formatDate(new Date(evaluation.date)) }}
+              {{ formatDate(new Date(submission.evaluations?.[0]?.created_at || '')) }}
             </p>
+          </div>
+          <div
+            v-else
+            class="text-right"
+          >
+            <div class="text-sm font-light text-gray-500">
+              Not Graded
+            </div>
           </div>
         </div>
         <p class="text-sm text-gray-500">
-          {{ evaluation.comments }}
+          {{ submission.evaluations?.[0]?.comment }}
         </p>
       </div>
     </div>

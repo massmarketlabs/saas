@@ -37,12 +37,35 @@ export default defineTask({
               status: f.valuesFromArray({ values: ['success', 'pending', 'failure'] })
             }
           },
-          evaluation: {
+          assignments: {
+            columns: {
+              id: f.valuesFromArray({
+                isUnique: true,
+                values: Array.from({ length: 1000 }, () => uuidV4())
+              }),
+              max_values: f.default({ defaultValue: 100 }),
+              type: f.valuesFromArray({ values: ['quiz', 'document_upload'] })
+            }
+          },
+          submissions: {
             columns: {
               id: f.valuesFromArray({
                 isUnique: true,
                 values: Array.from({ length: 1000 }, () => uuidV4())
               })
+            }
+          },
+          evaluations: {
+            columns: {
+              id: f.valuesFromArray({
+                isUnique: true,
+                values: Array.from({ length: 1000 }, () => uuidV4())
+              }),
+              comment: f.loremIpsum(),
+              letter_grade: f.valuesFromArray({
+                values: ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F']
+              }),
+              grade: f.int({ minValue: 0, maxValue: 100 })
             }
           },
           emergency_contacts: {

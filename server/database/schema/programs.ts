@@ -1,8 +1,7 @@
 // server/database/schema/programs.ts
 import { relations } from 'drizzle-orm'
-import { boolean, date, doublePrecision, integer, jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core'
+import { boolean, date, doublePrecision, integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { user } from './auth'
-
 import { program_status_enum } from './enums'
 import { audit_fields } from './shared'
 import { emergency_contacts, relationships } from './user'
@@ -61,17 +60,8 @@ export const intervention_enrollment = pgTable('intervention_enrollment', {
 })
 
 // ========================
-// Evaluation
+// User Notes
 // ========================
-export const evaluation = pgTable('evaluation', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').unique(),
-  version: integer('version'),
-  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
-  form: jsonb('form'),
-  ...audit_fields
-})
-
 export const user_notes = pgTable('user_notes', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: text('title').notNull(),
@@ -84,9 +74,87 @@ export const user_notes = pgTable('user_notes', {
 })
 
 // ========================
+// Assignments
+// ========================
+export const assignments = pgTable('assignments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: text('type').notNull(),
+  max_grade: integer('max_grade').notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
+  deadline: timestamp('deadline', { mode: 'string', withTimezone: true }).notNull(),
+  ...audit_fields
+})
+
+// ========================
+// Submission
+// ========================
+export const submissions = pgTable('submissions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: text('user_id').notNull().references(() => user.id),
+  assignment_id: uuid('assignment_id').notNull().references(() => assignments.id),
+  ...audit_fields
+})
+
+// ========================
+// Evaluation
+// ========================
+export const evaluations = pgTable('evaluations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  evaluator_id: text('evaluator_id').notNull().references(() => user.id),
+  submission_id: uuid('submission_id').notNull().references(() => submissions.id),
+  grade: integer('grade').notNull(),
+  letter_grade: text('letter_grade').notNull(),
+  comment: text('comment'),
+  ...audit_fields
+})
+
+// ========================
 // Relations
 // ========================
 
+// ========================
+// Evaluations Relations
+// ========================
+export const relations_evaluation = relations(evaluations, ({ one }) => ({
+  evaluator: one(user, {
+    fields: [evaluations.evaluator_id],
+    references: [user.id],
+    relationName: 'evaluator_id'
+  }),
+  submission: one(submissions, {
+    fields: [evaluations.submission_id],
+    references: [submissions.id]
+  })
+}))
+
+// ========================
+// Assignments Relations
+// ========================
+export const relations_assignments = relations(assignments, ({ one }) => ({
+  intervention: one(interventions, {
+    fields: [assignments.intervention_id],
+    references: [interventions.id]
+  })
+}))
+
+export const relations_submssions = relations(submissions, ({ one, many }) => ({
+  assignment: one(assignments, {
+    fields: [submissions.assignment_id],
+    references: [assignments.id]
+  }),
+  user: one(user, {
+    fields: [submissions.user_id],
+    references: [user.id],
+    relationName: 'submission_user_id'
+  }),
+  evaluations: many(evaluations)
+  // evaluation: one(evaluations, {
+  //   fields: [submissions.id],
+  //   references: [evaluations.submission_id]
+  // })
+}))
 // ========================
 // Programs Relations
 // ========================
@@ -119,8 +187,7 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
     fields: [interventions.created_by],
     references: [user.id]
   }),
-  intervention_enrollment: many(intervention_enrollment),
-  evaluations: many(evaluation)
+  intervention_enrollment: many(intervention_enrollment)
   // meeting_schedule: many(meeting_schedule),
   // attendance_settings: many(attendance_settings)
 }))
@@ -135,7 +202,10 @@ export const relations_user = relations(user, ({ many }) => ({
   beneficiary_notes: many(user_notes, { relationName: 'beneficiary_notes' }),
   created_notes: many(user_notes, { relationName: 'created_notes' }),
   relationship_user: many(relationships, { relationName: 'user_user_id' }),
-  relationship_related_user: many(relationships, { relationName: 'related_user_user_id' })
+  relationship_related_user: many(relationships, { relationName: 'related_user_user_id' }),
+  submissions: many(submissions, { relationName: 'submission_user_id' })
+  // evaluations: many(evaluations, { relationName: 'evaluator_id' })
+
   // instructed_meetings: many(meeting_schedule),
   // attendance_records: many(attendance),
   // marked_attendance: many(attendance, { relationName: 'marked_by_user' }),
@@ -158,21 +228,13 @@ export const relations_intervention_enrollment = relations(intervention_enrollme
 }))
 
 // ========================
-// Evaluation Relations
+// User Notes Relations
 // ========================
-export const relations_evaluation = relations(evaluation, ({ one }) => ({
-  intervention: one(interventions, {
-    fields: [evaluation.intervention_id],
-    references: [interventions.id]
-  })
-}))
-
 export const relations_user_notes = relations(user_notes, ({ one }) => ({
   intervention: one(interventions, {
     fields: [user_notes.intervention_id],
     references: [interventions.id],
     relationName: 'created_notes'
-
   }),
   created_by: one(user, {
     fields: [user_notes.created_by],

@@ -132,7 +132,6 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
             with: {
               program: true,
               term: true,
-              evaluations: true,
               intervention_enrollment: {
                 orderBy: (enrollment, { desc }) => desc(enrollment.updated_at),
                 with: {
@@ -257,7 +256,36 @@ export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
               with: {
                 intervention: true
               }
+            },
+            submissions: {
+              with: {
+                assignment: {
+                  with: {
+                    intervention: true
+                  }
+                },
+                user: true,
+                evaluations: {
+                  limit: 1,
+                  orderBy: ({ created_at }, { desc }) => desc(created_at)
+                }
+              }
             }
+            // evaluations: {
+            //   with: {
+            //     evaluator: true,
+            //     submission: {
+            //       with: {
+            //         assignment: {
+            //           with: {
+            //             intervention: true
+            //           }
+            //         },
+            //         user: true
+            //       }
+            //     }
+            //   }
+            // }
           }
         })
         return resp
