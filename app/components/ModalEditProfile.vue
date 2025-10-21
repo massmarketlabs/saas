@@ -12,7 +12,7 @@ const newImageKey = ref(props.profile?.image ? props.profile.image : '')
 const form = useTemplateRef('update-profile')
 
 const schema = z.object({
-  dob: z.custom<ZonedDateTime | null>().refine(x => x?.toDate(), 'Invalid date'),
+  dob: z.custom<ZonedDateTime | null>().refine(x => x?.toDate(), 'Invalid date').optional().nullable(),
   image: z.file().optional().nullable(),
   name: z.string(),
   gender: z.enum(['female', 'male', 'other']),
