@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
   const auditParams = extractAuditParams(event)
 
   await logAuditEvent({
-    userId: usser_id,
+    userId: user_id,
     action: 'Access granted to view personal interventions',
     category: 'enrollment',
     status: 'success',
