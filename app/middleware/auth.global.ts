@@ -40,7 +40,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const { only, redirectUserTo, redirectGuestTo } = defu(to.meta?.auth, redirectOptions)
 
   const localePath = useLocalePath()
-
   if (only === 'guest') {
     if (loggedIn.value) {
       // Guest-only routes: redirect authenticated users to specified path
