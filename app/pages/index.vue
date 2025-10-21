@@ -13,36 +13,6 @@ definePageMeta({
 const { user } = useAuth()
 const { t } = useI18n()
 
-const availableInterventions = [
-  {
-    id: 1,
-    name: 'Reading Comprehension Support',
-    description: 'Enhanced reading skills development program',
-    status: 'active',
-    participants: 12,
-    nextSession: '2025-08-02T10:00:00Z',
-    progress: 75
-  },
-  {
-    id: 2,
-    name: 'Math Skills Enhancement',
-    description: 'Targeted mathematics intervention program',
-    status: 'active',
-    participants: 8,
-    nextSession: '2025-08-03T14:00:00Z',
-    progress: 60
-  },
-  {
-    id: 3,
-    name: 'Social Skills Development',
-    description: 'Building interpersonal and communication skills',
-    status: 'pending',
-    participants: 15,
-    nextSession: '2025-08-05T11:00:00Z',
-    progress: 30
-  }
-]
-
 const upcomingTasks = [
   {
     id: 1,
@@ -128,15 +98,6 @@ const getPriorityColor = (priority: string) => {
     default: return 'bg-gray-100 text-gray-800'
   }
 }
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'active': return 'bg-success-100 text-success-800'
-    case 'pending': return 'bg-yellow-100 text-yellow-800'
-    case 'completed': return 'bg-blue-100 text-blue-800'
-    default: return 'bg-gray-100 text-gray-800'
-  }
-}
 </script>
 
 <template>
@@ -163,7 +124,12 @@ const getStatusColor = (status: string) => {
                 Welcome back, {{ user?.name }}
               </h1>
               <p class="text-gray-500 mt-1">
-                {{ t(`roles.${user?.role}`) }} Dashboard • {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+                {{ t(`roles.${user?.role}`) }} Dashboard • {{ new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                }) }}
               </p>
             </div>
           </div>
@@ -187,108 +153,7 @@ const getStatusColor = (status: string) => {
         <!-- Left Column: Interventions -->
         <div class="lg:col-span-2 space-y-6">
           <!-- My Interventions -->
-          <UCard class="shadow-sm">
-            <template #header>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <Icon
-                    name="i-lucide-zap"
-                    class="w-5 h-5 text-primary"
-                  />
-                  <span class="font-bold text-xl">My Interventions</span>
-                </div>
-                <UButton
-                  size="sm"
-                  variant="outline"
-                  icon="i-lucide-external-link"
-                  label="View All"
-                />
-              </div>
-            </template>
-
-            <div class="space-y-4">
-              <div
-                v-for="intervention in availableInterventions"
-                :key="intervention.id"
-                class="bg-accented rounded-lg p-4 hover:shadow-sm transition-shadow"
-              >
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                      <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                        <Icon
-                          name="i-lucide-zap"
-                          class="w-5 h-5 text-primary-600"
-                        />
-                      </div>
-                      <div>
-                        <h3 class="font-medium">
-                          {{ intervention.name }}
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                          {{ intervention.description }}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 text-sm text-gray-500">
-                      <span class="flex items-center gap-1">
-                        <Icon
-                          name="i-lucide-users"
-                          class="w-3 h-3"
-                        />
-                        {{ intervention.participants }} participants
-                      </span>
-                      <span class="flex items-center gap-1">
-                        <Icon
-                          name="i-lucide-calendar"
-                          class="w-3 h-3"
-                        />
-                        Next: {{ new Date(intervention.nextSession).toLocaleDateString() }}
-                      </span>
-                    </div>
-
-                    <div class="mt-3">
-                      <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs text-gray-600">Progress</span>
-                        <span class="text-xs text-gray-600">{{ intervention.progress }}%</span>
-                      </div>
-                      <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          class="bg-primary-500 h-2 rounded-full transition-all duration-300"
-                          :style="{ width: `${intervention.progress}%` }"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getStatusColor(intervention.status)"
-                    >
-                      {{ intervention.status }}
-                    </span>
-                    <UDropdownMenu
-                      :items="[
-                        [{ label: 'View Details', icon: 'i-lucide-eye' }],
-                        [{ label: 'Edit Session', icon: 'i-lucide-edit' }],
-                        [{ label: 'View Reports', icon: 'i-lucide-bar-chart' }]
-                      ]"
-                    >
-                      <UButton
-                        icon="i-lucide-more-horizontal"
-                        size="sm"
-                        variant="ghost"
-                        square
-                      />
-                    </UDropdownMenu>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </UCard>
-
+          <LandingInterventionEnrollment />
           <!-- Recent Activity -->
           <UCard class="shadow-sm">
             <template #header>
