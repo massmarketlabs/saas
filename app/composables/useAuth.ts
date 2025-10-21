@@ -1,8 +1,7 @@
 // app/composables/useAuth
 // import type { Subscription } from '@better-auth/stripe'
 import type {
-  ClientOptions,
-  InferSessionFromClient
+  BetterAuthClientPlugin
 } from 'better-auth/client'
 import type { RouteLocationRaw } from 'vue-router'
 // import { stripeClient } from '@better-auth/stripe/client'
@@ -36,13 +35,11 @@ export function useAuth() {
       // })
     ]
   })
-
-  const session = useState<InferSessionFromClient<ClientOptions> | null>('auth:session', () => null)
+  const session = useState<BetterAuthClientPlugin | null>('auth:session', () => null)
   const user = useState<UserWithRole | null>('auth:user', () => null)
   const isAdmin = useState('auth:isAdmin', () => false)
   // const subscriptions = useState<Subscription[]>('auth:subscriptions', () => [])
   const sessionFetching = import.meta.server ? ref(false) : useState('auth:sessionFetching', () => false)
-
   const fetchSession = async () => {
     if (sessionFetching.value) {
       return
@@ -51,14 +48,13 @@ export function useAuth() {
 
     try {
       // Fetch all data concurrently instead of sequentially
-      const sessionReq = await client.useSession(useFetch)
-
+      const sessionReq = await client.getSession()
       // Update state with fetched data
-      if (sessionReq.error.value) {
-        console.error('sessionReq ', sessionReq.error.value)
+      if (sessionReq.error) {
+        console.error('sessionReq ', sessionReq.error)
       } else {
-        session.value = sessionReq.data.value?.session || null
-        user.value = sessionReq.data.value?.user ? { ...sessionReq.data.value.user, role: sessionReq.data.value.user.role ?? undefined } : null
+        session.value = sessionReq.data?.session || null
+        user.value = sessionReq.data?.user ? { ...sessionReq.data.user, role: sessionReq.data.user.role ?? undefined } : null
 
         const adminStatus = await client.admin.hasPermission({ userId: user.value?.id, permission: { administration: ['full'] } })
         if (adminStatus.data?.success) {
