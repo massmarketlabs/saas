@@ -4,7 +4,7 @@ import { getDB } from './db'
 
 export async function logAuditEvent(data: {
   userId?: string
-  category: 'auth' | 'email' | 'payment' | 'organization' | 'enrollment' | 'users'
+  category: 'auth' | 'email' | 'payment' | 'organization' | 'enrollment' | 'users' | 'intervention'
   action: string
   targetType?: string
   targetId?: string

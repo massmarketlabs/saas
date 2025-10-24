@@ -37,13 +37,25 @@ export const interventions = pgTable('interventions', {
   description: text('description'),
   term_id: uuid('term_id').references(() => terms.id).notNull(),
   program_id: uuid('program_id').references(() => programs.id).notNull(),
-  start_date: date('start_date'),
-  end_date: date('end_date'),
+  // start_date: date('start_date'),
+  // end_date: date('end_date'),
   created_by: text('created_by').references(() => user.id).notNull(),
   status: program_status_enum().notNull().default('active'),
   credits: integer('credits'),
   room: text('room'),
   primary_instructor_id: text('primary_instructor_id').references(() => user.id),
+  ...audit_fields
+})
+
+// ========================
+// Announcements
+// ========================
+export const announcement = pgTable('announcements', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
+  created_by: text('created_by').references(() => user.id).notNull(),
   ...audit_fields
 })
 
@@ -128,6 +140,19 @@ export const attendance = pgTable('attendance', {
 // ========================
 
 // ========================
+// Announcement Relations
+// ========================
+export const relations_announcement = relations(announcement, ({ one }) => ({
+  intervention: one(interventions, {
+    references: [interventions.id],
+    fields: [announcement.intervention_id]
+  }),
+  creator: one(user, {
+    references: [user.id],
+    fields: [announcement.created_by]
+  })
+}))
+// ========================
 // Evaluations Relations
 // ========================
 export const relations_evaluation = relations(evaluations, ({ one }) => ({
@@ -200,7 +225,12 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
     fields: [interventions.created_by],
     references: [user.id]
   }),
-  intervention_enrollment: many(intervention_enrollment)
+  intervention_enrollment: many(intervention_enrollment),
+  announcements: many(announcement),
+  primary_instructor: one(user, {
+    fields: [interventions.primary_instructor_id],
+    references: [user.id]
+  })
   // meeting_schedule: many(meeting_schedule),
   // attendance_settings: many(attendance_settings)
 }))

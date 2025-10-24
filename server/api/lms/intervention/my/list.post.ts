@@ -37,7 +37,8 @@ export default defineEventHandler(async (event) => {
         with: {
           intervention_enrollment: {
             where: (enrollment, { eq }) => eq(enrollment.user_id, user_id)
-          }
+          },
+          term: true
         }
       }
     }

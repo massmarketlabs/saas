@@ -2,7 +2,5 @@
 </script>
 
 <template>
-  <NuxtImg
-    src="/images/logo.png"
-  />
+  <NuxtImg src="/images/logo.png" />
 </template>

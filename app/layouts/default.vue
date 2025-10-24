@@ -2,6 +2,12 @@
 import AppFooter from './components/AppFooter.vue'
 import AppNavbar from './components/AppNavbar.vue'
 
+defineSlots<{
+  'nav-center': () => any
+  'nav-right': () => any
+  'default': () => any
+}>()
+
 const i18nHead = useLocaleHead()
 useHead(() => ({
   link: [...(i18nHead.value.link || [])]
@@ -18,7 +24,7 @@ useHead(() => ({
         <slot name="nav-right" />
       </template>
     </AppNavbar>
-    <div class="flex flex-1 pt-16 w-full sm:w-auto">
+    <div class="pt-16 flex-1 w-full">
       <slot />
     </div>
     <AppFooter />

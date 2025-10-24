@@ -42,6 +42,9 @@ export type RequestInsertUserEmergencyContact = z.infer<typeof insertUserEmergen
 export const insertUserRelationship = createInsertSchema(schema.relationships).array()
 export type RequestInsertRelationship = z.infer<typeof insertUserRelationship>
 
+export const insertAnnouncement = createInsertSchema(schema.announcement)
+export type RequestInsertAnnouncement = z.infer<typeof insertAnnouncement>
+
 // Database Queries
 export const dbQueries = (db: NodePgDatabase<typeof schema>) => {
   return {

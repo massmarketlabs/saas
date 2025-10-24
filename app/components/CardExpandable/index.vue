@@ -102,7 +102,7 @@ const getItemKey = (item: T, index: number): string | number => {
       class="text-center py-12"
     >
       <!-- Empty state -->
-      <Icon
+      <UIcon
         class="w-12 h-12 text-primary mx-auto mb-4"
         :name="emptyStateIcon"
       />

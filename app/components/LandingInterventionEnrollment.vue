@@ -4,10 +4,10 @@ import { computed, onMounted, ref } from 'vue'
 const active_term = ref<string>('')
 
 // Fetch user-specific intervention terms
-const { data } = await useFetch('/api/intervention/my/list', {
-  method: 'post'
+const { data } = await useFetch('/api/lms/intervention/my/list', {
+  method: 'post',
+  key: 'data:lms:my-enrollments'
 })
-
 // Convert fetched data into a usable format for tab items
 const intervention_terms = computed(() => {
   if (!data.value || data.value.length === 0)
@@ -44,7 +44,7 @@ const getStatusColor = (status: string) => {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <Icon
+          <UIcon
             name="i-lucide-zap"
             class="w-5 h-5 text-primary"
           />
@@ -63,14 +63,14 @@ const getStatusColor = (status: string) => {
       v-model="active_term"
       :items="intervention_terms"
       variant="link"
-      activation-mode="automatic"
     >
-      <template
-        v-if="data && data.length > 0 && active_term"
-        #content
-      >
+      <template #content>
+        <div v-if="!data || data.length === 0 || active_term === ''">
+          <span>No enrollments found</span>
+        </div>
         <div
           v-for="item in data.filter(x => x.id === active_term)"
+          v-else
           :key="item.id"
           class="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
@@ -111,7 +111,13 @@ const getStatusColor = (status: string) => {
                 </span>
                 <UDropdownMenu
                   :items="[
-                    [{ label: 'View Details', icon: 'i-lucide-eye' }],
+                    [{
+                      label: 'View Details',
+                      icon: 'i-lucide-eye',
+                      onSelect: () => {
+                        navigateTo(`/intervention/${intervention.id}`)
+                      }
+                    }],
                     [{ label: 'Edit Session', icon: 'i-lucide-edit' }],
                     [{ label: 'View Reports', icon: 'i-lucide-bar-chart' }]
                   ]"
@@ -131,9 +137,9 @@ const getStatusColor = (status: string) => {
                   name="i-lucide-calendar"
                   class="w-3 h-3"
                 />
-                {{ new Date(intervention?.start_date || '')?.toLocaleDateString() }}
+                {{ new Date(intervention?.term.start_date || '')?.toLocaleDateString() }}
                 -
-                {{ new Date(intervention?.end_date || '')?.toLocaleDateString() }}
+                {{ new Date(intervention?.term.end_date || '')?.toLocaleDateString() }}
               </span>
             </div>
           </UCard>
