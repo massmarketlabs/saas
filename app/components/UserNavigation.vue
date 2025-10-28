@@ -4,7 +4,6 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 const localePath = useLocalePath()
 const { t } = useI18n()
 const { user, loggedIn, signOut, sessionFetching, isAdmin } = useAuth()
-
 const profileMenuItems: DropdownMenuItem[] = [
   {
     label: t('global.auth.profile'),
@@ -21,9 +20,7 @@ const profileMenuItems: DropdownMenuItem[] = [
 
 <template>
   <template v-if="loggedIn">
-    <UDropdownMenu
-      :items="profileMenuItems"
-    >
+    <UDropdownMenu :items="profileMenuItems">
       <UButton
         variant="ghost"
         color="neutral"
