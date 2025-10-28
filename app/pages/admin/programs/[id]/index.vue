@@ -92,7 +92,7 @@ useHead({ title: `Programs | ${data.value?.name}` })
         <!-- Left Column: Program Enrollment -->
         <div class="lg:col-span-2 space-y-6">
           <CardExpandable
-            :items="enrollments ?? []"
+            :items="enrollments"
             title="Active Enrollments"
             icon="i-lucide-users"
             header-icon="i-lucide-users"
@@ -106,7 +106,7 @@ useHead({ title: `Programs | ${data.value?.name}` })
                   <UAvatar
                     size="sm"
                     :src="item.image ?? ''"
-                    :alt="item.name"
+                    :alt="item.name ?? ''"
                   />
 
                   <span>

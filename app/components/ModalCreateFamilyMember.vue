@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestInsertRelationship } from '~~/server/database'
-import type * as schema from '~~/server/database/schema'
+import type { RequestInsertRelationship } from '~~/server/internal/auth/zod-types'
+import type * as schema from '~~/server/internal/schemas'
 import { get, refDebounced, set } from '@vueuse/core'
 
 type User = typeof schema.user.$inferSelect

@@ -24,7 +24,7 @@ useHead(() => ({
         <slot name="nav-right" />
       </template>
     </AppNavbar>
-    <div class="pt-16 flex-1 w-full">
+    <div class="pt-16 flex flex-col flex-1 w-full">
       <slot />
     </div>
     <AppFooter />

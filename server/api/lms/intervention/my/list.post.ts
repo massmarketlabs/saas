@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm'
-import * as schema from '~~/server/database/schema'
+import * as schema from '~~/server/internal/schemas'
 
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)

@@ -29,9 +29,11 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ['./app/stores/**']
   },
+
   i18n: {
     vueI18n: '~/i18n/i18n.config.ts',
     baseUrl: process.env.NUXT_APP_URL,
+    strategy: 'prefix_except_default',
     locales,
     defaultLocale: 'en'
   },
@@ -110,7 +112,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     debug: true,
-    logLevel: 5,
+    logLevel: 3,
     preset: process.env.NUXT_NITRO_PRESET,
     experimental: {
       tasks: true

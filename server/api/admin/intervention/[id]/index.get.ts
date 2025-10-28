@@ -1,4 +1,4 @@
-import { dbQueries } from '~~/server/database'
+import { interventionRepo } from '~~/server/internal/intervention/repo'
 
 const ERR_MISSING_ID = 'ID param is required'
 
@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const resp = await dbQueries(db).interventions.getById(id)
+  const resp = await interventionRepo(db).getById(id)
   return resp
 })

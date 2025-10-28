@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { InternalApi } from 'nitropack'
-import type { RequestCreateIntervention } from '~~/server/database'
-import { requestCreateInterventionSchema } from '~~/server/database'
+import type { RequestCreateIntervention } from '~~/server/internal/intervention/zod-types'
 
 const props = defineProps<{ intervention: InternalApi['/api/admin/intervention/:id']['get'], pending: boolean }>()
 const emit = defineEmits(['interventionChanged'])
@@ -91,9 +90,7 @@ async function onSubmit(event: FormSubmitEvent<RequestCreateIntervention>) {
       </UForm>
     </template>
     <template #footer>
-      <UButton
-        @click="form?.submit"
-      >
+      <UButton @click="form?.submit">
         Submit
       </UButton>
     </template>

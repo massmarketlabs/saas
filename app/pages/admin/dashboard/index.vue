@@ -1,7 +1,7 @@
 <i18n src="./i18n.json"></i18n>
 
 <script setup lang="ts">
-import ICountUp from 'vue-countup-v3'
+// import * as ICountUp from 'vue-countup-v3'
 
 definePageMeta({
   layout: false
@@ -114,27 +114,32 @@ const stats = ref([
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                   {{ t(`dashboard.stats.${stat.name}`) }}
                 </div>
-                <ICountUp
-                  class="mt-1 text-2xl font-semibold"
-                  :end-val="stat.value || '0'"
-                  :decimal-places="stat.decimalPlaces"
-                >
-                  <template #suffix>
-                    {{ stat.suffix }}
-                  </template>
-                </ICountUp>
+                <span class="mt-1 text-2xl font-semibold"> {{ stat.value }}</span>
+                <span
+                  v-if="stat.suffix"
+                  class="text-2xl font-semibold"
+                > {{ stat.suffix }}</span>
+                <!-- <ICountUp -->
+                <!--   class="mt-1 text-2xl font-semibold" -->
+                <!--   :end-val="stat.value || '0'" -->
+                <!--   :decimal-places="stat.decimalPlaces" -->
+                <!-- > -->
+                <!--   <template #suffix> -->
+                <!--     {{ stat.suffix }} -->
+                <!--   </template> -->
+                <!-- </ICountUp> -->
                 <div
                   class="mt-2 flex items-center text-sm"
                   :class="stat.isIncrease ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                 >
-                  <Icon
+                  <UIcon
                     :name="stat.isIncrease ? 'lucide:trending-up' : 'lucide:trending-down'"
                     class="mr-1 h-4 w-4"
                   />
                   {{ stat.change }}%
                 </div>
               </div>
-              <Icon
+              <UIcon
                 :name="`lucide:${stat.icon}`"
                 class="h-8 w-8 text-gray-400 dark:text-gray-600"
               />

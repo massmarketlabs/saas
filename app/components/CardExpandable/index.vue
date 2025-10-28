@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 // Types
 interface CardExpandableProps<T> {
   title: string
-  items: T[]
+  items?: T[]
   headerIcon?: string
   emptyStateIcon?: string
   emptyStateTitle?: string

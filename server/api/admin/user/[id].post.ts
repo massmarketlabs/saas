@@ -1,6 +1,6 @@
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { dbQueries } from '~~/server/database'
+import { authRepo } from '~~/server/internal/auth/repo'
 
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'ID param is required.' })
   }
   const db = await useDB(event)
-  const resp = await dbQueries(db).user.getById(id)
+  const resp = await authRepo(db).getById(id)
   const userId = session.user.id
   const auditParams = extractAuditParams(event)
 

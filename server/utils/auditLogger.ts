@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { auditLog } from '../database/schema/auditLog'
+import { auditLog } from '../internal/auditLog/schema'
 import { getDB } from './db'
 
 export async function logAuditEvent(data: {

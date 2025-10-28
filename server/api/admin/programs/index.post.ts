@@ -2,7 +2,8 @@
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 import { z } from 'zod/v4'
-import { dbQueries, insertProgramSchema } from '~~/server/database'
+import { programRepo } from '~~/server/internal/program/repo'
+import { insertProgramSchema } from '~~/server/internal/program/zod-types'
 
 // Define POST handler
 export default defineEventHandler(async (event: H3Event) => {
@@ -22,7 +23,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Get db connection
     const db = await useDB(event)
     // Insert into database
-    const result = await dbQueries(db).program.insert(body.data)
+    const result = await programRepo(db).create(body.data)
 
     await logAuditEvent({
       userId: user.session.userId,

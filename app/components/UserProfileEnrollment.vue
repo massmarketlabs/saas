@@ -41,7 +41,7 @@ const enrollmentTabs = ref([
       .map(intervention => ({
         id: intervention.id,
         course: intervention.name,
-        startDate: intervention.start_date,
+        // startDate: intervention.start_date,
         status: 'Active',
         instructor: 'Mr. Batata',
         period: '2nd Period',
@@ -59,7 +59,7 @@ const enrollmentTabs = ref([
       .map(intervention => ({
         id: intervention.id,
         course: intervention.name,
-        startDate: intervention.start_date,
+        // startDate: intervention.start_date,
         status: 'Active',
         instructor: 'Mr. Batata',
         period: '2nd Period',
@@ -144,10 +144,10 @@ const enrollmentTabs = ref([
                 <span class="font-medium">Room:</span>
                 {{ enrollment.room }}
               </div>
-              <div>
-                <span class="font-medium">Start Date:</span>
-                {{ formatDate(new Date(String(enrollment.startDate))) }}
-              </div>
+              <!-- <div> -->
+              <!--   <span class="font-medium">Start Date:</span> -->
+              <!--   {{ formatDate(new Date(String(enrollment.startDate))) }} -->
+              <!-- </div> -->
               <div>
                 <span class="font-medium">Credits:</span>
                 {{ enrollment.credits }}

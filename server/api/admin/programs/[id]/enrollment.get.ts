@@ -1,4 +1,4 @@
-import { dbQueries } from '~~/server/database'
+import { programRepo } from '~~/server/internal/program/repo'
 
 export default defineEventHandler(async (event) => {
   const __auth = requireAuth(event)
@@ -11,6 +11,6 @@ export default defineEventHandler(async (event) => {
 
   const db = await useDB(event)
 
-  const resp = await dbQueries(db).program.enrollments(id)
+  const resp = await programRepo(db).enrollments(id)
   return resp
 })

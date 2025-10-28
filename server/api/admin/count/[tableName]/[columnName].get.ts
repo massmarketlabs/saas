@@ -1,8 +1,8 @@
 import { getTableColumns, sql } from 'drizzle-orm'
 import { z } from 'zod'
-import * as schema from '~~/server/database/schema'
-import { groupedColumnSchema, processFilters, withFilters } from '~~/server/database/utils'
+import * as schema from '~~/server/internal/schemas'
 import { isValidTable } from '~~/server/utils/db'
+import { groupedColumnSchema, processFilters, withFilters } from '~~/server/utils/pagination'
 
 const pathSchema = z.object({
   tableName: z.string().min(1),

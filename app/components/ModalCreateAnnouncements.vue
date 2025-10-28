@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestInsertAnnouncement } from '~~/server/database'
-import { insertAnnouncement } from '~~/server/database'
+import type { RequestInsertAnnouncement } from '~~/server/internal/intervention/zod-types'
+import { insertAnnouncement } from '~~/server/internal/intervention/zod-types'
 
 const props = defineProps<{ interventionId?: string }>()
 const emits = defineEmits(['change'])

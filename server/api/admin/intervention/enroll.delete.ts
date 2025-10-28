@@ -1,11 +1,33 @@
-import { byIdSchema, dbQueries } from '~~/server/database'
+import { interventionRepo } from '~~/server/internal/intervention/repo'
 import { extractAuditParams } from '~~/server/utils/auditLogger'
 
 export default defineEventHandler(async (event) => {
-  const auditParams = extractAuditParams(event)
-  const auth = await requireAuth(event)
-  const payload = await readValidatedBody(event, byIdSchema.parse)
+  const session = await requireAuth(event)
+
+  const body = await readBody(event)
+
+  if (!body || !body.id) {
+    throw createError({
+      statusCode: 400,
+      message: 'Bad request'
+    })
+  }
+
   const db = await useDB(event)
 
-  return await dbQueries(db).interventions.deleteEnrollment(payload, auth.user, auditParams)
+  const resp = await interventionRepo(db).deleteEnrollment({ id: body.id })
+  const auditParams = extractAuditParams(event)
+
+  await logAuditEvent({
+    userId: session.user.id,
+    ipAddress: auditParams.ipAddress,
+    userAgent: auditParams.userAgent,
+    targetId: body.id,
+    category: 'enrollment',
+    action: `DELETE: Intervention Enrollment`,
+    targetType: 'intervention_enrollment',
+    status: 'success'
+  })
+
+  return resp
 })

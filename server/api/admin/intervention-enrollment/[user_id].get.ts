@@ -1,5 +1,4 @@
-import { dbQueries } from '~~/server/database'
-// import * as schema from '~~/server/database/schema'
+import { interventionRepo } from '~~/server/internal/intervention/repo'
 
 export default defineEventHandler(async (event) => {
   const __session = requireAuth(event)
@@ -8,6 +7,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ status: 404, message: `User ${user_id} not found.` })
   }
   const db = await useDB(event)
-  const data = await dbQueries(db).interventions.getByUserId(user_id)
+  const data = await interventionRepo(db).getByUserId(user_id)
   return data
 })

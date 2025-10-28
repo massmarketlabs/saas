@@ -1,4 +1,4 @@
-import { dbQueries } from '~~/server/database'
+import { programRepo } from '~~/server/internal/program/repo'
 
 const ERR_MISSING_ID = 'ID param is required'
 
@@ -15,6 +15,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const resp = await dbQueries(db).program.getById(id)
+  const resp = await programRepo(db).getById(id)
   return resp
 })

@@ -1,4 +1,5 @@
-import { dbQueries, requestCreateInterventionSchema } from '~~/server/database'
+import { interventionRepo } from '~~/server/internal/intervention/repo'
+import { requestCreateInterventionSchema } from '~~/server/internal/intervention/zod-types'
 
 export default defineEventHandler(async (event) => {
   const auth = await requireAuth(event)
@@ -10,5 +11,5 @@ export default defineEventHandler(async (event) => {
   const payload = { ...body.data, created_by: auth.user.id }
 
   const db = await useDB(event)
-  return await dbQueries(db).interventions.insert(payload)
+  return await interventionRepo(db).create(payload)
 })

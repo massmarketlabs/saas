@@ -1,8 +1,8 @@
 import type { AnyPgTable } from 'drizzle-orm/pg-core'
-import { DrizzleCrudRepository } from '~~/server/database/crud-repository'
-import * as schema from '~~/server/database/schema'
-import { paginatedSchema } from '~~/server/database/utils'
+import * as schema from '~~/server/internal/schemas'
+import { DrizzleCrudRepository } from '~~/server/utils/crud-repository'
 import { isValidTable } from '~~/server/utils/db'
+import { paginatedSchema } from '~~/server/utils/pagination'
 
 export default eventHandler(async (event) => {
   const tableName = getRouterParam(event, 'tableName')

@@ -1,5 +1,5 @@
 import type { LocalePathFunction } from '#i18n'
-import type { programs } from '~~/server/database/schema'
+import type { programs } from '~~/server/internal/schemas'
 
 type Program = typeof programs.$inferSelect
 

@@ -1,17 +1,17 @@
 import type { SQL } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { AnyPgTable, PgInsertValue, PgUpdateSetSource } from 'drizzle-orm/pg-core'
-import type z from 'zod/v4'
-import type * as schema from './schema'
-import type { paginatedSchema } from './utils'
+import type { z } from 'zod/v4'
+import type * as schema from '../internal/schemas'
+import type { paginatedSchema } from './pagination'
 import { asc, desc, eq, getTableColumns, inArray, sql } from 'drizzle-orm'
-import { processFilters, withFilters, withPagination, withSorts } from './utils'
+import { processFilters, withFilters, withPagination, withSorts } from './pagination'
 
 type InferSelectModel<T extends AnyPgTable> = T['$inferSelect']
 type InferInsertModel<T extends AnyPgTable> = T['$inferInsert']
 
 export class DrizzleCrudRepository<TTable extends AnyPgTable> {
-  private db: NodePgDatabase<typeof schema>
+  private db: NodePgDatabase<Partial<typeof schema>>
   private table: TTable
   private columns: ReturnType<typeof getTableColumns<TTable>>
 
@@ -21,7 +21,7 @@ export class DrizzleCrudRepository<TTable extends AnyPgTable> {
   private del = <TT extends AnyPgTable>(table: TT) => this.db.delete(table)
   private from = <TT extends AnyPgTable>(table: TT) => this.db.select().from(table as any)
 
-  constructor(db: NodePgDatabase<typeof schema>, table: TTable) {
+  constructor(db: NodePgDatabase<Partial<typeof schema>>, table: TTable) {
     this.db = db
     this.table = table
     this.columns = getTableColumns(table)

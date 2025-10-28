@@ -1,5 +1,4 @@
-import { dbQueries } from '~~/server/database'
-import { paginatedSchema } from '~~/server/database/utils'
+import { authRepo } from '~~/server/internal/auth/repo'
 
 export default defineEventHandler(async (event) => {
   const __user = await requireAuth(event)
@@ -7,5 +6,5 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, paginatedSchema.parse)
 
-  return await dbQueries(db).user.list(query)
+  return await authRepo(db).list(query)
 })

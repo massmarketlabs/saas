@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UModal } from '#components'
-import type { RequestInsertTerm } from '~~/server/database'
-import { insertTerm } from '~~/server/database'
+import type { RequestInsertTerm } from '~~/server/internal/intervention/zod-types'
+import { insertTerm } from '~~/server/internal/intervention/zod-types'
 
 definePageMeta({ layout: false })
 const toast = useToast()

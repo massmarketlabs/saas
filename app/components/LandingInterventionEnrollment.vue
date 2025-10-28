@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-
 const active_term = ref<string>('')
 
 // Fetch user-specific intervention terms
@@ -20,9 +18,10 @@ const intervention_terms = computed(() => {
 
 // Set the first term as active when loaded
 onMounted(() => {
-  if (data.value && data.value.length > 0 && data.value?.[0]) {
-    active_term.value = data.value[0].id
+  if (!data.value || data.value.length == 0) {
+    return
   }
+  active_term.value = data.value?.[0]?.id ?? ''
 })
 
 const getStatusColor = (status: string) => {
@@ -58,19 +57,21 @@ const getStatusColor = (status: string) => {
         />
       </div>
     </template>
-
+    <UEmpty
+      v-if="!data || !data.length"
+      title="No enrollments found"
+      description="Contact your academic advisor to enroll in your first intervention"
+      icon="i-lucide-zap"
+    />
     <UTabs
+      v-else
       v-model="active_term"
       :items="intervention_terms"
       variant="link"
     >
       <template #content>
-        <div v-if="!data || data.length === 0 || active_term === ''">
-          <span>No enrollments found</span>
-        </div>
         <div
-          v-for="item in data.filter(x => x.id === active_term)"
-          v-else
+          v-for="item in data?.filter(x => x.id === active_term)"
           :key="item.id"
           class="grid grid-cols-1 md:grid-cols-2 gap-4"
         >

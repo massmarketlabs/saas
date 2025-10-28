@@ -1,10 +1,14 @@
 import globalMessage from './global.json'
 
 export default defineI18nConfig(() => ({
-  legacy: false,
+  // legacy: false,
   locale: 'en',
   fallbackWarn: false,
   missingWarn: false,
-  availableLocales: locales,
-  messages: globalMessages
+  availableLocales: [
+    'en',
+    'ar'
+  ],
+  // availableLocales: locales,
+  messages: globalMessage
 }))

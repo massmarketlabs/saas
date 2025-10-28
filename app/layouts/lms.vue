@@ -41,7 +41,7 @@ const nav = [
     <template #default>
       <div
         v-if="id"
-        class="bg-accented w-full h-16 fixed"
+        class="bg-accented w-full h-16"
       >
         <UContainer class="h-full content-center space-x-4">
           <UNavigationMenu
@@ -50,11 +50,7 @@ const nav = [
           />
         </UContainer>
       </div>
-      <div
-        :class="{
-          'pt-16': id
-        }"
-      >
+      <div class="py-6 flex-1 flex flex-col">
         <slot name="default" />
       </div>
     </template>

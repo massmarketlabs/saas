@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestInsertUserNote } from '~~/server/database'
-import { insertUserNote } from '~~/server/database'
+import type { RequestInsertUserNote } from '~~/server/internal/intervention/zod-types'
+import { insertUserNote } from '~~/server/internal/intervention/zod-types'
 
 const props = defineProps<{ beneficiaryId: string }>()
 const emit = defineEmits(['noteAdded'])

@@ -1,5 +1,5 @@
 import { reset } from 'drizzle-seed'
-import * as schema from '~~/server/database/schema'
+import * as schema from '~~/server/internal/schemas'
 
 export default defineTask({
   meta: {

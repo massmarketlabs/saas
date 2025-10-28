@@ -1,5 +1,5 @@
-import { insertAnnouncement } from '~~/server/database'
-import * as schemas from '~~/server/database/schema'
+import { insertAnnouncement } from '~~/server/internal/intervention/zod-types'
+import * as schemas from '~~/server/internal/schemas'
 
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)

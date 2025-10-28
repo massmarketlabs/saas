@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestCreateProgram } from '~~/server/database'
-import { insertProgramSchema } from '~~/server/database'
+import type { RequestCreateProgram } from '~~/server/internal/program/zod-types'
+import { insertProgramSchema } from '~~/server/internal/program/zod-types'
 
 const form = useTemplateRef('form')
 const isOpen = ref(false)

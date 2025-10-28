@@ -4,7 +4,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { admin as adminPlugin, openAPI } from 'better-auth/plugins'
 import { v7 as uuidv7 } from 'uuid'
-import * as schema from '../database/schema'
+import * as schema from '../internal/schemas'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import {
@@ -207,7 +207,7 @@ const createBetterAuth = () => betterAuth({
 let _auth: ReturnType<typeof createBetterAuth>
 
 // Used by npm run auth:schema only.
-const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/database/schema/auth.ts'))
+const isAuthSchemaCommand = process.argv.some(arg => arg.includes('server/internal/auth/schema.ts'))
 if (isAuthSchemaCommand) {
   _auth = createBetterAuth()
 }

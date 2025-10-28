@@ -1,6 +1,6 @@
 import { seed } from 'drizzle-seed'
 import { v4 as uuidV4 } from 'uuid'
-import * as schema from '~~/server/database/schema'
+import * as schema from '~~/server/internal/schemas'
 
 export default defineTask({
   meta: {
@@ -143,7 +143,9 @@ export default defineTask({
                 isUnique: true,
                 values: Array.from({ length: 1000 }, () => uuidV4())
               }),
-              description: f.loremIpsum({ sentencesCount: 5 })
+              description: f.loremIpsum({ sentencesCount: 5 }),
+              room: f.valuesFromArray({ values: ['1001', '1002', '1003', '1004', '1005', '2001', '2002', '2003', '2004', '3001', '3002', '3003', '3004'] }),
+              credits: f.number({ minValue: 1, maxValue: 6, precision: 1 })
             }
           },
           intervention_enrollment: {

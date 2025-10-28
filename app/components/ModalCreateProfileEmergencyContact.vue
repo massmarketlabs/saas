@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestInsertUserEmergencyContact } from '~~/server/database'
-import { insertUserEmergencyContact } from '~~/server/database'
+import type { RequestInsertUserEmergencyContact } from '~~/server/internal/auth/zod-types'
+import { insertUserEmergencyContact } from '~~/server/internal/auth/zod-types'
 
 const props = defineProps<{ beneficiaryId: string }>()
 const emit = defineEmits(['emergencyContactAdded'])
@@ -103,9 +103,7 @@ const onSubmit = async (event: FormSubmitEvent<RequestInsertUserEmergencyContact
             :items="[{ label: 'Mother', value: 'mother' }, { label: 'Father', value: 'father' }, { label: 'Sibling', value: 'sibling' }]"
           />
         </UFormField>
-        <UFormField
-          name="is_primary"
-        >
+        <UFormField name="is_primary">
           <UCheckbox
             v-model="state.is_primary as boolean"
             label="Primary Contact"

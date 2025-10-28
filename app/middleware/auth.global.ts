@@ -71,7 +71,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const hasPermission = await client.admin.hasPermission({
       permissions: { administration: ['full'] }
     })
-
+    console.log({ hasPermission })
     if (!hasPermission.data?.success) {
       return navigateTo(localePath('/403'))
     }
