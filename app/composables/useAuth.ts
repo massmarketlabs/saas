@@ -57,7 +57,6 @@ export function useAuth() {
 
         const adminStatus = await client.admin.hasPermission({ userId: user.value?.id, permission: { administration: ['full'] } })
 
-        console.log({ adminStatus })
         if (adminStatus.data?.success) {
           isAdmin.value = true
         }
