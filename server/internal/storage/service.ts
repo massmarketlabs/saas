@@ -1,10 +1,22 @@
 import type { H3Event } from 'h3'
-import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { v4 } from 'uuid'
 import { storageRepo } from './repo'
 
-export const service = (event: H3Event, bucket: 'attachments' | 'avatars') => {
-  const uploadAttachments = async () => {
+// type S3BucketNames = 'attachments' | 'avatars'
+
+export const storageService = () => {
+  const uploadAttachments = async (event: H3Event) => {
+    const bucket = getRouterParam(event, 'bucket')
+
+    if (!bucket || !['attachments', 'avatars'].includes(bucket)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Bad request: bucket does not exist'
+      })
+    }
+
     const files = await readMultipartFormData(event)
     if (!files || files.length === 0) {
       throw createError({
@@ -61,7 +73,30 @@ export const service = (event: H3Event, bucket: 'attachments' | 'avatars') => {
     return uploadedFiles
   }
 
+  const getById = async (event: H3Event, id: string) => {
+    const db = await useDB(event)
+    const repo = storageRepo({ db })
+    const file = await repo.read({ id })
+    if (!file) {
+      throw createError({
+        statusCode: 404,
+        message: 'Attachment not found'
+      })
+    }
+    const command = new GetObjectCommand({
+      Bucket: file.bucket,
+      Key: file.id
+
+    })
+
+    const presignedUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: 3600
+    })
+
+    return { url: presignedUrl, type: file.mime_type }// Add this line
+  }
   return {
-    uploadAttachments
+    uploadAttachments,
+    getById
   }
 }

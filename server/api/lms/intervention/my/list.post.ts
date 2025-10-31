@@ -12,13 +12,13 @@ export default defineEventHandler(async (event) => {
       exists(
         db
           .select()
-          .from(schema.intervention_enrollment)
+          .from(schema.enrollment)
           .innerJoin(
             schema.interventions,
-            eq(schema.interventions.id, schema.intervention_enrollment.intervention_id)
+            eq(schema.interventions.id, schema.enrollment.intervention_id)
           )
           .where(
-            sql`${schema.interventions.term_id} = ${term.id} AND ${schema.intervention_enrollment.user_id} = ${user_id}`
+            sql`${schema.interventions.term_id} = ${term.id} AND ${schema.enrollment.user_id} = ${user_id}`
           )
       ),
     orderBy: (term, { asc }) => asc(term.start_date),
@@ -28,10 +28,10 @@ export default defineEventHandler(async (event) => {
           exists(
             db
               .select()
-              .from(schema.intervention_enrollment)
+              .from(schema.enrollment)
               .where(
-                sql`${schema.intervention_enrollment.intervention_id} = ${intervention.id}
-                AND ${schema.intervention_enrollment.user_id} = ${user_id}`
+                sql`${schema.enrollment.intervention_id} = ${intervention.id}
+                AND ${schema.enrollment.user_id} = ${user_id}`
               )
           ),
         with: {

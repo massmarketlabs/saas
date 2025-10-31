@@ -1,11 +1,12 @@
 import { date, doublePrecision, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { audit_fields } from '../../utils/auditFields'
-import { programs, user } from '../schemas'
+import { programs, storage, user } from '../schemas'
 
 // ========================
 // Program Status Enum
 // ========================
 export const program_status_enum = pgEnum('status', ['active', 'inactive'])
+
 // ========================
 // Terms
 // ========================
@@ -31,6 +32,7 @@ export const interventions = pgTable('interventions', {
   credits: integer('credits'),
   room: text('room'),
   primary_instructor_id: text('primary_instructor_id').references(() => user.id),
+  syllabus_id: uuid('syllabus_id').references(() => storage.id),
   ...audit_fields
 })
 
@@ -49,7 +51,7 @@ export const announcement = pgTable('announcements', {
 // ========================
 // Intervention ↔ Enrollment
 // ========================
-export const intervention_enrollment = pgTable('intervention_enrollment', {
+export const enrollment = pgTable('enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
   intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   user_id: text('user_id').references(() => user.id).notNull(),

@@ -6,6 +6,7 @@ const { data } = await useFetch('/api/lms/intervention/my/list', {
   method: 'post',
   key: 'data:lms:my-enrollments'
 })
+
 // Convert fetched data into a usable format for tab items
 const intervention_terms = computed(() => {
   if (!data.value || data.value.length === 0)
@@ -16,13 +17,12 @@ const intervention_terms = computed(() => {
   }))
 })
 
-// Set the first term as active when loaded
-onMounted(() => {
-  if (!data.value || data.value.length == 0) {
-    return
+// Set the first term as active when data is available
+watch(data, (newData) => {
+  if (newData && newData[0]) {
+    active_term.value = newData[0].id
   }
-  active_term.value = data.value?.[0]?.id ?? ''
-})
+}, { immediate: true })
 
 const getStatusColor = (status: string) => {
   switch (status) {

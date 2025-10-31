@@ -2,3 +2,4 @@
 export * from './schema'
 export * from './relations'
 export * from './repo'
+export * from './service'

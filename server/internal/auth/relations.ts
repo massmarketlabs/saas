@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm'
-import { emergency_contacts, intervention_enrollment, interventions, notes, relationships, submissions, user } from '../schemas'
+import { emergency_contacts, enrollment, interventions, notes, relationships, submissions, user } from '../schemas'
 
 // ========================
 // User Relations
 // ========================
 export const relations_user = relations(user, ({ many }) => ({
-  intervention_enrollment: many(intervention_enrollment),
+  intervention_enrollment: many(enrollment),
   created_interventions: many(interventions),
   emergency_contacts: many(emergency_contacts),
   beneficiary_notes: many(notes, { relationName: 'beneficiary_notes' }),

@@ -3,15 +3,14 @@ import { z } from 'zod/v4'
 import * as schema from '../schemas'
 
 // interventions.insert
-
 export const requestCreateInterventionSchema = createInsertSchema(schema.interventions)
 export type RequestCreateIntervention = z.infer<typeof requestCreateInterventionSchema>
 
-export const insertInterventionEnrollment = createInsertSchema(schema.intervention_enrollment, { intervention_id: z.string(), user_id: z.string() }) // TODO: ensure that no leaking uuid that don't use v4
-
+// intervention enrollment insert
+export const insertInterventionEnrollment = createInsertSchema(schema.enrollment, { intervention_id: z.string(), user_id: z.string() }) // TODO: ensure that no leaking uuid that don't use v4
 export type RequestCreateInterventionEnrollment = z.infer<typeof insertInterventionEnrollment>
-// terms.insert
 
+// terms.insert
 export const insertTerm = createInsertSchema(schema.terms).refine(data => data.end_date > data.start_date, {
   message: 'End date cannot be earlier than start date.',
   path: ['end_date']

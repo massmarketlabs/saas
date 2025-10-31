@@ -1,3 +1,5 @@
+import { storageService } from '~~/server/internal/storage/service'
+
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)
   const id = getRouterParam(event, 'id')
@@ -10,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const db = await useDB(event)
 
-  const enrollment = await db.query.intervention_enrollment.findFirst({
+  const enrollment = await db.query.enrollment.findFirst({
     where: (enrollment, { eq, and }) => (and(eq(enrollment.intervention_id, id), eq(enrollment.user_id, session.user.id)))
   })
 
@@ -55,5 +57,15 @@ export default defineEventHandler(async (event) => {
     details: `User: ${session.user.id} read intervention: ${id}`
   })
 
-  return intervention
+  if (intervention.syllabus_id) {
+    const storage = storageService()
+    const res = await storage.getById(event, intervention.syllabus_id)
+    if (res) {
+      return {
+        ...intervention,
+        syllabus_src: res.url
+      }
+    }
+  }
+  return { ...intervention, syllabus_src: null }
 })

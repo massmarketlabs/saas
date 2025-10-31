@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { user } from '../auth/schema'
-import { programs } from '../schemas'
-import { announcement, assignments, evaluations, intervention_enrollment, interventions, notes, submissions, terms } from './schema'
+import { programs, storage } from '../schemas'
+import { announcement, assignments, enrollment, evaluations, interventions, notes, submissions, terms } from './schema'
 
 // ========================
 // Announcement Relations
@@ -82,11 +82,15 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
     fields: [interventions.created_by],
     references: [user.id]
   }),
-  intervention_enrollment: many(intervention_enrollment),
+  intervention_enrollment: many(enrollment),
   announcements: many(announcement),
   primary_instructor: one(user, {
     fields: [interventions.primary_instructor_id],
     references: [user.id]
+  }),
+  syllabus: one(storage, {
+    fields: [interventions.syllabus_id],
+    references: [storage.id]
   })
   // meeting_schedule: many(meeting_schedule),
   // attendance_settings: many(attendance_settings)
@@ -95,13 +99,13 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
 // ========================
 // Intervention Enrollment Relations
 // ========================
-export const relations_intervention_enrollment = relations(intervention_enrollment, ({ one }) => ({
+export const relations_intervention_enrollment = relations(enrollment, ({ one }) => ({
   intervention: one(interventions, {
-    fields: [intervention_enrollment.intervention_id],
+    fields: [enrollment.intervention_id],
     references: [interventions.id]
   }),
   user: one(user, {
-    fields: [intervention_enrollment.user_id],
+    fields: [enrollment.user_id],
     references: [user.id]
   })
   // attendance: many(attendance)

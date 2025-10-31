@@ -18,6 +18,7 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
         with: {
           program: true,
           term: true,
+          syllabus: true,
           intervention_enrollment: {
             orderBy: (enrollment, { desc }) => desc(enrollment.updated_at),
             with: {
@@ -62,16 +63,16 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
     const { intervention_id, user_id } = payload
     const enrollments = await db
       .select()
-      .from(schema.intervention_enrollment)
+      .from(schema.enrollment)
       .where(
         and(
-          eq(schema.intervention_enrollment.intervention_id, intervention_id),
-          eq(schema.intervention_enrollment.user_id, user_id)
+          eq(schema.enrollment.intervention_id, intervention_id),
+          eq(schema.enrollment.user_id, user_id)
         )
       )
       .limit(1)
 
-    const repo = new DrizzleCrudRepository(db, schema.intervention_enrollment)
+    const repo = new DrizzleCrudRepository(db, schema.enrollment)
     const enrollment = enrollments[0]
     if (!enrollment) {
       await repo.create({
@@ -103,7 +104,7 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
   }
 
   const deleteEnrollment = async (payload: { id: string }) => {
-    const repo = new DrizzleCrudRepository(db, schema.intervention_enrollment)
+    const repo = new DrizzleCrudRepository(db, schema.enrollment)
     const resp = await repo.deleteById(payload.id)
     return resp
   }
