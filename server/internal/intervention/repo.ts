@@ -1,8 +1,8 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
-import type { RequestCreateIntervention, RequestCreateInterventionEnrollment, RequestInsertTerm, RequestInsertUserNote } from './zod-types'
+import type { RequestCreateIntervention, RequestCreateInterventionEnrollment, RequestInsertSubject, RequestInsertTerm, RequestInsertUserNote } from './zod-types'
 import { and, eq } from 'drizzle-orm'
+import * as schema from '..'
 import { DrizzleCrudRepository } from '../../utils/crud-repository'
-import * as schema from '../schemas'
 
 export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
   const create = async (payload: RequestCreateIntervention) => {
@@ -19,6 +19,7 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
           program: true,
           term: true,
           syllabus: true,
+          subjects: true,
           intervention_enrollment: {
             orderBy: (enrollment, { desc }) => desc(enrollment.updated_at),
             with: {
@@ -119,6 +120,17 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
     const repo = new DrizzleCrudRepository(db, schema.notes)
     return await repo.create(payload)
   }
+
+  const createSubject = async (payload: RequestInsertSubject) => {
+    const repo = new DrizzleCrudRepository(db, schema.subject)
+    return await repo.create(payload)
+  }
+
+  const updateSyllabusAttachmentId = async (payload: Pick<RequestCreateIntervention, 'syllabus_id' | 'id'>) => {
+    const r = new DrizzleCrudRepository(db, schema.interventions)
+    return await r.updateById(payload.id as string, payload)
+  }
+
   return {
     create,
     getById,
@@ -127,6 +139,8 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
     toggleEnrollment,
     deleteEnrollment,
     createTerm,
-    createNote
+    createNote,
+    updateSyllabusAttachmentId,
+    createSubject
   }
 }

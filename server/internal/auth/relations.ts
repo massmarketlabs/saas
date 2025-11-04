@@ -1,5 +1,7 @@
 import { relations } from 'drizzle-orm'
-import { emergency_contacts, enrollment, interventions, notes, relationships, submissions, user } from '../schemas'
+import { enrollment, interventions, notes, submissions } from '../intervention/schema'
+import { emergency_contacts, relationships } from '../user/schema'
+import { user } from './schema'
 
 // ========================
 // User Relations

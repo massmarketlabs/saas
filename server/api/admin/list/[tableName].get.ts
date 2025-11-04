@@ -1,5 +1,5 @@
 import type { AnyPgTable } from 'drizzle-orm/pg-core'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 import { DrizzleCrudRepository } from '~~/server/utils/crud-repository'
 import { isValidTable } from '~~/server/utils/db'
 import { paginatedSchema } from '~~/server/utils/pagination'

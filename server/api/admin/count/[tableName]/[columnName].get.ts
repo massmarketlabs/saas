@@ -1,6 +1,6 @@
 import { getTableColumns, sql } from 'drizzle-orm'
 import { z } from 'zod'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal/'
 import { isValidTable } from '~~/server/utils/db'
 import { groupedColumnSchema, processFilters, withFilters } from '~~/server/utils/pagination'
 

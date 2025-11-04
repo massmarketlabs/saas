@@ -1,4 +1,4 @@
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 
 export default defineEventHandler(async (event) => {
   const __user = await requireAuth(event)

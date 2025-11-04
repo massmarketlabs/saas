@@ -4,7 +4,7 @@ import type { user as userSchema } from '../auth/schema'
 import type { RequestCreateProgram } from './zod-types'
 import { eq } from 'drizzle-orm'
 import { DrizzleCrudRepository } from '../../utils/crud-repository'
-import * as schema from '../schemas'
+import * as schema from './schema'
 
 // Database Queries
 export const programRepo = (db: NodePgDatabase<typeof schema>) => {

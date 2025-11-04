@@ -1,6 +1,8 @@
 import { date, doublePrecision, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { audit_fields } from '../../utils/auditFields'
-import { programs, storage, user } from '../schemas'
+import { user } from '../auth/schema'
+import { programs } from '../program/schema'
+import { storage } from '../storage/schema'
 
 // ========================
 // Program Status Enum
@@ -25,12 +27,12 @@ export const interventions = pgTable('interventions', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   description: text('description'),
-  term_id: uuid('term_id').references(() => terms.id).notNull(),
-  program_id: uuid('program_id').references(() => programs.id).notNull(),
-  created_by: text('created_by').references(() => user.id).notNull(),
   status: program_status_enum().notNull().default('active'),
   credits: integer('credits'),
   room: text('room'),
+  program_id: uuid('program_id').references(() => programs.id).notNull(),
+  created_by: text('created_by').references(() => user.id).notNull(),
+  term_id: uuid('term_id').references(() => terms.id).notNull(),
   primary_instructor_id: text('primary_instructor_id').references(() => user.id),
   syllabus_id: uuid('syllabus_id').references(() => storage.id),
   ...audit_fields
@@ -53,10 +55,10 @@ export const announcement = pgTable('announcements', {
 // ========================
 export const enrollment = pgTable('enrollment', {
   id: uuid('id').primaryKey().defaultRandom(),
-  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
-  user_id: text('user_id').references(() => user.id).notNull(),
   letter_grade: text('letter_grade'),
   final_grade: doublePrecision('final_grade'),
+  user_id: text('user_id').references(() => user.id).notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   ...audit_fields
 })
 
@@ -69,8 +71,8 @@ export const assignments = pgTable('assignments', {
   description: text('description'),
   type: text('type').notNull(),
   max_grade: integer('max_grade').notNull(),
-  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   deadline: timestamp('deadline', { mode: 'string', withTimezone: true }).notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   ...audit_fields
 })
 
@@ -89,11 +91,11 @@ export const submissions = pgTable('submissions', {
 // ========================
 export const evaluations = pgTable('evaluations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  evaluator_id: text('evaluator_id').notNull().references(() => user.id),
-  submission_id: uuid('submission_id').notNull().references(() => submissions.id),
   grade: integer('grade').notNull(),
   letter_grade: text('letter_grade').notNull(),
   comment: text('comment'),
+  submission_id: uuid('submission_id').notNull().references(() => submissions.id),
+  evaluator_id: text('evaluator_id').notNull().references(() => user.id),
   ...audit_fields
 })
 
@@ -102,11 +104,11 @@ export const evaluations = pgTable('evaluations', {
 // ========================
 export const attendance = pgTable('attendance', {
   id: uuid('id').primaryKey().defaultRandom(),
-  intervention_id: uuid('intervention_id').notNull().references(() => interventions.id),
-  user_id: text('user_id').references(() => user.id).notNull(),
-  scheduled_date: timestamp({ withTimezone: true, mode: 'string' }).notNull(),
+  scheduled_date: timestamp('scheduled_date', { withTimezone: true, mode: 'string' }).notNull(),
   state: text('state').default('untracked').notNull(),
   note: text('note'),
+  user_id: text('user_id').references(() => user.id).notNull(),
+  intervention_id: uuid('intervention_id').notNull().references(() => interventions.id),
   ...audit_fields
 })
 
@@ -121,5 +123,19 @@ export const notes = pgTable('notes', {
   created_by: text('created_by').references(() => user.id).notNull(),
   beneficiary_id: text('beneficiary_id').references(() => user.id).notNull(),
   intervention_id: uuid('intervention_id').references(() => interventions.id),
+  ...audit_fields
+})
+
+// ========================
+// Subject
+// ========================
+export const subject = pgTable('subject', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  start_date: timestamp('start_date', { withTimezone: true, mode: 'string' }),
+  end_date: timestamp('end_date', { withTimezone: true, mode: 'string' }),
+  sort_order: integer('sort_order').notNull(),
+  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
   ...audit_fields
 })

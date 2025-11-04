@@ -1,7 +1,6 @@
 import type { H3Event } from 'h3'
-import { eq } from 'drizzle-orm'
-
-import * as schema from '~~/server/internal/schemas'
+import { interventionRepo } from './repo'
+import { insertSubject } from './zod-types'
 
 export const interventionService = (event: H3Event) => {
   const updateSyllabusId = async () => {
@@ -29,10 +28,24 @@ export const interventionService = (event: H3Event) => {
 
     const db = await useDB(event)
 
-    return await db.update(schema.interventions).set({ syllabus_id: attachmentId }).where(eq(schema.interventions.id, interventionId)).returning()
+    const repo = interventionRepo(db)
+    return await repo.updateSyllabusAttachmentId({ syllabus_id: attachmentId, id: interventionId })
+  }
+
+  const createSubject = async () => {
+    const __session = await requireAuth(event)
+
+    const body = await readValidatedBody(event, insertSubject.parse)
+
+    const db = await useDB(event)
+
+    const repo = interventionRepo(db)
+
+    return await repo.createSubject(body)
   }
 
   return {
-    updateSyllabusId
+    updateSyllabusId,
+    createSubject
   }
 }

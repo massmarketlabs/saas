@@ -1,3 +1,4 @@
+import { subject } from '~~/server/internal'
 import { storageService } from '~~/server/internal/storage/service'
 
 export default defineEventHandler(async (event) => {
@@ -28,10 +29,13 @@ export default defineEventHandler(async (event) => {
     with: {
       term: true,
       primary_instructor: true,
+      subjects: {
+        orderBy: (subject, { asc }) => asc(subject.sort_order)
+      },
       announcements: {
+        orderBy: (announcement, { desc }) => desc(subject.created_at),
         with: {
           creator: true
-
         }
       }
     }

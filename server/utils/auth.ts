@@ -4,7 +4,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError, createAuthMiddleware } from 'better-auth/api'
 import { admin as adminPlugin, openAPI } from 'better-auth/plugins'
 import { v7 as uuidv7 } from 'uuid'
-import * as schema from '../internal/schemas'
+import * as schema from '../internal'
 import { logAuditEvent } from './auditLogger'
 import { getDB } from './db'
 import {

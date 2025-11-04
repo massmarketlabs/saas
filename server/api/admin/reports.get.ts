@@ -1,6 +1,6 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { and, count, gte, lt } from 'drizzle-orm'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 
 interface ReportItem {
   total: number

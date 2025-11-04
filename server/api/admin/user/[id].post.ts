@@ -1,6 +1,6 @@
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { authRepo } from '~~/server/internal/auth/repo'
+import { authRepo } from '~~/server/internal/user/repo'
 
 export default defineEventHandler(async (event) => {
   const session = await requireAuth(event)

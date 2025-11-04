@@ -1,6 +1,6 @@
 // server/api/attendance/[user_id].post.ts
 import { desc, eq, sql } from 'drizzle-orm'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 
 export default defineEventHandler(async (event) => {
   const __session = await requireAuth(event)

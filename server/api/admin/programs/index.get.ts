@@ -1,5 +1,5 @@
 import { asc } from 'drizzle-orm'
-import { programs } from '~~/server/internal/schemas'
+import { programs } from '~~/server/internal/program/schema'
 
 export default defineEventHandler(async (event) => {
   const __user = await requireAuth(event)

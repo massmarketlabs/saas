@@ -4,8 +4,8 @@ import type { paginatedSchema } from '~~/server/utils/pagination'
 
 import type { RequestInsertRelationship, RequestInsertUserEmergencyContact } from './zod-types'
 
+import * as schema from '..'
 import { DrizzleCrudRepository } from '../../utils/crud-repository'
-import * as schema from '../schemas'
 
 // database queries
 export const authRepo = (db: NodePgDatabase<typeof schema>) => {

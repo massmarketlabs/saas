@@ -1,6 +1,6 @@
 import { seed } from 'drizzle-seed'
 import { v4 as uuidV4 } from 'uuid'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 
 export default defineTask({
   meta: {

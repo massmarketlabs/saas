@@ -48,67 +48,31 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div id="syllabus" class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-lg font-semibold">
         Syllabus
       </h3>
       <UModal title="Update Syllabus">
-        <UButton
-          icon="i-lucide-upload"
-          label="Upload"
-        />
+        <UButton icon="i-lucide-upload" label="Upload" />
 
         <template #body>
-          <UForm
-            ref="form-ref"
-            :schema="schema"
-            :state="state"
-            class="space-y-4"
-            @submit="onSubmit"
-          >
-            <UFormField
-              name="syllabus"
-              label="Syllabus"
-              description="PDF. 2MB Max."
-            >
-              <UFileUpload
-                v-model="state.syllabus"
-                accept="application/pdf"
-                class="min-h-48"
-              />
+          <UForm ref="form-ref" :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
+            <UFormField name="syllabus" label="Syllabus" description="PDF. 2MB Max.">
+              <UFileUpload v-model="state.syllabus" accept="application/pdf" class="min-h-48" />
             </UFormField>
           </UForm>
         </template>
 
         <template #footer="{ close }">
-          <UButton
-            label="Submit"
-            :loading="isLoadingUpload"
-            :disabled="!state.syllabus || isLoadingUpload"
-            @click="form?.submit"
-          />
-          <UButton
-            type="button"
-            label="Cancel"
-            variant="outline"
-            :disabled="isLoadingUpload"
-            @click="close"
-          />
+          <UButton label="Submit" :loading="isLoadingUpload" :disabled="!state.syllabus || isLoadingUpload"
+            @click="form?.submit" />
+          <UButton type="button" label="Cancel" variant="outline" :disabled="isLoadingUpload" @click="close" />
         </template>
       </UModal>
     </div>
 
-    <embed
-      v-if="data?.syllabus_src"
-      :src="data.syllabus_src"
-      width="100%"
-      height="500px"
-    >
-    <UEmpty
-      v-else
-      icon="material-symbols:document-scanner-outline"
-      title="No syllabus found"
-    />
+    <embed v-if="data?.syllabus_src" :src="data.syllabus_src" width="100%" height="500px">
+    <UEmpty v-else icon="material-symbols:document-scanner-outline" title="No syllabus found" />
   </div>
 </template>

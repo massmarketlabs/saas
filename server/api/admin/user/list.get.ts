@@ -1,4 +1,4 @@
-import { authRepo } from '~~/server/internal/auth/repo'
+import { authRepo } from '~~/server/internal/user/repo'
 
 export default defineEventHandler(async (event) => {
   const __user = await requireAuth(event)

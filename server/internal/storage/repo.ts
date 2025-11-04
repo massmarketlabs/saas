@@ -1,6 +1,6 @@
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { CreateStorageRow } from './zod-types'
-import * as schema from '~~/server/internal/schemas'
+import * as schema from '~~/server/internal'
 import { DrizzleCrudRepository } from '~~/server/utils/crud-repository'
 
 export const storageRepo = ({ db }: { db: NodePgDatabase<typeof schema> }) => {

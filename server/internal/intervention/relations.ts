@@ -1,7 +1,8 @@
 import { relations } from 'drizzle-orm'
-import { user } from '../auth/schema'
-import { programs, storage } from '../schemas'
-import { announcement, assignments, enrollment, evaluations, interventions, notes, submissions, terms } from './schema'
+import { user } from '../auth'
+import { programs } from '../program/schema'
+import { storage } from '../storage/schema'
+import { announcement, assignments, enrollment, evaluations, interventions, notes, subject, submissions, terms } from './schema'
 
 // ========================
 // Announcement Relations
@@ -91,7 +92,8 @@ export const relations_interventions = relations(interventions, ({ one, many }) 
   syllabus: one(storage, {
     fields: [interventions.syllabus_id],
     references: [storage.id]
-  })
+  }),
+  subjects: many(subject)
   // meeting_schedule: many(meeting_schedule),
   // attendance_settings: many(attendance_settings)
 }))
@@ -128,5 +130,12 @@ export const relations_user_notes = relations(notes, ({ one }) => ({
     fields: [notes.beneficiary_id],
     references: [user.id],
     relationName: 'beneficiary_notes'
+  })
+}))
+
+export const relations_subject = relations(subject, ({ one }) => ({
+  intervention: one(interventions, {
+    fields: [subject.intervention_id],
+    references: [interventions.id]
   })
 }))

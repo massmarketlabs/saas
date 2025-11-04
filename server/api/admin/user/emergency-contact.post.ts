@@ -1,5 +1,5 @@
-import { authRepo } from '~~/server/internal/auth/repo'
-import { insertUserEmergencyContact } from '~~/server/internal/auth/zod-types'
+import { authRepo } from '~~/server/internal/user/repo'
+import { insertUserEmergencyContact } from '~~/server/internal/user/zod-types'
 
 export default defineEventHandler(async (event) => {
   const __auth = await requireAuth(event)
