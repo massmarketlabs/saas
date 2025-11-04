@@ -52,46 +52,95 @@ const onSubmit = async (event: FormSubmitEvent<Partial<RequestInsertSubject>>) =
   <UContainer class="grid grid-cols-12 gap-4 min-h-0 flex-1">
     <div class="col-span-3 flex gap-2">
       <div class="flex-1">
-        <UNavigationMenu :items="menu" orientation="vertical" />
+        <UNavigationMenu
+          :items="menu"
+          orientation="vertical"
+        />
       </div>
       <USeparator orientation="vertical" />
     </div>
 
     <div class="col-span-9">
-      <div v-show="route.hash === '#bookmarks'" id="bookmarks">
-        <UEmpty icon="i-lucide-bookmark" title="No bookmarks found"
-          description="Add items from this intervention to your bookmarks for easy access" />
+      <div
+        v-show="route.hash === '#bookmarks'"
+        id="bookmarks"
+      >
+        <UEmpty
+          icon="i-lucide-bookmark"
+          title="No bookmarks found"
+          description="Add items from this intervention to your bookmarks for easy access"
+        />
       </div>
-      <div v-show="route.hash === '#schedule'" id="schedule">
+      <div
+        v-show="route.hash === '#schedule'"
+        id="schedule"
+      >
         <UCard>
           <UCalendar variant="solid" />
         </UCard>
       </div>
 
-      <div v-show="route.hash === '#toc'" id="toc">
+      <div
+        v-show="route.hash === '#toc'"
+        id="toc"
+      >
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold">
             Table of Contents
           </h3>
-          <UModal title="Create a new subject"
-            description="A subject is a collection of exams, assignments, and resources.">
-            <UButton label="Add Subject" icon="i-lucide-plus" />
+          <UModal
+            title="Create a new subject"
+            description="A subject is a collection of exams, assignments, and resources."
+          >
+            <UButton
+              label="Add Subject"
+              icon="i-lucide-plus"
+            />
             <template #body>
-              <UForm ref="subject-create-form" :state="state" :schema="insertSubject" class="space-y-4"
-                @submit="onSubmit">
-                <UFormField name="title" label="Title">
-                  <UInput v-model="state.title" placeholder="Title" class="w-full" />
+              <UForm
+                ref="subject-create-form"
+                :state="state"
+                :schema="insertSubject"
+                class="space-y-4"
+                @submit="onSubmit"
+              >
+                <UFormField
+                  name="title"
+                  label="Title"
+                >
+                  <UInput
+                    v-model="state.title"
+                    placeholder="Title"
+                    class="w-full"
+                  />
                 </UFormField>
-                <UFormField name="description" label="Description">
-                  <UTextarea v-model="state.description" class="w-full" placeholder="Description" :rows="6" />
+                <UFormField
+                  name="description"
+                  label="Description"
+                >
+                  <UTextarea
+                    v-model="state.description"
+                    class="w-full"
+                    placeholder="Description"
+                    :rows="6"
+                  />
                 </UFormField>
-                <UFormField name="start_date" label="Date Range">
-                  <DateRangePicker v-model:start="state.start_date" v-model:end="state.end_date" />
+                <UFormField
+                  name="start_date"
+                  label="Date Range"
+                >
+                  <DateRangePicker
+                    v-model:start="state.start_date"
+                    v-model:end="state.end_date"
+                  />
                 </UFormField>
               </UForm>
             </template>
             <template #footer="{ close }">
-              <UButton variant="outline" @click="close">
+              <UButton
+                variant="outline"
+                @click="close"
+              >
                 Cancel
               </UButton>
               <UButton @click="formRef?.submit">
@@ -100,9 +149,11 @@ const onSubmit = async (event: FormSubmitEvent<Partial<RequestInsertSubject>>) =
             </template>
           </UModal>
         </div>
-        <UTree :items="data?.subjects.map(subject => ({
-          label: subject.title
-        }))" />
+        <UTree
+          :items="data?.subjects.map(subject => ({
+            label: subject.title
+          }))"
+        />
       </div>
       <ClientOnly>
         <div v-show="data?.subjects.find(subject => `#${subject.id}` === route.hash)">
@@ -110,7 +161,12 @@ const onSubmit = async (event: FormSubmitEvent<Partial<RequestInsertSubject>>) =
         </div>
       </ClientOnly>
 
-      <ContentSyllabus v-show="route.hash === '#syllabus' || !route.hash" :id="id" :data="data" @update="refresh" />
+      <ContentSyllabus
+        v-show="route.hash === '#syllabus' || !route.hash"
+        :id="id"
+        :data="data"
+        @update="refresh"
+      />
     </div>
   </UContainer>
 </template>
