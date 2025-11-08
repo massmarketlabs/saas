@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { RequestInsertUserEmergencyContact } from '~~/server/internal/auth/zod-types'
-import { insertUserEmergencyContact } from '~~/server/internal/auth/zod-types'
+import type { RequestInsertUserEmergencyContact } from '~~/server/internal/user/zod-types'
+import { insertUserEmergencyContact } from '~~/server/internal/user/zod-types'
 
 const props = defineProps<{ beneficiaryId: string }>()
 const emit = defineEmits(['emergencyContactAdded'])

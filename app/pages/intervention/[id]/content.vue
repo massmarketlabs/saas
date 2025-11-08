@@ -40,7 +40,6 @@ const menu = computed<NavigationMenuItem[][]>(() => [
 ])
 
 const onSubmit = async (event: FormSubmitEvent<Partial<RequestInsertSubject>>) => {
-  // console.log({ data: event.data })
   const resp = await $fetch('/api/lms/intervention/subject', { method: 'post', body: event.data })
   if (resp.success) {
     await refresh()
@@ -151,7 +150,10 @@ const onSubmit = async (event: FormSubmitEvent<Partial<RequestInsertSubject>>) =
         </div>
         <UTree
           :items="data?.subjects.map(subject => ({
-            label: subject.title
+            label: subject.title,
+            children: [
+              { label: 'Assignment 1' }
+            ]
           }))"
         />
       </div>

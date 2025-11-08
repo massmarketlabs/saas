@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { enrollment, interventions, notes, submissions } from '../intervention/schema'
+import { enrollment, interventions, notes, submission } from '../intervention/schema'
 import { emergency_contacts, relationships } from '../user/schema'
 import { user } from './schema'
 
@@ -14,7 +14,7 @@ export const relations_user = relations(user, ({ many }) => ({
   created_notes: many(notes, { relationName: 'created_notes' }),
   relationship_user: many(relationships, { relationName: 'user_user_id' }),
   relationship_related_user: many(relationships, { relationName: 'related_user_user_id' }),
-  submissions: many(submissions, { relationName: 'submission_user_id' })
+  submissions: many(submission, { relationName: 'submission_user_id' })
   // evaluations: many(evaluations, { relationName: 'evaluator_id' })
   // instructed_meetings: many(meeting_schedule),
   // attendance_records: many(attendance),

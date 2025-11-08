@@ -121,10 +121,36 @@ This project is licensed under the [MIT License](LICENSE).
 ## TODO
 
 - [ ] Profile page needs:
-  - [ ] Family Members (C/R/U/D)
+  - [x] Family Members (C/R/U/D)
   - [ ] Enrollments by active and previous
   - [ ] Recent Assignments Completed
   - [ ] Attendance History
 - [ ] Landing Page
-  - [ ] Intervention Selector and navigation
+  - [x] Intervention Selector and navigation
+  - [ ] Calendar events coming up
+  - [ ] Recent Activity
 - [ ] Remove sign up page
+- [ ] Intervention
+  - [ ] Home
+    - [ ] Calendar with upcoming events
+    - [ ] user shall be able to read announcements
+    - [x] instructor shall be able to create an announcement
+  - [ ] Mark attendance
+  - [ ] Class list
+    - [ ] user shall see list of enrolled participant with their role
+  - [ ] Content Page
+    - [ ] Instructor shall have the ability to build the layout of the intervention:
+      - [ ] subjects
+        - [ ] (C/R/U/D)
+        - [ ] resources (C/R/U/D)
+        - [ ] upload assets
+        - [ ] create an assignment with a submission Dropbox (not mvp)
+  - [ ] Attendance
+    - [ ] auto include in grade book
+    - [ ] instructor shall be able to mark attendance
+    - [ ] beneficiary shall be able to view their attendance history
+  - Grade book
+    - [ ] Admin view
+    - [ ] Instructor view
+    - [ ] Beneficiary view
+

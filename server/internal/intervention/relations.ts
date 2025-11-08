@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm'
 import { user } from '../auth'
 import { programs } from '../program/schema'
 import { storage } from '../storage/schema'
-import { announcement, assignments, enrollment, evaluations, interventions, notes, subject, submissions, terms } from './schema'
+import { announcement, assignments, enrollment, evaluation, interventions, notes, subject, submission, terms } from './schema'
 
 // ========================
 // Announcement Relations
@@ -21,15 +21,15 @@ export const relations_announcement = relations(announcement, ({ one }) => ({
 // ========================
 // Evaluations Relations
 // ========================
-export const relations_evaluation = relations(evaluations, ({ one }) => ({
+export const relations_evaluation = relations(evaluation, ({ one }) => ({
   evaluator: one(user, {
-    fields: [evaluations.evaluator_id],
+    fields: [evaluation.evaluator_id],
     references: [user.id],
     relationName: 'evaluator_id'
   }),
-  submission: one(submissions, {
-    fields: [evaluations.submission_id],
-    references: [submissions.id]
+  submission: one(submission, {
+    fields: [evaluation.submission_id],
+    references: [submission.id]
   })
 }))
 
@@ -37,23 +37,23 @@ export const relations_evaluation = relations(evaluations, ({ one }) => ({
 // Assignments Relations
 // ========================
 export const relations_assignments = relations(assignments, ({ one }) => ({
-  intervention: one(interventions, {
-    fields: [assignments.intervention_id],
-    references: [interventions.id]
+  intervention: one(subject, {
+    fields: [assignments.subject_id],
+    references: [subject.id]
   })
 }))
 
-export const relations_submssions = relations(submissions, ({ one, many }) => ({
+export const relations_submssions = relations(submission, ({ one, many }) => ({
   assignment: one(assignments, {
-    fields: [submissions.assignment_id],
+    fields: [submission.assignment_id],
     references: [assignments.id]
   }),
   user: one(user, {
-    fields: [submissions.user_id],
+    fields: [submission.user_id],
     references: [user.id],
     relationName: 'submission_user_id'
   }),
-  evaluations: many(evaluations)
+  evaluations: many(evaluation)
   // evaluation: one(evaluations, {
   //   fields: [submissions.id],
   //   references: [evaluations.submission_id]

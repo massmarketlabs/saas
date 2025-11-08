@@ -63,43 +63,6 @@ export const enrollment = pgTable('enrollment', {
 })
 
 // ========================
-// Assignments
-// ========================
-export const assignments = pgTable('assignments', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  title: text('title').notNull(),
-  description: text('description'),
-  type: text('type').notNull(),
-  max_grade: integer('max_grade').notNull(),
-  deadline: timestamp('deadline', { mode: 'string', withTimezone: true }).notNull(),
-  intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
-  ...audit_fields
-})
-
-// ========================
-// Submission
-// ========================
-export const submissions = pgTable('submissions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  user_id: text('user_id').notNull().references(() => user.id),
-  assignment_id: uuid('assignment_id').notNull().references(() => assignments.id),
-  ...audit_fields
-})
-
-// ========================
-// Evaluation
-// ========================
-export const evaluations = pgTable('evaluations', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  grade: integer('grade').notNull(),
-  letter_grade: text('letter_grade').notNull(),
-  comment: text('comment'),
-  submission_id: uuid('submission_id').notNull().references(() => submissions.id),
-  evaluator_id: text('evaluator_id').notNull().references(() => user.id),
-  ...audit_fields
-})
-
-// ========================
 // Attendance
 // ========================
 export const attendance = pgTable('attendance', {
@@ -129,7 +92,7 @@ export const notes = pgTable('notes', {
 // ========================
 // Subject
 // ========================
-export const subject = pgTable('subject', {
+export const subject = pgTable('subjects', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: text('title').notNull(),
   description: text('description'),
@@ -137,5 +100,64 @@ export const subject = pgTable('subject', {
   end_date: timestamp('end_date', { withTimezone: true, mode: 'string' }),
   sort_order: integer('sort_order').notNull(),
   intervention_id: uuid('intervention_id').references(() => interventions.id).notNull(),
+  ...audit_fields
+})
+
+// ========================
+// Assignments
+// ========================
+export const assignments = pgTable('assignments', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  type: text('type').notNull(),
+  max_grade: integer('max_grade').notNull(),
+  deadline: timestamp('deadline', { mode: 'string', withTimezone: true }).notNull(),
+  subject_id: uuid('subject_id').references(() => subject.id).notNull(),
+  ...audit_fields
+})
+
+// ========================
+// Submission
+// ========================
+export const submission = pgTable('submissions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: text('user_id').notNull().references(() => user.id),
+  assignment_id: uuid('assignment_id').notNull().references(() => assignments.id),
+  ...audit_fields
+})
+
+// ========================
+// Evaluation
+// ========================
+export const evaluation = pgTable('evaluations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  grade: integer('grade').notNull(),
+  letter_grade: text('letter_grade').notNull(),
+  comment: text('comment'),
+  submission_id: uuid('submission_id').notNull().references(() => submission.id),
+  evaluator_id: text('evaluator_id').notNull().references(() => user.id),
+  ...audit_fields
+})
+
+// ========================
+// Resources
+// ========================
+export const resource = pgTable('resources', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  description: text('description'),
+  subject_id: uuid('subject_id').notNull().references(() => subject.id),
+  type: text('type').notNull(),
+  ...audit_fields
+})
+
+// ========================
+// Resource Attachments
+// ========================
+export const resource_attachments = pgTable('resource_attachment', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  resource_id: uuid('resource_id').references(() => resource.id),
+  attachment_id: uuid('attachment_id').references(() => storage.id),
   ...audit_fields
 })
