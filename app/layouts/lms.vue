@@ -4,7 +4,6 @@ import DefaultLayout from './default.vue'
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-
 const id = route.params.id
 const nav = [
   {
@@ -13,7 +12,8 @@ const nav = [
   },
   {
     label: 'Content',
-    to: `/intervention/${id}/content`
+    to: `/intervention/${id}/content`,
+    active: route.fullPath.includes('/content')
   },
   {
     label: 'Classlist',

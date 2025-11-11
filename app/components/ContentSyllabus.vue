@@ -21,7 +21,6 @@ const onSubmit = async (e: FormSubmitEvent<Schema>) => {
 
     // Upload to server
     const attachment = await fileManager.uploadToServer(e.data.syllabus, 'attachments')
-
     if (attachment && attachment[0]) {
       // Call API endpoint to finalize
       const resp = await $fetch(`/api/lms/intervention/${id}/syllabus`, {
