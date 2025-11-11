@@ -44,8 +44,33 @@ export const interventionService = (event: H3Event) => {
     return await repo.createSubject(body)
   }
 
+  const getInterventionClasslist = async (intervention_id: string) => {
+    const session = await requireAuth(event)
+
+    const db = await useDB(event)
+
+    const repo = interventionRepo(db)
+
+    const resp = repo.getInterventionClasslist(intervention_id)
+
+    const audit_params = extractAuditParams(event)
+
+    await logAuditEvent({
+      category: 'enrollment',
+      action: 'read',
+      userId: session.user.id,
+      status: 'success',
+      targetId: intervention_id,
+      targetType: 'intervention',
+      details: `${session.user.id} accessed intervention ${intervention_id} to view enrollment`,
+      ...audit_params
+    })
+
+    return resp
+  }
   return {
     updateSyllabusId,
-    createSubject
+    createSubject,
+    getInterventionClasslist
   }
 }

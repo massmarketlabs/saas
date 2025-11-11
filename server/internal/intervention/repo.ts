@@ -131,6 +131,15 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
     return await r.updateById(payload.id as string, payload)
   }
 
+  const getInterventionClasslist = async (intervention_id: string) => {
+    const resp = await db.query.enrollment.findMany({
+      where: (enrollment, { eq }) => eq(enrollment.intervention_id, intervention_id),
+      with: {
+        user: true
+      }
+    })
+    return resp
+  }
   return {
     create,
     getById,
@@ -141,6 +150,7 @@ export const interventionRepo = (db: NodePgDatabase<typeof schema>) => {
     createTerm,
     createNote,
     updateSyllabusAttachmentId,
-    createSubject
+    createSubject,
+    getInterventionClasslist
   }
 }
