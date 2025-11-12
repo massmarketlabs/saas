@@ -41,7 +41,9 @@ export const interventionService = (event: H3Event) => {
 
     const repo = interventionRepo(db)
 
-    return await repo.createSubject(body)
+    const resp = await repo.createSubject(body)
+
+    return resp
   }
 
   const getInterventionClasslist = async (intervention_id: string) => {
