@@ -2,7 +2,7 @@
 const props = defineProps<{ userId: string }>()
 const user_id = props.userId
 const data = await useFetch(`api/admin/intervention-enrollment/${user_id as 'user_id'}`)
-console.log({ data })
+// console.log({ data })
 </script>
 
 <template>

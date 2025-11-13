@@ -75,7 +75,7 @@ const handleSubmit = async () => {
     payload.push({ related_user_id: user.id, user_id: props.userId, relationship_type: role })
   }
 
-  console.log('submit', payload)
+  // console.log('submit', payload)
 
   const resp = await $fetch('/api/admin/user/relationships', { method: 'post', body: payload })
   if (resp.success) {

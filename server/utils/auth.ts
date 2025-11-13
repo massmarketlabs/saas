@@ -29,6 +29,7 @@ const createBetterAuth = () => betterAuth({
     }
   },
   trustedOrigins: [
+    'localhost:3000',
     'http://localhost:3000',
     'http://localhost:8787',
     'http://tyo.massmarketlabs.com',

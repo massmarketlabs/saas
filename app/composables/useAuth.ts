@@ -14,10 +14,11 @@ export function useAuth() {
   const toast = useToast()
 
   const headers = import.meta.server ? useRequestHeaders() : undefined
+  // Add Origin header on server
   const client = createAuthClient({
     baseURL: url.origin,
     fetchOptions: {
-      headers
+      headers: { ...headers, origin: url.origin }
     },
     plugins: [
       inferAdditionalFields<typeof auth>(),
@@ -43,6 +44,7 @@ export function useAuth() {
     if (sessionFetching.value) {
       return
     }
+    // console.log({ headers })
     sessionFetching.value = true
 
     try {
@@ -56,7 +58,7 @@ export function useAuth() {
         user.value = sessionReq.data?.user ? { ...sessionReq.data.user, role: sessionReq.data.user.role ?? undefined } : null
 
         const adminStatus = await client.admin.hasPermission({ userId: user.value?.id, permission: { administration: ['full'] } })
-
+        // console.log({ adminStatus })
         if (adminStatus.data?.success) {
           isAdmin.value = true
         }

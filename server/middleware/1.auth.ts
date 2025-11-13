@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    console.log({ 'server-middleware': hasPermission })
+    // console.log({ 'server-middleware': hasPermission })
 
     if (!hasPermission.success || hasPermission.error) {
       throw createError({
